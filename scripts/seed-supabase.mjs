@@ -1,14 +1,35 @@
 import { createClient } from '@supabase/supabase-js'
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
+
+// Auto-load .env if variables are not in process.env
+if (!process.env.SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  const envPath = join(root, '.env')
+  if (existsSync(envPath)) {
+    try {
+      const content = readFileSync(envPath, 'utf8')
+      for (const line of content.split('\n')) {
+        const trimmed = line.trim()
+        if (!trimmed || trimmed.startsWith('#')) continue
+        const idx = trimmed.indexOf('=')
+        if (idx > 0) {
+          const k = trimmed.slice(0, idx).trim()
+          const v = trimmed.slice(idx + 1).trim()
+          if (!process.env[k]) process.env[k] = v
+        }
+      }
+    } catch {}
+  }
+}
+
 const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!url || !key) {
-  console.error('Set SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY. No values were printed.')
+  console.error('Set SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY in .env. No values were found.')
   process.exit(1)
 }
 
