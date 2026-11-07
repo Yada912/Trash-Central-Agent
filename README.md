@@ -171,7 +171,7 @@ No account. The app has no login.
 ## Known Limitations
 
 - The default store is in memory and is not shared across processes or serverless instances. A report or plan created on one instance is a 404 on another, including `GET /api/plans/:id`. Reloading the planner works only on the same server process. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` when the data has to survive a new instance.
-- `lib/ai/*` and `lib/planner/*` are placeholders and will be replaced.
+- Classification and plan explanation call Gemini only when `GEMINI_API_KEY` is set. With the key unset, the classify route returns a labelled demo and does not call the model. A live model failure is an error, not a silent demo.
 - Routes use straight-line distance, not the road network. Shift time is a simple speed and service-time model.
 - Kecamatan for a new report is the nearest seeded demo point, not an official boundary.
 - There is no authentication, no rate limit, and no real message to DLH. Hazardous copy says the report is flagged for special handling and that demo routing was not sent.

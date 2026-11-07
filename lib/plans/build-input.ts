@@ -13,10 +13,16 @@ export class PlanInputError extends Error {
   }
 }
 
+/** Bank sampah and any other site with a null coordinate are not stops and not a depot. */
+export function hasMapCoordinates(point: { lat: number | null; lng: number | null }): point is { lat: number; lng: number } {
+  return point.lat !== null && point.lng !== null && Number.isFinite(point.lat) && Number.isFinite(point.lng)
+}
+
 export async function buildSolveInput(store: Store, request: PlanRequest): Promise<SolvePlanInput> {
   const facilities = await store.listFacilities()
-  const depot = facilities.find((facility) => facility.id === DEPOT_FACILITY_ID) ?? facilities.find((facility) => facility.kind === 'TPA')
-  if (!depot || depot.lat === null || depot.lng === null) {
+  const located = facilities.filter((facility) => hasMapCoordinates(facility))
+  const depot = located.find((facility) => facility.id === DEPOT_FACILITY_ID) ?? located.find((facility) => facility.kind === 'TPA')
+  if (!depot) {
     throw new PlanInputError('DEPOT', 'The planner depot is missing.')
   }
   const stops = []

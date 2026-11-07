@@ -8,7 +8,7 @@ export function requestIdFrom(request: Request): string {
 }
 
 export function apiMode(): ApiMode {
-  return process.env.GEMINI_API_KEY ? 'live' : 'demo'
+  return process.env.GEMINI_API_KEY?.trim() ? 'live' : 'demo'
 }
 
 function withHeaders(response: NextResponse, requestId: string): NextResponse {
