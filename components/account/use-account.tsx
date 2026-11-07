@@ -76,7 +76,7 @@ const SIGNED_IN_KEY = 'cta.isSignedIn'
 
 export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AccountApiData | null>(null)
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(true)
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,16 +86,22 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedId = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null
       const signedFlag = typeof window !== 'undefined' ? window.localStorage.getItem(SIGNED_IN_KEY) : null
-      if (signedFlag === 'false') {
-        setIsSignedIn(false)
-      } else {
+
+      if (signedFlag === 'true' && savedId) {
         setIsSignedIn(true)
+        const res = await fetch(`/api/accounts?accountId=${encodeURIComponent(savedId)}`)
+        if (res.ok) {
+          const payload = (await res.json()) as { data: AccountApiData }
+          setData(payload.data)
+        }
+      } else {
+        setIsSignedIn(false)
+        const res = await fetch('/api/accounts')
+        if (res.ok) {
+          const payload = (await res.json()) as { data: AccountApiData }
+          setData(payload.data)
+        }
       }
-      const query = savedId ? `?accountId=${encodeURIComponent(savedId)}` : ''
-      const res = await fetch(`/api/accounts${query}`)
-      if (!res.ok) return
-      const payload = (await res.json()) as { data: AccountApiData }
-      setData(payload.data)
     } catch {
       // Keep graceful state
     } finally {
@@ -150,6 +156,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     setIsSignedIn(false)
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(SIGNED_IN_KEY, 'false')
+      window.localStorage.removeItem(STORAGE_KEY)
     }
   }, [])
 

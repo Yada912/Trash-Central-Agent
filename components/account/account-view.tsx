@@ -60,8 +60,19 @@ const CONDITION_OPTIONS: Array<{
 
 export function AccountView() {
   const router = useRouter()
-  const { activeAccount, timetable, optimization, busy, login, logout, switchAccount, updateProfile, updateTimetable } =
-    useAccount()
+  const {
+    activeAccount,
+    timetable,
+    optimization,
+    busy,
+    login,
+    logout,
+    switchAccount,
+    updateProfile,
+    updateTimetable,
+    isSignedIn,
+    loading,
+  } = useAccount()
 
   const [profileDraft, setProfileDraft] = useState<ResidentWasteProfile | null>(null)
   const [nameDraft, setNameDraft] = useState('')
@@ -99,12 +110,47 @@ export function AccountView() {
     }
   }, [activeAccount])
 
-  if (!activeAccount) {
+  if (loading && !activeAccount) {
     return (
-      <main id="main" className="grid gap-6">
+      <main id="main" className="grid gap-6 max-w-xl mx-auto">
         <div className="vector-card p-6">
-          <p className="font-bold">Memuat profil akun…</p>
+          <p className="font-bold text-ink">Memuat profil akun…</p>
         </div>
+      </main>
+    )
+  }
+
+  if (!isSignedIn || !activeAccount) {
+    return (
+      <main id="main" className="grid gap-6 max-w-xl mx-auto" data-testid="guest-account-guard">
+        <section className="vector-card bg-card p-6 grid gap-4 border-2 border-ink">
+          <span className="vector-pill bg-lavender text-ink font-black w-fit">
+            <MaterialIcon name="person" size="sm" />
+            Sesi Pengguna
+          </span>
+          <h1 className="text-2xl font-black text-ink">
+            Anda Belum Masuk ke Sistem
+          </h1>
+          <p className="text-sm font-semibold text-ink leading-relaxed">
+            Silakan masuk menggunakan akun Anda atau daftarkan tempat tinggal / tempat usaha Anda untuk mengelola profil timbulan sampah, memantau wuku otonan, dan melihat jadwal armada TPS3R.
+          </p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Link
+              href="/masuk"
+              className="btn-tactile bg-primary text-white px-4 py-2.5 rounded-lg border-2 border-ink font-black text-sm flex items-center gap-2 shadow-[2px_2px_0_#1F2933]"
+            >
+              <MaterialIcon name="login" size="sm" />
+              <span>Masuk / Buat Akun Warga</span>
+            </Link>
+            <Link
+              href="/masuk/petugas"
+              className="btn-tactile bg-lavender text-ink px-4 py-2.5 rounded-lg border-2 border-ink font-black text-sm flex items-center gap-2 shadow-[2px_2px_0_#1F2933]"
+            >
+              <MaterialIcon name="badge" size="sm" />
+              <span>Masuk Petugas DLHK</span>
+            </Link>
+          </div>
+        </section>
       </main>
     )
   }
@@ -208,6 +254,12 @@ export function AccountView() {
                 <MaterialIcon name="account_balance" size="sm" />
                 {activeAccount.banjarName ?? 'Banjar Lingkungan'}
               </span>
+              {activeAccount.id === 'usr_warga_01' ? (
+                <span className="vector-pill bg-gold text-ink font-black border-2 border-ink">
+                  <MaterialIcon name="school" size="sm" />
+                  Contoh Akun Sampel Evaluasi Juri
+                </span>
+              ) : null}
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               {activeAccount.role === 'petugas'

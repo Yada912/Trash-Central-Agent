@@ -279,6 +279,43 @@ export default function MasukPage() {
               <span>{busy ? 'Memverifikasi…' : 'Masuk ke Dasbor Warga'}</span>
             </Button>
           </div>
+
+          {/* Dewan Juri / Evaluator Reference Box */}
+          <div className="rounded-xl border-2 border-dashed border-ink bg-amber/35 p-4 text-xs grid gap-2.5 shadow-[2px_2px_0_#1F2933] mt-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-ink text-gold font-black text-xs shrink-0">
+                <MaterialIcon name="school" size="sm" />
+              </span>
+              <div>
+                <span className="font-black text-sm text-ink block">
+                  Akun Sampel Evaluasi Juri &amp; Admin
+                </span>
+                <span className="text-[11px] font-bold text-ink/90">
+                  Contoh Profil Warga Terisi Penuh (Data Historis, Rahinan &amp; Memori AI)
+                </span>
+              </div>
+            </div>
+            <p className="font-semibold text-ink leading-relaxed">
+              Untuk menguji platform tanpa perlu mengisi data dari awal, Dewan Juri dapat menggunakan akun sampel <strong>I Made Adi Wijaya</strong> (Warga Banjar Pekambingan, Denpasar Barat):
+            </p>
+            <div className="rounded-lg border-2 border-ink bg-card p-3 font-mono text-xs flex flex-wrap items-center justify-between gap-2 shadow-[1px_1px_0_#1F2933]">
+              <div className="grid gap-0.5">
+                <p>Email: <strong className="text-ink">made.adi@warga.denpasar.id</strong></p>
+                <p>Sandi: <strong className="text-ink">warga123</strong></p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginEmail('made.adi@warga.denpasar.id')
+                  setLoginPassword('warga123')
+                }}
+                className="btn-tactile bg-mint text-ink px-3 py-1.5 rounded-md border-2 border-ink font-sans font-black text-xs flex items-center gap-1 shadow-[1px_1px_0_#1F2933] hover:bg-mint/80"
+              >
+                <MaterialIcon name="content_copy" size="sm" />
+                <span>Gunakan Akun Juri</span>
+              </button>
+            </div>
+          </div>
         </form>
       ) : (
         /* TAB 2: CURATED ONBOARDING QUESTIONNAIRE FLOW */
