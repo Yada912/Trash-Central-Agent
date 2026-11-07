@@ -1,17 +1,23 @@
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
-export function DescriptionField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function DescriptionField({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (value: string) => void
+}) {
   return (
     <div className="grid gap-2">
-      <Label htmlFor="description">What do you see?</Label>
+      <Label htmlFor="description">Apa yang Anda lihat?</Label>
       <Textarea
         id="description"
         name="description"
         maxLength={1000}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Example: a pile of plastic bottles beside the lane"
+        placeholder="Contoh: tumpukan botol plastik dan sisa makanan di tepi gang"
       />
       <p className="text-sm text-ink/80">{value.trim().length} / 1000</p>
     </div>

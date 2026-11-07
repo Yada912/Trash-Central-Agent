@@ -1,6 +1,7 @@
 import { guardImage, parseSchema, readJson } from '@/lib/api/body'
 import { jsonErr, jsonOk, mapModuleError, requestIdFrom } from '@/lib/api/respond'
 import { classifyReport } from '@/lib/ai/classify'
+import { classifyModelId, hasGeminiApiKey } from '@/lib/ai/keys'
 import { stampClassification } from '@/lib/review'
 import {
   classifyRequestSchema,
@@ -15,7 +16,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 25
 
 function geminiConfigured(): boolean {
-  return Boolean(process.env.GEMINI_API_KEY?.trim())
+  return hasGeminiApiKey()
 }
 
 const MATERIAL_PATTERNS: Array<{ type: TrashType; pattern: RegExp }> = [
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
       ? stampOutcome(await classifyReport(requestInput), text, hasImage)
       : stampOutcome(demoClassify(requestInput), text, hasImage)
     return jsonOk(requestId, outcome, {
-      model: geminiConfigured() ? 'gemini-2.5-flash' : 'demo-mock',
+      model: geminiConfigured() ? classifyModelId() : 'demo-mock',
       latencyMs: Date.now() - started,
     })
   } catch (error) {

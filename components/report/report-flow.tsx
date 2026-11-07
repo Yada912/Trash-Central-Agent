@@ -11,14 +11,18 @@ import { HazardWarning } from '@/components/report/HazardWarning'
 import { LocationPicker } from '@/components/report/LocationPicker'
 import { PhotoUploader } from '@/components/report/PhotoUploader'
 import { ResidentApproval } from '@/components/report/ResidentApproval'
-import { classifierHeading, demoMockLabel, storedRecordLabel } from '@/components/report/report-labels'
+import {
+  classifierHeading,
+  demoMockLabel,
+  storedRecordLabel,
+} from '@/components/report/report-labels'
 import { HAZARDOUS_LABEL, isSeparateHazard } from '@/components/report/hazard-policy'
 import { useReportFlow } from '@/components/report/use-report-flow'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import Link from 'next/link'
 
-const STEPS = ['Describe', 'Review', 'Location and submit'] as const
+const STEPS = ['Deskripsikan', 'Tinjau', 'Lokasi dan kirim'] as const
 
 export function ReportFlow() {
   const flow = useReportFlow()
@@ -27,17 +31,28 @@ export function ReportFlow() {
     return (
       <main id="main" className="grid gap-4">
         <DemoBadge mode={flow.mode} />
-        <section role="status" className="grid gap-3 rounded-lg border border-ink/10 bg-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Report saved</p>
-          <h1 className="text-3xl font-semibold tracking-tight">Report submitted</h1>
-          <p>Report {flow.success.id}</p>
-          <p data-testid="stored-record">{storedRecordLabel({ isDemo: flow.success.isDemo, source: flow.success.classification.source, mode: flow.mode })}</p>
+        <section
+          role="status"
+          className="grid gap-3 rounded-lg border border-ink/10 bg-card p-4"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+            Laporan tersimpan
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight">Laporan terkirim</h1>
+          <p>Laporan {flow.success.id}</p>
+          <p data-testid="stored-record">
+            {storedRecordLabel({
+              isDemo: flow.success.isDemo,
+              source: flow.success.classification.source,
+              mode: flow.mode,
+            })}
+          </p>
           {hazardous ? <p>{HAZARDOUS_LABEL}</p> : null}
           <Link href="/dashboard" className="font-semibold text-primary">
-            View the dashboard
+            Lihat dasbor
           </Link>
           <Button variant="secondary" onClick={flow.reset}>
-            Report another pile
+            Laporkan tumpukan lain
           </Button>
         </section>
       </main>
@@ -46,17 +61,26 @@ export function ReportFlow() {
 
   const stepIndex = !flow.hasDraft ? 0 : flow.locationOk && flow.reviewed ? 2 : 1
   const heading =
-    flow.source === 'manual' ? 'Manual entry' : flow.shown ? classifierHeading(flow.mode, flow.model) : 'Classification'
-  const qualityFlagWithoutPhoto = flow.classifierFlags.includes('low_image_quality') && !flow.photo
+    flow.source === 'manual'
+      ? 'Pengisian manual'
+      : flow.shown
+        ? classifierHeading(flow.mode, flow.model)
+        : 'Klasifikasi'
+  const qualityFlagWithoutPhoto =
+    flow.classifierFlags.includes('low_image_quality') && !flow.photo
 
   return (
     <main id="main" className="grid gap-6">
       <div className="grid gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Resident report</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+            Laporan warga
+          </p>
           <DemoBadge mode={flow.mode} />
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">You decide what gets sent.</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Anda yang menentukan apa yang dikirim.
+        </h1>
         <ol className="grid gap-2 sm:grid-cols-3">
           {STEPS.map((label, index) => (
             <li
@@ -72,20 +96,50 @@ export function ReportFlow() {
             </li>
           ))}
         </ol>
-        <p className="text-sm">A photo and location are only used to plan pickups, and this is a demo.</p>
+        <p className="text-sm">
+          Foto dan lokasi hanya digunakan untuk merencanakan pengangkutan sampah dalam mode
+          demonstrasi ini.
+        </p>
       </div>
       <ErrorNotice message={flow.error} />
-      <section className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4" aria-labelledby="describe-heading">
+      <section
+        className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4"
+        aria-labelledby="describe-heading"
+      >
         <h2 id="describe-heading" className="text-xl font-semibold">
-          Photo and description
+          Foto dan deskripsi
         </h2>
-        <PhotoUploader previewUrl={flow.photo?.previewUrl ?? null} error={flow.photoError} onFile={flow.onPhoto} onClear={flow.clearPhoto} />
+        <PhotoUploader
+          previewUrl={flow.photo?.previewUrl ?? null}
+          error={flow.photoError}
+          onFile={flow.onPhoto}
+          onClear={flow.clearPhoto}
+        />
         <DescriptionField value={flow.text} onChange={flow.setText} />
         <ActionBar
           actions={[
-            { label: flow.busy === 'classify' ? 'Classifying…' : 'Classify', onClick: flow.classify, disabled: !flow.canClassify },
-            { label: 'Enter details manually', onClick: flow.enterManually, disabled: Boolean(flow.busy), variant: 'secondary' },
-            ...(flow.error ? [{ label: 'Retry', onClick: flow.classify, disabled: !flow.canClassify, variant: 'secondary' as const }] : []),
+            {
+              label:
+                flow.busy === 'classify' ? 'Mengklasifikasikan…' : 'Klasifikasikan',
+              onClick: flow.classify,
+              disabled: !flow.canClassify,
+            },
+            {
+              label: 'Isi detail secara manual',
+              onClick: flow.enterManually,
+              disabled: Boolean(flow.busy),
+              variant: 'secondary',
+            },
+            ...(flow.error
+              ? [
+                  {
+                    label: 'Coba lagi',
+                    onClick: flow.classify,
+                    disabled: !flow.canClassify,
+                    variant: 'secondary' as const,
+                  },
+                ]
+              : []),
           ]}
         />
       </section>
@@ -107,14 +161,17 @@ export function ReportFlow() {
           />
           {qualityFlagWithoutPhoto ? (
             <p className="text-sm">
-              The classifier set low_image_quality. No photo is attached, so that flag is left out of the confirmed classification.
+              Pengklasifikasi menyetel low_image_quality. Tidak ada foto yang dilampirkan,
+              sehingga tanda tersebut tidak dimasukkan ke klasifikasi terkonfirmasi.
             </p>
           ) : null}
         </>
       ) : null}
       {flow.hasDraft ? (
         <>
-          {demoMockLabel(flow.mode) ? <p className="text-sm font-semibold">{demoMockLabel(flow.mode)}</p> : null}
+          {demoMockLabel(flow.mode) ? (
+            <p className="text-sm font-semibold">{demoMockLabel(flow.mode)}</p>
+          ) : null}
           <ClassificationEditor
             percents={flow.percents}
             liters={flow.liters}
@@ -130,24 +187,40 @@ export function ReportFlow() {
             onChange={flow.setHazardChecked}
           />
           {flow.draft ? (
-            <p className="text-sm">Confirmed flags: {flow.draft.flags.length > 0 ? flow.draft.flags.join(', ') : 'none'}</p>
+            <p className="text-sm">
+              Confirmed flags:{' '}
+              {flow.draft.flags.length > 0 ? flow.draft.flags.join(', ') : 'none'}
+            </p>
           ) : (
-            <p className="text-sm font-semibold text-alert">The six percentages must sum to 100 before the confirmed flags can be saved.</p>
+            <p className="text-sm font-semibold text-alert">
+              Keenam persentase harus berjumlah 100 sebelum flag terkonfirmasi dapat disimpan.
+            </p>
           )}
           <div className="grid gap-2 rounded-lg border border-primary/20 bg-primary/10 p-4">
-            <h2 className="text-xl font-semibold">Your confirmation</h2>
-            <p className="text-sm">Check the type, volume, urgency, photo, and pin. Editing any of them clears this confirmation.</p>
-            <ResidentApproval checked={flow.reviewed} onChange={flow.setReviewed} disabled={flow.percentTotal !== 100} />
+            <h2 className="text-xl font-semibold">Konfirmasi Anda</h2>
+            <p className="text-sm">
+              Periksa jenis, volume, urgensi, foto, dan pin lokasi. Mengubah salah satu nilai
+              tersebut akan mereset centang konfirmasi ini.
+            </p>
+            <ResidentApproval
+              checked={flow.reviewed}
+              onChange={flow.setReviewed}
+              disabled={flow.percentTotal !== 100}
+            />
           </div>
           <label className="grid gap-2 text-sm font-semibold">
-            Account type
+            Jenis akun
             <Select
-              aria-label="Account type"
+              aria-label="Jenis akun"
               value={flow.accountType}
-              onChange={(event) => flow.setAccountType(event.target.value === 'company' ? 'company' : 'household')}
+              onChange={(event) =>
+                flow.setAccountType(
+                  event.target.value === 'company' ? 'company' : 'household',
+                )
+              }
             >
-              <option value="household">Household</option>
-              <option value="company">Company</option>
+              <option value="household">Rumah tangga (household)</option>
+              <option value="company">Perusahaan / Usaha (company)</option>
             </Select>
           </label>
           <LocationPicker
@@ -159,12 +232,14 @@ export function ReportFlow() {
             geoMessage={flow.geoMessage}
           />
           {!flow.locationOk && (flow.lat !== '' || flow.lng !== '') ? (
-            <p className="text-sm font-semibold text-alert">That point is outside Denpasar.</p>
+            <p className="text-sm font-semibold text-alert">
+              Titik tersebut berada di luar wilayah Denpasar.
+            </p>
           ) : null}
           <ActionBar
             actions={[
               {
-                label: flow.busy === 'submit' ? 'Submitting…' : 'Submit report',
+                label: flow.busy === 'submit' ? 'Mengirim…' : 'Kirim laporan',
                 onClick: flow.submit,
                 disabled: !flow.canSubmit,
               },

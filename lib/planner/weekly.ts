@@ -1,4 +1,4 @@
-// Simulated weekly pickup allocation. Not a dispatch and not an official schedule.
+﻿// Simulated weekly pickup allocation. Not a dispatch and not an official schedule.
 //
 // solveWeekly(input) -> WeeklyScheduleResult
 //
@@ -19,7 +19,7 @@
 // B3 is never dated. A next pickup is the earliest run whose window has not
 // ended by asOf (date-only asOf is 00:00; overnight end < start ends next day).
 //
-// Adapter to Hensen's ScheduleEntry (he owns the canonical type):
+// Adapter to ScheduleEntry (lib/schedule/index.ts):
 //   routine run -> days: [weekday of run.date], window: {start, end},
 //     mode: 'routine', basis.liters: the GROUP weeklyLiters (not the sum of chunks),
 //     basis.reports: reportCount, source: 'simulated',

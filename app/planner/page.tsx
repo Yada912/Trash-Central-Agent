@@ -3,7 +3,7 @@ import { PlannerView } from '@/components/planner/planner-view'
 
 export default function PlannerPage() {
   return (
-    <Suspense fallback={<p>Loading planner…</p>}>
+    <Suspense fallback={<p>Memuat perencana…</p>}>
       <PlannerView />
     </Suspense>
   )

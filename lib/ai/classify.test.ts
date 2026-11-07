@@ -1,6 +1,7 @@
 import { generateObject } from 'ai'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  CLASSIFY_MODEL_ID,
   CLASSIFY_PROMPT,
   CLASSIFY_REPAIR_PROMPT,
   CLASSIFY_TIMEOUT_MS,
@@ -20,11 +21,20 @@ vi.mock('ai', () => ({
 
 const generate = vi.mocked(generateObject)
 const previousKey = process.env.GEMINI_API_KEY
+const previousKey2 = process.env.GEMINI_API_KEY_2
+const previousKey3 = process.env.GEMINI_API_KEY_3
+const previousKey4 = process.env.GEMINI_API_KEY_4
 const photoClaim = /\b(photo|photograph|image|picture|foto|gambar)\b/i
 
 afterEach(() => {
   if (previousKey === undefined) delete process.env.GEMINI_API_KEY
   else process.env.GEMINI_API_KEY = previousKey
+  if (previousKey2 === undefined) delete process.env.GEMINI_API_KEY_2
+  else process.env.GEMINI_API_KEY_2 = previousKey2
+  if (previousKey3 === undefined) delete process.env.GEMINI_API_KEY_3
+  else process.env.GEMINI_API_KEY_3 = previousKey3
+  if (previousKey4 === undefined) delete process.env.GEMINI_API_KEY_4
+  else process.env.GEMINI_API_KEY_4 = previousKey4
   vi.clearAllMocks()
   vi.useRealTimers()
 })
@@ -73,6 +83,9 @@ describe('classify prompts', () => {
 describe('classifyReport without a key', () => {
   it('returns insufficient for a short note with no photo and does not call the provider', async () => {
     delete process.env.GEMINI_API_KEY
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     const outcome = await classifyReport({ text: 'plastik' })
     expect(outcome).toEqual({
       kind: 'insufficient',
@@ -86,6 +99,9 @@ describe('classifyReport without a key', () => {
 
   it('throws a typed error for classifiable input and does not invent a demo', async () => {
     delete process.env.GEMINI_API_KEY
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     await expect(classifyReport({ text: 'Ada sampah plastik di gang' })).rejects.toMatchObject({
       code: 'MISSING_API_KEY',
     })
@@ -139,6 +155,7 @@ describe('classifyReport live model', () => {
     expect(outcome.classification.needsReview).toBe(false)
     expect(photoClaim.test(outcome.classification.rationale)).toBe(false)
     expect(generate.mock.calls[0]?.[0]).toMatchObject({ maxRetries: 0, temperature: 0 })
+    expect(CLASSIFY_MODEL_ID).toBe('gemini-2.5-flash')
   })
 
   it('uses a strict confidence threshold of 0.5', async () => {
@@ -396,6 +413,9 @@ describe('classifyReport live model', () => {
 
   it('times out, reports provider failures, and does not fall back to demo', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     generate.mockRejectedValue(Object.assign(new Error('limited'), { statusCode: 429 }))
     await expect(classifyReport({ text: 'Ada sampah plastik di gang dekat rumah' })).rejects.toMatchObject({
       code: 'RATE_LIMIT',
@@ -425,6 +445,20 @@ describe('classifyReport live model', () => {
     await vi.advanceTimersByTimeAsync(CLASSIFY_TIMEOUT_MS)
     await assertion
     expect(generate).toHaveBeenCalledTimes(1)
+  })
+
+  it('fails over across up to 4 configured API keys when earlier keys are rate-limited', async () => {
+    process.env.GEMINI_API_KEY = 'key-1'
+    process.env.GEMINI_API_KEY_2 = 'key-2'
+    process.env.GEMINI_API_KEY_3 = 'key-3'
+    process.env.GEMINI_API_KEY_4 = 'key-4'
+    generate
+      .mockRejectedValueOnce(Object.assign(new Error('limited-1'), { statusCode: 429 }))
+      .mockRejectedValueOnce(Object.assign(new Error('limited-2'), { statusCode: 429 }))
+      .mockResolvedValueOnce({ object: trash() } as never)
+    const outcome = await classifyReport({ text: 'Ada sampah plastik di gang dekat rumah' })
+    expect(outcome.kind).toBe('trash')
+    expect(generate).toHaveBeenCalledTimes(3)
   })
 
   it('rejects malformed and oversized photos before calling the model', async () => {

@@ -59,7 +59,7 @@ export default function DenpasarMap({ markers = [], routes = [], pin, onPick, he
         ))}
         {pin ? (
           <CircleMarker center={[pin.lat, pin.lng]} radius={11} pathOptions={{ color: '#0F766E', fillColor: '#0F766E', fillOpacity: 1 }}>
-            <Popup>Selected pin</Popup>
+            <Popup>Titik terpilih</Popup>
           </CircleMarker>
         ) : null}
       </MapContainer>
