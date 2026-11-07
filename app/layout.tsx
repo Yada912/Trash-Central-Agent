@@ -4,7 +4,6 @@ import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import './globals.css'
 import { AccountProvider } from '@/components/account/use-account'
-import { ModeBadge } from '@/components/mode-badge'
 import { SiteHeader } from '@/components/site-header'
 
 export const metadata: Metadata = {
@@ -27,9 +26,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="#main" className="skip-link">
             Lewati ke konten utama
           </a>
-          <div className="mx-auto max-w-6xl px-4 pt-2">
-            <ModeBadge />
-          </div>
           <SiteHeader />
           <div className="mx-auto max-w-6xl px-4 py-6">{children}</div>
         </AccountProvider>

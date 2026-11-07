@@ -1,268 +1,364 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useAccount } from '@/components/account/use-account'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
-import {
-  SOURCE_GUIDE_CITATION,
-  SOURCE_GUIDE_LABELS,
-  SOURCE_TO_STREAM,
-  SOURCE_TYPES,
-  type SourceType,
-} from '@/lib/schedule/sourceTypes'
+import { Textarea } from '@/components/ui/textarea'
+import type { ClassifyOutcome } from '@/lib/schemas'
 
-const STREAM_BADGE_COLORS: Record<string, string> = {
-  organik: 'bg-mint text-ink',
-  anorganik: 'bg-sky text-ink',
-  residu: 'bg-amber text-ink',
-  B3: 'bg-coral text-alert',
-}
+const GUEST_LIMIT = 5
+const GUEST_STORAGE_KEY = 'cta_guest_try_count_v1'
 
-const SOURCE_ICONS: Record<SourceType, string> = {
-  mudah_terurai: 'compost',
-  guna_ulang: 'replay',
-  daur_ulang: 'recycling',
-  b3: 'warning',
-  residu: 'delete_sweep',
-}
-
-const SOURCE_EXAMPLES_ID: Record<SourceType, string> = {
-  mudah_terurai: 'Sisa makanan, daun, canang/janur organik, potongan sayur & buah',
-  guna_ulang: 'Botol kaca utuh, stoples layak pakai, kantong belanja guna ulang',
-  daur_ulang: 'Botol plastik PET, kardus kering, kertas, kaleng aluminium/besi',
-  b3: 'Baterai bekas, lampu neon/TL, kaleng cat/aerosol, limbah elektronik',
-  residu: 'Popok sekali pakai, tisu kotor, styrofoam, residu sapuan tercampur',
-}
+const SAMPLE_PROMPTS = [
+  {
+    label: 'Canang & Janur Galungan',
+    text: 'Ada 3 kantong besar sampah organik sisa daun canang sari, janur penjor, dan kulit buah sekitar 45 liter di depan rumah seusai Hari Raya Galungan.',
+  },
+  {
+    label: 'Botol Plastik Warung',
+    text: 'Tumpukan botol plastik minuman kemasan bersih sekitar 30 liter sudah dikumpulkan dalam 2 karung di dekat warung makan.',
+  },
+  {
+    label: 'Baterai & Lampu Bekas',
+    text: 'Ada baterai bekas bocor dan kaleng pestisida sekitar 5 liter yang dipisahkan di dalam kotak tertutup.',
+  },
+] as const
 
 export default function HomePage() {
-  const { activeAccount, optimization } = useAccount()
+  const [guestTriesUsed, setGuestTriesUsed] = useState(0)
+  const [sampleText, setSampleText] = useState<string>(SAMPLE_PROMPTS[0].text)
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState<ClassifyOutcome | null>(null)
+  const [modelUsed, setModelUsed] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    try {
+      const saved = Number(window.localStorage.getItem(GUEST_STORAGE_KEY) ?? '0')
+      if (Number.isFinite(saved) && saved >= 0) {
+        setGuestTriesUsed(Math.min(GUEST_LIMIT, saved))
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [])
+
+  const remainingTries = Math.max(0, GUEST_LIMIT - guestTriesUsed)
+
+  async function handleGuestTry() {
+    if (remainingTries <= 0) {
+      setError('Batas 5 kali uji coba tamu telah habis. Silakan masuk atau daftar akun gratis untuk melanjutkan.')
+      return
+    }
+    if (!sampleText.trim()) {
+      setError('Masukkan deskripsi singkat kondisi sampah terlebih dahulu.')
+      return
+    }
+    setError(null)
+    setBusy(true)
+    try {
+      const response = await fetch('/api/reports/classify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: sampleText.trim() }),
+      })
+      const json = (await response.json()) as {
+        ok: boolean
+        data?: ClassifyOutcome
+        meta?: { model?: string }
+        error?: { message?: string }
+      }
+      if (!response.ok || !json.ok || !json.data) {
+        setError(json.error?.message ?? 'Gagal menjalankan klasifikasi uji coba.')
+        return
+      }
+      setResult(json.data)
+      setModelUsed(json.meta?.model ?? null)
+      const nextCount = Math.min(GUEST_LIMIT, guestTriesUsed + 1)
+      setGuestTriesUsed(nextCount)
+      try {
+        window.localStorage.setItem(GUEST_STORAGE_KEY, String(nextCount))
+      } catch {
+        // ignore
+      }
+    } catch {
+      setError('Gagal terhubung ke server klasifikasi.')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
-    <main id="main" className="grid gap-10">
-      {/* Hero Banner with Tactile Vector Geometry & Logo Slot */}
-      <section className="vector-card relative overflow-hidden bg-gradient-to-br from-card via-card to-mint/50 p-6 md:p-8">
+    <main id="main" className="grid gap-8">
+      {/* 1. Hero Section */}
+      <section className="vector-card bg-card p-6 md:p-8 grid gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="vector-pill bg-mint text-ink tilt-left">
+              <MaterialIcon name="eco" size="sm" />
+              Kota Denpasar · Bali
+            </span>
+            <span className="vector-pill bg-amber text-ink tilt-right">
+              <MaterialIcon name="temple_hindu" size="sm" />
+              Terintegrasi Kalender Bali & Jadwal Kecamatan
+            </span>
+          </div>
+          <Link
+            href="/masuk"
+            className="vector-btn inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-gold px-3.5 py-1.5 text-xs font-extrabold text-ink"
+          >
+            <MaterialIcon name="login" size="sm" />
+            Masuk / Daftar Akun
+          </Link>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-center">
-          <div className="grid gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="vector-pill bg-amber text-ink tilt-left">
-                <MaterialIcon name="eco" size="sm" />
-                Sistem Pengelolaan Sampah Terpadu · Kota Denpasar
+          <div className="grid gap-3">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+              Central Trash Agent
+            </h1>
+            <p className="text-lg font-medium text-ink/85">
+              Platform pengelolaan sampah cerdas yang menghubungkan <strong>Warga & UMKM Kota Denpasar</strong> dengan <strong>Armada Petugas DLHK</strong>. Dilengkapi kalender jemputan interaktif, prediksi lonjakan sampah Hari Raya Bali, dan optimasi rute pengangkutan.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link
+                href="/warga"
+                data-testid="open-warga-portal-link"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-primary px-5 py-3 text-base font-extrabold text-white"
+              >
+                <MaterialIcon name="home" />
+                Portal Warga
+              </Link>
+              <Link
+                href="/petugas"
+                data-testid="open-petugas-portal-link"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-lavender px-5 py-3 text-base font-extrabold text-ink"
+              >
+                <MaterialIcon name="badge" />
+                Portal Petugas DLHK
+              </Link>
+              <Link
+                href="/report"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-mint px-4 py-3 text-sm font-extrabold text-ink"
+              >
+                <MaterialIcon name="add_a_photo" size="sm" />
+                Laporkan tumpukan
+              </Link>
+              <Link
+                href="/dashboard"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-card px-4 py-3 text-sm font-extrabold text-ink"
+              >
+                <MaterialIcon name="space_dashboard" size="sm" />
+                Lihat dasbor
+              </Link>
+            </div>
+          </div>
+
+          {/* Role Comparison Quick Box */}
+          <div className="grid gap-3">
+            <div className="vector-card-soft bg-mint/45 p-4 grid gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-extrabold text-base flex items-center gap-1.5">
+                  <MaterialIcon name="person" size="sm" className="text-primary" />
+                  Tampilan Khusus Warga (`/warga`)
+                </span>
+                <Link href="/warga" className="text-xs font-extrabold text-primary underline">
+                  Buka →
+                </Link>
+              </div>
+              <p className="text-xs font-medium text-ink/85">
+                Fokus pada rumah/usaha Anda sendiri: kalender hari angkut Organik/Anorganik/Residu, simpan jadwal ke Google Calendar/HP (`.ics`), pilih Rahinan Bali yang dirayakan, dan pantau riwayat pengangkutan.
+              </p>
+            </div>
+
+            <div className="vector-card-soft bg-lavender/45 p-4 grid gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-extrabold text-base flex items-center gap-1.5">
+                  <MaterialIcon name="local_shipping" size="sm" className="text-primary" />
+                  Tampilan Khusus Petugas (`/petugas`)
+                </span>
+                <Link href="/petugas" className="text-xs font-extrabold text-primary underline">
+                  Buka →
+                </Link>
+              </div>
+              <p className="text-xs text-ink/85 font-medium">
+                Pusat kendali armada DLHK: verifikasi laporan warga, kelola leeway jadwal per kecamatan, susun & setujui rute VRP dari TPA Suwung, serta uji efektivitas AI secara langsung.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. About Section (Tentang Central Trash Agent) */}
+      <section aria-labelledby="about-heading" className="grid gap-4 md:grid-cols-3">
+        <div className="vector-card bg-card p-5 grid content-start gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-ink bg-mint">
+            <MaterialIcon name="calendar_month" />
+          </div>
+          <h2 id="about-heading" className="text-lg font-extrabold">
+            1. Kalender Jemputan & Rahinan Bali
+          </h2>
+          <p className="text-sm text-ink/80">
+            Menyatukan jadwal pengangkutan rutin kecamatan dengan Kalender Bali (<em>Galungan, Kuningan, Purnama, Tilem, Kajeng Kliwon</em>). Warga dapat mengklik tanggal mana pun untuk mengunduh pengingat ke kalender pribadi.
+          </p>
+        </div>
+
+        <div className="vector-card bg-card p-5 grid content-start gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-ink bg-amber">
+            <MaterialIcon name="photo_camera" />
+          </div>
+          <h3 className="text-lg font-extrabold">
+            2. Klasifikasi AI & Input Kantong Mudah
+          </h3>
+          <p className="text-sm text-ink/80">
+            Tidak perlu menebak volume dalam liter. Gunakan kamera langsung, ketik, atau rekam suara Bahasa Indonesia, lalu sesuaikan dengan ukuran kantong kresek atau ember rumah tangga.
+          </p>
+        </div>
+
+        <div className="vector-card bg-card p-5 grid content-start gap-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-ink bg-sky">
+            <MaterialIcon name="route" />
+          </div>
+          <h3 className="text-lg font-extrabold">
+            3. Optimasi Leeway & Rute Armada VRP
+          </h3>
+          <p className="text-sm text-ink/80">
+            Petugas mengatur kuota toleransi (leeway) saat lonjakan hari raya, memisahkan limbah berbahaya dari truk biasa, dan menyusun rute paling efisien dengan log audit penuh.
+          </p>
+        </div>
+      </section>
+
+      {/* 3. Guest AI Sandbox (Limited to 1–5 Tries without an account) */}
+      <section
+        aria-labelledby="guest-sandbox-heading"
+        data-testid="guest-ai-sandbox"
+        className="vector-card bg-sky/25 p-6 grid gap-4"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span className="vector-pill bg-amber text-ink">
+              <MaterialIcon name="auto_awesome" size="sm" />
+              Coba Langsung Tanpa Akun
+            </span>
+            <h2 id="guest-sandbox-heading" className="mt-1.5 text-2xl font-extrabold">
+              Uji Coba Klasifikasi Sampah AI (Batas {GUEST_LIMIT}x Percobaan Tamu)
+            </h2>
+            <p className="text-xs text-ink/80">
+              Coba kemampuan analisis jenis dan volume sampah sebelum membuat akun. Dibatasi maksimal {GUEST_LIMIT} kali percobaan agar kuota token tetap terjaga.
+            </p>
+          </div>
+          <div
+            data-testid="guest-tries-badge"
+            className="vector-card-soft bg-card px-4 py-2 text-xs font-extrabold"
+          >
+            Sisa Kuota Tamu: <span className="text-primary text-sm">{remainingTries}</span> / {GUEST_LIMIT}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-extrabold">Contoh Cepat:</span>
+          {SAMPLE_PROMPTS.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => setSampleText(item.text)}
+              className="rounded-md border-2 border-ink bg-card hover:bg-mint/45 px-2.5 py-1 text-xs font-bold transition-colors"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-[1.3fr_1fr]">
+          <div className="grid gap-2">
+            <label htmlFor="guest-ai-input" className="text-xs font-extrabold uppercase">
+              Deskripsi Kondisi Sampah
+            </label>
+            <Textarea
+              id="guest-ai-input"
+              rows={3}
+              value={sampleText}
+              onChange={(e) => setSampleText(e.target.value)}
+              disabled={remainingTries <= 0 || busy}
+              placeholder="Contoh: Ada 3 kantong sampah organik sisa daun canang dan janur..."
+            />
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                onClick={() => void handleGuestTry()}
+                disabled={remainingTries <= 0 || busy}
+                data-testid="guest-try-submit-btn"
+              >
+                <MaterialIcon name="psychology" size="sm" />
+                {busy
+                  ? 'Menganalisis…'
+                  : remainingTries > 0
+                    ? `Uji Klasifikasi Sekarang (${remainingTries} sisa)`
+                    : 'Kuota Tamu Habis'}
+              </Button>
+              {remainingTries <= 0 ? (
+                <Link
+                  href="/masuk"
+                  className="vector-btn inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-gold px-3.5 py-2 text-xs font-extrabold text-ink"
+                >
+                  <MaterialIcon name="person_add" size="sm" />
+                  Masuk / Daftar untuk Akses Penuh
+                </Link>
+              ) : null}
+            </div>
+            {error ? (
+              <p role="alert" className="text-xs font-extrabold text-alert">
+                {error}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="vector-card-soft bg-card p-4 grid content-start gap-2" data-testid="guest-ai-result">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-extrabold uppercase text-primary">
+                Hasil Analisis Uji Coba
               </span>
-              {activeAccount ? (
-                <span className="vector-pill bg-sky text-ink">
-                  <MaterialIcon name={activeAccount.role === 'petugas' ? 'badge' : 'person'} size="sm" />
-                  Aktif: {activeAccount.name} ({activeAccount.role === 'petugas' ? 'Petugas' : 'Warga'})
+              {modelUsed ? (
+                <span className="rounded border border-ink/40 bg-bg px-2 py-0.5 text-[10px] font-bold">
+                  {modelUsed}
                 </span>
               ) : null}
             </div>
 
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Central Trash Agent
-            </h1>
-
-            <p className="max-w-2xl text-lg font-medium text-ink/85">
-              Kenali kondisi sampah Anda hari ini, sesuaikan timbulan mingguan &amp; lonjakan hari raya dengan jadwal dan toleransi (<em>leeway</em>) petugas, lalu optimalkan rute pengangkutan di seluruh kecamatan Kota Denpasar.
-            </p>
-
-            <div className="flex flex-wrap gap-3 pt-1">
-              <Button asChild>
-                <Link href="/report">
-                  <MaterialIcon name="add_a_photo" />
-                  Laporkan tumpukan
-                </Link>
-              </Button>
-              <Button asChild variant="gold">
-                <Link href="/akun">
-                  <MaterialIcon name="tune" />
-                  Atur Profil Sampah &amp; Acara
-                </Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link href="/schedule">
-                  <MaterialIcon name="calendar_month" />
-                  Jadwal pengangkutan
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Right Vector Visual Summary Card */}
-          <div className="vector-card bg-ink text-white p-5 grid gap-4 tilt-right">
-            <div className="flex items-center justify-between border-b border-white/20 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-white bg-primary font-extrabold text-xs">
-                  LOGO
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-gold">Status Cerdas Hari Ini</p>
-                  <p className="text-base font-extrabold">
-                    {activeAccount ? `${activeAccount.kecamatan} · ${activeAccount.desa}` : 'Kota Denpasar'}
-                  </p>
-                </div>
-              </div>
-              <MaterialIcon name="verified" className="text-gold" size="lg" />
-            </div>
-
-            {optimization ? (
-              <div className="grid gap-3 text-sm">
-                <p className="font-bold text-mint">{optimization.headline}</p>
-                <div className="grid grid-cols-2 gap-2 text-ink">
-                  <div className="rounded-md border-2 border-white bg-mint p-2.5">
-                    <p className="text-[11px] font-extrabold uppercase">Estimasi Mingguan</p>
-                    <p className="text-lg font-extrabold">
-                      {optimization.totalWeeklyLiters} L ({optimization.equivalentContainers} wadah)
-                    </p>
-                  </div>
-                  <div className="rounded-md border-2 border-white bg-amber p-2.5">
-                    <p className="text-[11px] font-extrabold uppercase">Lonjakan Acara</p>
-                    <p className="text-lg font-extrabold">+{optimization.eventExtraLiters} L</p>
-                  </div>
-                </div>
-                <Link
-                  href="/akun"
-                  className="inline-flex items-center gap-1.5 text-xs font-extrabold text-gold underline underline-offset-4"
-                >
-                  <MaterialIcon name="arrow_forward" size="sm" />
-                  Sesuaikan takaran kantong/ember atau jadwal acara Anda
-                </Link>
-              </div>
-            ) : (
-              <div className="grid gap-2 text-sm text-white/90">
-                <p>Mode Petugas aktif. Pantau klaster laporan warga, atur leeway jadwal kecamatan, dan jalankan solver rute VRP.</p>
-                <div className="flex gap-2 pt-1">
-                  <Link href="/dashboard" className="underline font-bold text-gold">
-                    Buka Dasbor
-                  </Link>
-                  <span>·</span>
-                  <Link href="/planner" className="underline font-bold text-gold">
-                    Buka Perencana Rute
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Dual Actor Action Grid (Warga & Petugas) */}
-      <section aria-label="Menu Aktor Utama" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="vector-card bg-mint/45 p-5 grid content-between gap-4">
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="vector-pill bg-card text-ink">Warga · Langkah 1</span>
-              <MaterialIcon name="photo_camera" size="lg" className="text-primary" />
-            </div>
-            <h2 className="text-xl font-extrabold">Lapor via Kamera, Suara, atau Teks</h2>
-            <p className="text-sm text-ink/80">
-              Ambil foto langsung dari kamera, rekam suara Bahasa Indonesia, atau pilih takaran kantong kresek/ember tanpa hitung rumit.
-            </p>
-          </div>
-          <Button asChild>
-            <Link href="/report">Laporkan tumpukan</Link>
-          </Button>
-        </div>
-
-        <div className="vector-card bg-amber/45 p-5 grid content-between gap-4">
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="vector-pill bg-card text-ink">Warga &amp; Petugas</span>
-              <MaterialIcon name="event_available" size="lg" className="text-ink" />
-            </div>
-            <h2 className="text-xl font-extrabold">Jadwal &amp; Leeway Kecamatan</h2>
-            <p className="text-sm text-ink/80">
-              Lihat jendela waktu pengangkutan organik, anorganik, residu, dan B3 beserta toleransi muatan saat hari raya/upacara.
-            </p>
-          </div>
-          <Button asChild variant="secondary">
-            <Link href="/schedule">Jadwal pengangkutan</Link>
-          </Button>
-        </div>
-
-        <div className="vector-card bg-sky/55 p-5 grid content-between gap-4">
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="vector-pill bg-card text-ink">Petugas · Monitor</span>
-              <MaterialIcon name="map" size="lg" className="text-accent" />
-            </div>
-            <h2 className="text-xl font-extrabold">Dasbor &amp; Klaster Peta Kota</h2>
-            <p className="text-sm text-ink/80">
-              Pantau total liter per jenis sampah, saring laporan yang perlu tinjauan manusia, dan pisahkan penanganan limbah B3.
-            </p>
-          </div>
-          <Button asChild variant="secondary">
-            <Link href="/dashboard">Lihat dasbor</Link>
-          </Button>
-        </div>
-
-        <div className="vector-card bg-lavender/55 p-5 grid content-between gap-4">
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="vector-pill bg-card text-ink">Petugas · Rute VRP</span>
-              <MaterialIcon name="local_shipping" size="lg" className="text-primary" />
-            </div>
-            <h2 className="text-xl font-extrabold">Perencana Rute &amp; Audit</h2>
-            <p className="text-sm text-ink/80">
-              Hitung rute truk deterministik berdasarkan kapasitas &amp; sif kerja, tinjau penjelasan AI, dan catat keputusan petugas.
-            </p>
-          </div>
-          <Button asChild variant="secondary">
-            <Link href="/planner">Susun rencana penjemputan</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Source Sorting Guide (Pergub Bali No. 47 Tahun 2019 Pasal 6 ayat (2)) */}
-      <section aria-labelledby="sorting-guide-heading" className="vector-card p-6 grid gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="grid gap-1">
-            <span className="vector-pill bg-mint text-ink w-fit tilt-left">
-              <MaterialIcon name="verified" size="sm" />
-              {SOURCE_GUIDE_CITATION}
-            </span>
-            <h2 id="sorting-guide-heading" className="text-2xl font-extrabold mt-1">
-              Panduan Pemilahan Sampah dari Sumber
-            </h2>
-            <p className="max-w-3xl text-sm text-ink/80">
-              Pilah sampah rumah tangga atau tempat usaha menjadi <strong>5 kategori sumber</strong> berikut. Sistem secara otomatis memetakannya ke <strong>4 aliran jadwal pengangkutan</strong> armada Kota Denpasar:
-            </p>
-          </div>
-          <Button asChild variant="secondary">
-            <Link href="/akun">
-              <MaterialIcon name="person_check" />
-              Cek Kesiapan Pilah Saya
-            </Link>
-          </Button>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {SOURCE_TYPES.map((type, idx) => {
-            const label = SOURCE_GUIDE_LABELS[type]
-            const stream = SOURCE_TO_STREAM[type]
-            return (
-              <div
-                key={type}
-                className={`vector-card-soft p-4 grid content-between gap-3 ${idx % 2 === 1 ? 'bg-bg' : 'bg-card'}`}
-              >
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <MaterialIcon name={SOURCE_ICONS[type]} className="text-primary" size="lg" />
-                    <span className={`vector-pill ${STREAM_BADGE_COLORS[stream] ?? 'bg-bg text-ink'}`}>
-                      {stream}
+            {!result ? (
+              <p className="text-xs text-ink/70">
+                Klik tombol <strong>Uji Klasifikasi Sekarang</strong> untuk melihat hasil estimasi jenis sampah, persentase komposisi, dan perkiraan jumlah kantong/liter.
+              </p>
+            ) : result.kind === 'trash' ? (
+              <div className="grid gap-1.5 text-xs">
+                <div className="flex flex-wrap gap-1.5">
+                  {result.classification.types.map((t) => (
+                    <span
+                      key={t.type}
+                      className="rounded border-2 border-ink bg-mint px-2 py-0.5 font-extrabold uppercase"
+                    >
+                      {t.type}: {Math.round(t.share * 100)}%
                     </span>
-                  </div>
-                  <h3 className="text-base font-extrabold leading-snug">{label.id}</h3>
-                  <p className="text-xs font-semibold text-ink/60">{label.en}</p>
-                  <p className="text-xs text-ink/80">
-                    <strong>Contoh:</strong> {SOURCE_EXAMPLES_ID[type]}.
-                  </p>
+                  ))}
                 </div>
-                <p className="border-t border-ink/15 pt-2 text-[11px] font-medium text-ink/75">
-                  Aliran: <strong>{stream}</strong> ({label.citation})
+                <p className="font-extrabold text-sm mt-1">
+                  Estimasi Volume: {result.classification.volume.liters} Liter (~
+                  {Math.max(1, Math.round(result.classification.volume.liters / 15))} kantong sedang)
+                </p>
+                <p className="font-semibold text-ink/80">
+                  Urgensi: <strong>{result.classification.urgency}</strong> · Kepercayaan:{' '}
+                  <strong>{Math.round(result.classification.confidence * 100)}%</strong>
+                </p>
+                <p className="text-ink/80 bg-bg p-2 rounded border border-ink/20">
+                  {result.classification.rationale}
                 </p>
               </div>
-            )
-          })}
+            ) : result.kind === 'insufficient' ? (
+              <p className="text-xs font-bold text-alert">{result.reason}</p>
+            ) : (
+              <p className="text-xs font-bold">{result.reason}</p>
+            )}
+          </div>
         </div>
       </section>
     </main>
