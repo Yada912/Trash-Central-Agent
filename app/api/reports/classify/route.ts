@@ -3,6 +3,7 @@ import { jsonErr, jsonOk, mapModuleError, requestIdFrom } from '@/lib/api/respon
 import { classifyReport } from '@/lib/ai/classify'
 import { classifyModelId, hasGeminiApiKey } from '@/lib/ai/keys'
 import { stampClassification } from '@/lib/review'
+import { checkRateLimit, clientIpFromRequest, inspectPromptInput } from '@/lib/security/guard'
 import {
   classifyRequestSchema,
   volumeLabelFor,
@@ -117,16 +118,26 @@ export async function POST(request: Request) {
   const requestId = requestIdFrom(request)
   const started = Date.now()
   try {
+    const ip = clientIpFromRequest(request)
+    const rate = checkRateLimit(`api_classify:${ip}`, 30, 60_000)
+    if (!rate.allowed) {
+      return jsonErr(requestId, 429, 'RATE_LIMIT', `Terlalu banyak permintaan klasifikasi. Coba lagi dalam ${rate.retryAfterSec} detik.`)
+    }
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response
     const parsed = parseSchema(classifyRequestSchema, body.value, requestId)
     if (!parsed.ok) return parsed.response
     const imageError = guardImage(parsed.data.image, requestId)
     if (imageError) return imageError
-    const text = parsed.data.text ?? ''
-    if (!text && !parsed.data.image) {
+    const rawText = parsed.data.text ?? ''
+    if (!rawText && !parsed.data.image) {
       return jsonErr(requestId, 400, 'empty_report', 'Send a photo or a description.')
     }
+    const securityCheck = inspectPromptInput(rawText)
+    if (securityCheck.blocked) {
+      return jsonErr(requestId, 400, 'VALIDATION', securityCheck.reason ?? 'Disallowed prompt input.')
+    }
+    const text = securityCheck.sanitizedText
     const hasImage = Boolean(parsed.data.image)
     const requestInput = { text, ...(parsed.data.image ? { image: parsed.data.image } : {}) }
     const outcome = geminiConfigured()

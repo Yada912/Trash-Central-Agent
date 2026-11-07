@@ -21,6 +21,7 @@ import { CLASSIFY_DEFAULT_MODEL_ID, classifyModelId, geminiApiKeys, hasGeminiApi
 import { decodedBase64Bytes } from '@/lib/api/image'
 import { MAX_IMAGE_BYTES } from '@/lib/limits'
 import { stampClassification } from '@/lib/review'
+import { containsSensitiveModelLeak, inspectPromptInput, redactPiiFromText } from '@/lib/security/guard'
 import {
   CLASSIFICATION_FLAGS,
   INSUFFICIENT_MISSING,
@@ -169,7 +170,12 @@ function validateClassifyInput(input: ClassifyInput): ValidatedInput {
   if (textLength > 1000 || (textLength < 1 && !input.image)) {
     throw new ClassifyError('VALIDATION', 'Send a photo or a description of 1 to 1000 characters.')
   }
-  if (!input.image) return { text: input.text }
+  const securityCheck = inspectPromptInput(input.text)
+  if (securityCheck.blocked) {
+    throw new ClassifyError('VALIDATION', securityCheck.reason ?? 'The report text contains disallowed instructions.')
+  }
+  const safeText = securityCheck.sanitizedText
+  if (!input.image) return { text: safeText }
   const { base64, mimeType } = input.image
   if (typeof mimeType !== 'string' || !MIME_TYPES.has(mimeType)) {
     throw new ClassifyError('VALIDATION', 'Photo mimeType must be image/jpeg, image/png, or image/webp.')
@@ -185,7 +191,7 @@ function validateClassifyInput(input: ClassifyInput): ValidatedInput {
     throw new ClassifyError('VALIDATION', 'The decoded photo is larger than 3000000 bytes.')
   }
   return {
-    text: input.text,
+    text: safeText,
     image: { base64, mimeType: mimeType as 'image/jpeg' | 'image/png' | 'image/webp' },
   }
 }
@@ -237,9 +243,12 @@ function normalizeUnit(value: number, label: string): number {
 }
 
 function normalizeProse(value: string, label: string, hasImage: boolean): string {
-  const text = value.trim()
+  const text = redactPiiFromText(value.trim())
   if (text.length < 1 || text.length > 280) {
     throw new OutputRejected(`${label} must be 1 to 280 characters after trimming. It is not truncated.`)
+  }
+  if (containsSensitiveModelLeak(text)) {
+    throw new OutputRejected(`${label} contains sensitive or disallowed output patterns.`)
   }
   if (!hasImage && PHOTO_CLAIM.test(text)) {
     throw new OutputRejected(`${label} describes a photo, but no photo was attached.`)
