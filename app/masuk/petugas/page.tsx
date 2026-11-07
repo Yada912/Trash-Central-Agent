@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MaterialIcon } from '@/components/ui/material-icon'
+import { BrandLogo } from '@/components/ui/brand-logo'
 
 export default function MasukPetugasPage() {
   const router = useRouter()
@@ -43,7 +44,7 @@ export default function MasukPetugasPage() {
       <section className="vector-card bg-card p-6 grid gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink pb-3">
           <span className="vector-pill bg-lavender text-ink font-extrabold flex items-center gap-1.5">
-            <MaterialIcon name="badge" size="sm" />
+            <BrandLogo variant="ink" size={16} />
             Portal Petugas Armada Denpasar
           </span>
           <Link
@@ -55,13 +56,18 @@ export default function MasukPetugasPage() {
           </Link>
         </div>
 
-        <div className="grid gap-1.5">
-          <h1 className="text-2xl font-black text-ink">
-            Masuk sebagai Petugas Operasional
-          </h1>
-          <p className="text-sm text-ink/80 leading-relaxed">
-            Halaman otentikasi khusus pengemudi armada, operator cikar swakelola TPS3R, dan koordinator pengangkutan sampah Kota Denpasar.
-          </p>
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-primary text-white p-2 shadow-[2px_2px_0_#1F2933]">
+            <BrandLogo variant="white" className="h-full w-full object-contain" />
+          </div>
+          <div className="grid gap-0.5">
+            <h1 className="text-xl sm:text-2xl font-black text-ink">
+              Masuk Petugas Operasional
+            </h1>
+            <p className="text-xs sm:text-sm text-ink/80 leading-relaxed">
+              Otentikasi pengemudi armada, operator swakelola TPS3R, dan koordinator pengangkutan sampah.
+            </p>
+          </div>
         </div>
 
         {isSignedIn && activeAccount ? (

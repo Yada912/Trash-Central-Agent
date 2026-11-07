@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount } from '@/components/account/use-account'
 import { MaterialIcon } from '@/components/ui/material-icon'
+import { BrandLogo } from '@/components/ui/brand-logo'
 
 type NavItem = {
   href: string
@@ -44,7 +45,7 @@ export function SiteHeader() {
     <>
       <header className="site-header sticky top-0 z-40 border-b-4 border-ink bg-ink text-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          {/* Brand + Dedicated Logo Placeholder */}
+          {/* Brand + Dedicated Logo */}
           <div className="flex items-center gap-3">
             <Link
               href="/"
@@ -53,20 +54,17 @@ export function SiteHeader() {
             >
               <div
                 data-testid="brand-logo-slot"
-                title="Ruang Logo (Siap diganti dengan aset logo resmi)"
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border-2 border-white bg-primary text-white font-extrabold text-[11px] tracking-tighter tilt-left group-hover:rotate-0 transition-transform"
+                title="Central Trash Agent Bali"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border-2 border-white bg-primary text-white font-extrabold tilt-left group-hover:rotate-0 transition-transform p-1.5 shadow-[2px_2px_0_#000]"
               >
-                <span className="flex flex-col items-center leading-none">
-                  <MaterialIcon name="recycling" size="sm" />
-                  <span className="mt-0.5 text-[9px]">LOGO</span>
-                </span>
+                <BrandLogo variant="white" className="h-full w-full object-contain" />
               </div>
               <div>
                 <span className="block text-lg font-extrabold tracking-tight text-white">
                   Central Trash Agent Bali
                 </span>
                 <span className="block text-xs font-medium text-white/75">
-                  Warga &amp; Armada DLHK Provinsi Bali
+                  Prototipe Pengelolaan Sampah Cerdas Bali
                 </span>
               </div>
             </Link>

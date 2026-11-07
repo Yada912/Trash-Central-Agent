@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: 'Central Trash Agent Bali — Pengelolaan & Penjemputan Sampah Cerdas',
   description:
     'Platform terpadu agen cerdas pelaporan sampah warga, profil timbulan rumah tangga/usaha, jadwal armada desentralisasi TPS3R, dan rute VRP di Provinsi Bali.',
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

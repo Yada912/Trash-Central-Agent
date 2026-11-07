@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Textarea } from '@/components/ui/textarea'
+import { BrandLogo } from '@/components/ui/brand-logo'
 import { SupportedAreasList } from '@/components/home/supported-areas-list'
 import type { ClassifyOutcome } from '@/lib/schemas'
 
@@ -116,9 +117,14 @@ export default function HomePage() {
 
         <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-center">
           <div className="grid gap-3">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              Central Trash Agent Bali
-            </h1>
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-14 w-14 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl border-2 border-ink bg-primary text-white p-2.5 shadow-[3px_3px_0_#1F2933]">
+                <BrandLogo variant="white" className="h-full w-full object-contain" />
+              </div>
+              <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                Central Trash Agent Bali
+              </h1>
+            </div>
             <p className="text-lg font-medium text-ink/85">
               Platform pengelolaan sampah cerdas yang menghubungkan <strong>Warga &amp; UMKM Provinsi Bali</strong> dengan <strong>Armada Petugas DLHK &amp; TPS3R Desa</strong>. Dilengkapi asisten AI Kresna berbasis permintaan, kalender rahinan interaktif, dan optimasi rute pengangkutan desentralisasi.
             </p>

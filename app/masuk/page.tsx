@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
+import { BrandLogo } from '@/components/ui/brand-logo'
 import {
   CONTAINER_PRESETS,
   DEFAULT_SELECTED_BALI_EVENTS,
@@ -161,13 +162,18 @@ export default function MasukPage() {
           ) : null}
         </div>
 
-        <div>
-          <h1 className="text-3xl font-black text-ink tracking-tight">
-            Selamat Datang di Central Trash Agent Bali
-          </h1>
-          <p className="text-sm font-semibold text-ink/85 mt-1 leading-relaxed">
-            Platform agen cerdas pengelolaan persampahan berbasis sumber sesuai <strong>Pergub Bali No. 47 Tahun 2019</strong> &amp; <strong>Perda Denpasar No. 8 Tahun 2023</strong>.
-          </p>
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-primary text-white p-2 shadow-[2px_2px_0_#1F2933]">
+            <BrandLogo variant="white" className="h-full w-full object-contain" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-ink tracking-tight">
+              Selamat Datang di Central Trash Agent Bali
+            </h1>
+            <p className="text-xs sm:text-sm font-semibold text-ink/85 mt-1 leading-relaxed">
+              Platform agen cerdas pengelolaan persampahan berbasis sumber sesuai <strong>Pergub Bali No. 47 Tahun 2019</strong> &amp; <strong>Perda Denpasar No. 8 Tahun 2023</strong>.
+            </p>
+          </div>
         </div>
 
         {/* Dedicated Petugas Switcher Banner */}

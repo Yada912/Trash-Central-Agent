@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MaterialIcon } from '@/components/ui/material-icon'
+import { BrandLogo } from '@/components/ui/brand-logo'
 
 export function SiteFooter() {
   return (
@@ -8,13 +9,13 @@ export function SiteFooter() {
         {/* Brand & Purpose */}
         <div className="md:col-span-2 grid gap-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-ink bg-primary text-white font-extrabold shadow-[2px_2px_0_#1F2933]">
-              <MaterialIcon name="recycling" size="sm" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-ink bg-primary text-white p-1.5 shadow-[2px_2px_0_#1F2933]">
+              <BrandLogo variant="white" className="h-full w-full object-contain" />
             </div>
             <div>
               <span className="font-black text-base tracking-tight text-ink">Central Trash Agent Bali</span>
               <p className="text-[11px] font-black text-ink">
-                Pemerintah Provinsi Bali &amp; Kota Denpasar · Dinas Lingkungan Hidup dan Kebersihan
+                Prototipe Inovasi AI · Tim Punya Dendam (Bali DigiFest 2026)
               </p>
             </div>
           </div>
@@ -82,18 +83,18 @@ export function SiteFooter() {
             <li>
               <Link href="/syarat-ketentuan" className="hover:text-primary hover:underline flex items-center gap-1">
                 <MaterialIcon name="gavel" size="sm" />
-                <span>Syarat &amp; Ketentuan Layanan</span>
+                <span>Syarat &amp; Ketentuan Prototipe</span>
               </Link>
             </li>
             <li>
               <a
-                href="https://denpasarkota.go.id"
+                href="https://github.com/Yada912/Trash-Central-Agent"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-primary hover:underline flex items-center gap-1"
               >
-                <MaterialIcon name="public" size="sm" />
-                <span>Portal Resmi Kota Denpasar</span>
+                <MaterialIcon name="code" size="sm" />
+                <span>Repositori Sumber Terbuka (GitHub)</span>
               </a>
             </li>
           </ul>
@@ -101,9 +102,8 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t-2 border-ink/20 bg-bg px-4 py-3 text-center text-xs font-black text-ink">
-        <p>© 2026 Central Trash Agent Bali — Dinas Lingkungan Hidup dan Kebersihan Provinsi Bali &amp; Kota Denpasar. Seluruh hak cipta dilindungi undang-undang.</p>
+        <p>© 2026 Central Trash Agent Bali — Prototipe Inovasi AI oleh Tim Punya Dendam untuk AI Web Innovation Challenge Bali DigiFest 2026. Tidak berafiliasi dengan instansi pemerintah mana pun.</p>
       </div>
     </footer>
   )
 }
-
