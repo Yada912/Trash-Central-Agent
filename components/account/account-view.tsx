@@ -254,12 +254,6 @@ export function AccountView() {
                 <MaterialIcon name="account_balance" size="sm" />
                 {activeAccount.banjarName ?? 'Banjar Lingkungan'}
               </span>
-              {activeAccount.id === 'usr_warga_01' ? (
-                <span className="vector-pill bg-gold text-ink font-black border-2 border-ink">
-                  <MaterialIcon name="school" size="sm" />
-                  Contoh Akun Sampel Evaluasi Juri
-                </span>
-              ) : null}
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               {activeAccount.role === 'petugas'

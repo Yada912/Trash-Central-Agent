@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAccount } from '@/components/account/use-account'
@@ -16,10 +16,15 @@ import {
   type ContainerPreset,
 } from '@/lib/accounts/store'
 import { KECAMATAN, type AccountType, type Kecamatan } from '@/lib/schemas'
+import {
+  getDesaListByKecamatan,
+  getDesaDetails,
+  getBanjarsByDesa,
+} from '@/lib/data/denpasar-regions'
 
 export default function MasukPage() {
   const router = useRouter()
-  const { activeAccount, isSignedIn, login, logout, createNewAccount } = useAccount()
+  const { activeAccount, isSignedIn, login, logout, createNewAccount, timetable } = useAccount()
   const [tab, setTab] = useState<'login' | 'register'>('login')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,8 +45,39 @@ export default function MasukPage() {
   // Step 2: Lokasi & Banjar di Bali
   const [regKecamatan, setRegKecamatan] = useState<Kecamatan>('Denpasar Barat')
   const [regDesa, setRegDesa] = useState('Pemecutan')
-  const [regBanjarName, setRegBanjarName] = useState('')
+  const [regBanjarName, setRegBanjarName] = useState('Banjar Pekambingan')
   const [regAddress, setRegAddress] = useState('')
+  const [desaSearch, setDesaSearch] = useState('')
+  const [isManualDesa, setIsManualDesa] = useState(false)
+  const [isManualBanjar, setIsManualBanjar] = useState(false)
+
+  const availableDesas = useMemo(() => {
+    const list = getDesaListByKecamatan(regKecamatan)
+    if (!desaSearch.trim()) return list
+    const q = desaSearch.toLowerCase().trim()
+    return list.filter((d) => d.name.toLowerCase().includes(q))
+  }, [regKecamatan, desaSearch])
+
+  const selectedDesaInfo = useMemo(
+    () => getDesaDetails(regKecamatan, regDesa),
+    [regKecamatan, regDesa],
+  )
+
+  const availableBanjars = useMemo(
+    () => getBanjarsByDesa(regKecamatan, regDesa),
+    [regKecamatan, regDesa],
+  )
+
+  const currentLeewayMinutes = useMemo(() => {
+    const slot = timetable.find((s) => s.kecamatan === regKecamatan && s.stream === 'organik')
+    return slot?.leewayMinutes ?? 45
+  }, [timetable, regKecamatan])
+
+  const timetableSummary = useMemo(() => {
+    const org = timetable.find((s) => s.kecamatan === regKecamatan && s.stream === 'organik')
+    const anorg = timetable.find((s) => s.kecamatan === regKecamatan && s.stream === 'anorganik')
+    return `${org?.days?.length ?? 4}x Organik (${org?.windowStart ?? '06:00'}–${org?.windowEnd ?? '09:00'}) + ${anorg?.days?.length ?? 3}x Anorganik`
+  }, [timetable, regKecamatan])
 
   // Step 3: Karakteristik Sampah Rumah Tangga
   const [regContainerPreset, setRegContainerPreset] = useState<ContainerPreset>('kantong_15l')
@@ -97,6 +133,9 @@ export default function MasukPage() {
         kecamatan: regKecamatan,
         desa: regDesa.trim() || 'Pemecutan',
         banjarName: regBanjarName.trim() || `Banjar Lingkungan ${regDesa.trim() || 'Pemecutan'}`,
+        tps3rNode: selectedDesaInfo?.tps3rNode,
+        lat: selectedDesaInfo?.lat,
+        lng: selectedDesaInfo?.lng,
         birthDate: regBirthDate.trim() || undefined,
         address: regAddress.trim() || `Wilayah ${regKecamatan}`,
         accountType: regAccountType,
@@ -285,43 +324,6 @@ export default function MasukPage() {
               <span>{busy ? 'Memverifikasi…' : 'Masuk ke Dasbor Warga'}</span>
             </Button>
           </div>
-
-          {/* Dewan Juri / Evaluator Reference Box */}
-          <div className="rounded-xl border-2 border-dashed border-ink bg-amber/35 p-4 text-xs grid gap-2.5 shadow-[2px_2px_0_#1F2933] mt-2">
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-ink text-gold font-black text-xs shrink-0">
-                <MaterialIcon name="school" size="sm" />
-              </span>
-              <div>
-                <span className="font-black text-sm text-ink block">
-                  Akun Sampel Evaluasi Juri &amp; Admin
-                </span>
-                <span className="text-[11px] font-bold text-ink/90">
-                  Contoh Profil Warga Terisi Penuh (Data Historis, Rahinan &amp; Memori AI)
-                </span>
-              </div>
-            </div>
-            <p className="font-semibold text-ink leading-relaxed">
-              Untuk menguji platform tanpa perlu mengisi data dari awal, Dewan Juri dapat menggunakan akun sampel <strong>I Made Adi Wijaya</strong> (Warga Banjar Pekambingan, Denpasar Barat):
-            </p>
-            <div className="rounded-lg border-2 border-ink bg-card p-3 font-mono text-xs flex flex-wrap items-center justify-between gap-2 shadow-[1px_1px_0_#1F2933]">
-              <div className="grid gap-0.5">
-                <p>Email: <strong className="text-ink">made.adi@warga.denpasar.id</strong></p>
-                <p>Sandi: <strong className="text-ink">warga123</strong></p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginEmail('made.adi@warga.denpasar.id')
-                  setLoginPassword('warga123')
-                }}
-                className="btn-tactile bg-mint text-ink px-3 py-1.5 rounded-md border-2 border-ink font-sans font-black text-xs flex items-center gap-1 shadow-[1px_1px_0_#1F2933] hover:bg-mint/80"
-              >
-                <MaterialIcon name="content_copy" size="sm" />
-                <span>Gunakan Akun Juri</span>
-              </button>
-            </div>
-          </div>
         </form>
       ) : (
         /* TAB 2: CURATED ONBOARDING QUESTIONNAIRE FLOW */
@@ -445,7 +447,7 @@ export default function MasukPage() {
             </div>
           ) : null}
 
-          {/* STEP 2: LOKASI & LINGKUNGAN BANJAR */}
+          {/* STEP 2: LOKASI & LINGKUNGAN BANJAR (Filterable & AI Connected) */}
           {onboardingStep === 2 ? (
             <div className="grid gap-4">
               <div>
@@ -462,7 +464,18 @@ export default function MasukPage() {
                 <Select
                   id="reg-kecamatan"
                   value={regKecamatan}
-                  onChange={(e) => setRegKecamatan(e.target.value as Kecamatan)}
+                  onChange={(e) => {
+                    const nextKec = e.target.value as Kecamatan
+                    setRegKecamatan(nextKec)
+                    const desas = getDesaListByKecamatan(nextKec)
+                    if (desas.length > 0) {
+                      setRegDesa(desas[0].name)
+                      setRegBanjarName(desas[0].banjars[0] ?? '')
+                    }
+                    setIsManualDesa(false)
+                    setIsManualBanjar(false)
+                    setDesaSearch('')
+                  }}
                 >
                   {KECAMATAN.map((k) => (
                     <option key={k} value={k}>
@@ -472,33 +485,133 @@ export default function MasukPage() {
                 </Select>
               </div>
 
-              <div className="grid gap-1">
-                <Label htmlFor="reg-desa" className="text-xs font-black uppercase text-ink">
-                  Kelurahan / Desa
-                </Label>
-                <Input
-                  id="reg-desa"
-                  type="text"
-                  value={regDesa}
-                  onChange={(e) => setRegDesa(e.target.value)}
-                  placeholder="Contoh: Pemecutan, Sanur Kauh, Ubung..."
-                  required
-                />
+              {/* Kelurahan / Desa with filter & dropdown */}
+              <div className="grid gap-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="reg-desa" className="text-xs font-black uppercase text-ink">
+                    Kelurahan / Desa di {regKecamatan}
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setIsManualDesa(!isManualDesa)}
+                    className="text-[11px] font-bold text-primary hover:underline"
+                  >
+                    {isManualDesa ? 'Pilih dari Daftar Resmi' : 'Ketik Manual'}
+                  </button>
+                </div>
+
+                {!isManualDesa ? (
+                  <div className="grid gap-1.5">
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={desaSearch}
+                        onChange={(e) => setDesaSearch(e.target.value)}
+                        placeholder={`Saring nama desa (contoh: ${availableDesas[0]?.name ?? 'Pemecutan'})...`}
+                        className="text-xs pr-8"
+                      />
+                      {desaSearch ? (
+                        <button
+                          type="button"
+                          onClick={() => setDesaSearch('')}
+                          className="absolute right-2 top-2.5 text-xs text-ink/60 hover:text-ink font-bold"
+                          title="Hapus filter"
+                        >
+                          ✕
+                        </button>
+                      ) : null}
+                    </div>
+
+                    <Select
+                      id="reg-desa"
+                      value={regDesa}
+                      onChange={(e) => {
+                        const nextDesa = e.target.value
+                        setRegDesa(nextDesa)
+                        const bList = getBanjarsByDesa(regKecamatan, nextDesa)
+                        setRegBanjarName(bList[0] ?? `Banjar ${nextDesa}`)
+                        setIsManualBanjar(false)
+                      }}
+                    >
+                      {availableDesas.map((d) => (
+                        <option key={d.name} value={d.name}>
+                          {d.type} {d.name} ({d.banjars.length} Banjar)
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                ) : (
+                  <Input
+                    id="reg-desa"
+                    type="text"
+                    value={regDesa}
+                    onChange={(e) => setRegDesa(e.target.value)}
+                    placeholder="Contoh: Pemecutan, Sanur Kauh, Ubung..."
+                    required
+                  />
+                )}
               </div>
 
-              <div className="grid gap-1">
-                <Label htmlFor="reg-banjar" className="text-xs font-black uppercase text-ink">
-                  Nama Banjar Adat / Lingkungan
-                </Label>
-                <Input
-                  id="reg-banjar"
-                  type="text"
-                  value={regBanjarName}
-                  onChange={(e) => setRegBanjarName(e.target.value)}
-                  placeholder="Contoh: Banjar Pekambingan, Banjar Intaran..."
-                />
+              {/* Nama Banjar Adat / Lingkungan */}
+              <div className="grid gap-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="reg-banjar" className="text-xs font-black uppercase text-ink">
+                    Banjar Adat / Lingkungan di {regDesa}
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setIsManualBanjar(!isManualBanjar)}
+                    className="text-[11px] font-bold text-primary hover:underline"
+                  >
+                    {isManualBanjar ? 'Pilih dari Banjar Terdaftar' : 'Ketik Manual'}
+                  </button>
+                </div>
+
+                {!isManualBanjar && availableBanjars.length > 0 ? (
+                  <div className="grid gap-2">
+                    <Select
+                      id="reg-banjar"
+                      value={regBanjarName}
+                      onChange={(e) => setRegBanjarName(e.target.value)}
+                    >
+                      {availableBanjars.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </Select>
+
+                    {/* Quick Select Pill Tags for Banjars */}
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                      <span className="text-[10px] font-black text-ink/70 w-full">Pilih Cepat Banjar:</span>
+                      {availableBanjars.map((b) => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => setRegBanjarName(b)}
+                          className={`text-[11px] px-2 py-0.5 rounded-md border font-bold transition-all ${
+                            regBanjarName === b
+                              ? 'bg-primary text-white border-primary shadow-[1px_1px_0_#1F2933]'
+                              : 'bg-card text-ink border-ink/40 hover:bg-mint/40'
+                          }`}
+                        >
+                          {b}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Input
+                    id="reg-banjar"
+                    type="text"
+                    value={regBanjarName}
+                    onChange={(e) => setRegBanjarName(e.target.value)}
+                    placeholder="Contoh: Banjar Pekambingan, Banjar Intaran..."
+                  />
+                )}
               </div>
 
+              {/* Alamat Jalan / Patokan Rumah */}
               <div className="grid gap-1">
                 <Label htmlFor="reg-address" className="text-xs font-black uppercase text-ink">
                   Alamat Jalan / Patokan Rumah
@@ -510,6 +623,30 @@ export default function MasukPage() {
                   onChange={(e) => setRegAddress(e.target.value)}
                   placeholder="Contoh: Jl. Hasanuddin No. 12"
                 />
+              </div>
+
+              {/* Live Decentralized Node & AI Schedule Feedback Box */}
+              <div className="rounded-xl border-2 border-ink bg-mint/30 p-3.5 text-xs grid gap-2 shadow-[2px_2px_0_#1F2933]">
+                <div className="flex items-center gap-1.5 font-black text-ink">
+                  <MaterialIcon name="hub" className="text-primary" size="sm" />
+                  <span>Koneksi Jadwal Armada &amp; Agen Kresna:</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-ink">
+                  <div className="rounded-lg border border-ink/30 bg-card p-2.5">
+                    <span className="text-[10px] uppercase font-black text-primary block">Sentra TPS3R Penanggung Jawab</span>
+                    <strong className="text-xs text-ink block">{selectedDesaInfo?.tps3rNode ?? `TPS3R Swakelola ${regDesa}`}</strong>
+                    <p className="text-[10px] text-ink/75 mt-0.5">Pengolahan kompos &amp; daur ulang berbasis sumber desa</p>
+                  </div>
+                  <div className="rounded-lg border border-ink/30 bg-card p-2.5">
+                    <span className="text-[10px] uppercase font-black text-primary block">Toleransi Waktu Armada (Leeway)</span>
+                    <strong className="text-xs text-ink block">±{currentLeewayMinutes} Menit</strong>
+                    <p className="text-[10px] text-ink/75 mt-0.5">Disesuaikan otomatis saat rahinan adat &amp; lonjakan timbulan</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center justify-between text-[11px] text-ink/80 font-medium pt-1 border-t border-ink/10">
+                  <span>📍 Lokasi jemput: <strong>{regBanjarName || 'Banjar'}, {regDesa}</strong></span>
+                  <span>Jalur Operasional: <strong>{timetableSummary}</strong></span>
+                </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">
@@ -525,6 +662,10 @@ export default function MasukPage() {
                 <Button
                   type="button"
                   onClick={() => {
+                    if (!regDesa.trim()) {
+                      setError('Harap pilih atau masukkan Kelurahan / Desa.')
+                      return
+                    }
                     setError(null)
                     setOnboardingStep(3)
                   }}

@@ -136,43 +136,6 @@ export default function MasukPetugasPage() {
           </div>
         </form>
 
-        {/* Dewan Juri / Evaluator Reference Box for Petugas */}
-        <div className="rounded-xl border-2 border-dashed border-ink bg-lavender/40 p-4 text-xs grid gap-2.5 shadow-[2px_2px_0_#1F2933]">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-ink text-white font-black text-xs shrink-0">
-              <MaterialIcon name="badge" size="sm" />
-            </span>
-            <div>
-              <span className="font-black text-sm text-ink block">
-                Akun Sampel Petugas DLHK (Akses Juri &amp; Admin)
-              </span>
-              <span className="text-[11px] font-bold text-ink/90">
-                Contoh Driver Armada Pengangkutan Denpasar Barat
-              </span>
-            </div>
-          </div>
-          <p className="font-semibold text-ink leading-relaxed">
-            Dewan Juri dapat mengevaluasi antarmuka pengemudi armada DLHK, rute VRP terintegrasi Google Maps, dan pengatur leeway dengan akun dinas contoh:
-          </p>
-          <div className="rounded-lg border-2 border-ink bg-card p-3 font-mono text-xs flex flex-wrap items-center justify-between gap-2 shadow-[1px_1px_0_#1F2933]">
-            <div className="grid gap-0.5">
-              <p>Email: <strong className="text-ink">surya.wirawan@dlhk.denpasar.id</strong></p>
-              <p>Sandi: <strong className="text-ink">petugas123</strong></p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('surya.wirawan@dlhk.denpasar.id')
-                setPassword('petugas123')
-              }}
-              className="btn-tactile bg-lavender text-ink px-3 py-1.5 rounded-md border-2 border-ink font-sans font-black text-xs flex items-center gap-1 shadow-[1px_1px_0_#1F2933] hover:bg-lavender/80"
-            >
-              <MaterialIcon name="content_copy" size="sm" />
-              <span>Gunakan Akun Petugas</span>
-            </button>
-          </div>
-        </div>
-
         <div className="rounded-xl border-2 border-ink bg-bg p-3.5 text-xs text-ink font-semibold grid gap-1">
           <p className="font-black flex items-center gap-1 text-ink">
             <MaterialIcon name="shield" size="sm" className="text-primary" />

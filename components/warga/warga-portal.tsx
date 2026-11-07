@@ -155,12 +155,6 @@ export function WargaPortal() {
                 Otonan: {computedOtonan.pawukonLabel}
               </span>
             ) : null}
-            {activeAccount.id === 'usr_warga_01' ? (
-              <span className="vector-pill bg-gold text-ink font-black border-2 border-ink">
-                <MaterialIcon name="school" size="sm" />
-                Akun Sampel Evaluasi Juri
-              </span>
-            ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
             <Link

@@ -1,4 +1,5 @@
 import type { AccountType, Kecamatan, TrashType, WasteStream } from '@/lib/schemas'
+import { getDesaDetails } from '@/lib/data/denpasar-regions'
 import {
   BALINESE_CALENDAR_EVENTS_2026,
   computeUserOtonanFromBirthDate,
@@ -846,9 +847,15 @@ export function createAccount(input: {
   tps3rNode?: string
   birthDate?: string
   address: string
+  lat?: number
+  lng?: number
   accountType: AccountType
   wasteProfile?: Partial<ResidentWasteProfile>
 }): UserAccount {
+  const regionInfo = getDesaDetails(input.kecamatan, input.desa)
+  const resolvedLat = input.lat ?? regionInfo?.lat ?? -8.6562
+  const resolvedLng = input.lng ?? regionInfo?.lng ?? 115.2124
+  const resolvedNode = input.tps3rNode?.trim() || regionInfo?.tps3rNode || `TPS3R Swakelola ${input.desa.trim() || 'Desa'}`
   const state = getAccountState()
   const id = `usr_${input.role}_${Date.now().toString(36)}`
   const defaultProfile: ResidentWasteProfile | undefined =
@@ -905,11 +912,11 @@ export function createAccount(input: {
     kecamatan: input.kecamatan,
     desa: input.desa.trim() || 'Pemecutan',
     banjarName: input.banjarName?.trim() || `Banjar Lingkungan ${input.desa.trim() || 'Desa'}`,
-    tps3rNode: input.tps3rNode?.trim() || `TPS3R Swakelola ${input.desa.trim() || 'Desa'}`,
+    tps3rNode: resolvedNode,
     birthDate: input.birthDate?.trim(),
     address: input.address.trim() || `Wilayah ${input.kecamatan}`,
-    lat: -8.6562,
-    lng: 115.2124,
+    lat: resolvedLat,
+    lng: resolvedLng,
     accountType: input.accountType,
     wasteProfile: defaultProfile,
   }

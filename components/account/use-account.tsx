@@ -51,6 +51,8 @@ type AccountContextValue = {
     desa: string
     banjarName?: string
     tps3rNode?: string
+    lat?: number
+    lng?: number
     birthDate?: string
     address: string
     accountType: AccountType
