@@ -34,12 +34,19 @@ export const CLASSIFICATION_FLAGS = [
 export const classificationFlagSchema = z.enum(CLASSIFICATION_FLAGS)
 export type ClassificationFlag = z.infer<typeof classificationFlagSchema>
 
+/**
+ * needsReview is true exactly when reviewReasons is non-empty. The server fills this list.
+ * hazard_cleared_by_resident: the stored aiClassification was hazardous
+ * (isHazardousClassification) and the confirmed classification is not.
+ * The report still needs review, and it routes on an ordinary truck.
+ */
 export const REVIEW_REASONS = [
   'low_confidence',
   'hazardous',
   'insufficient_text',
   'contradictory',
   'low_image_quality',
+  'hazard_cleared_by_resident',
 ] as const
 export const reviewReasonSchema = z.enum(REVIEW_REASONS)
 export type ReviewReason = z.infer<typeof reviewReasonSchema>

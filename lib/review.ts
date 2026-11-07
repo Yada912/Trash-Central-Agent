@@ -15,12 +15,17 @@ export type ReviewInput = {
   flags: readonly string[]
   text: string
   hasImage: boolean
+  aiClassification?: { types: ReadonlyArray<{ type: string; share: number }>; flags: readonly string[] }
 }
 
 export function reviewReasonsFor(input: ReviewInput): ReviewReason[] {
   const reasons: ReviewReason[] = []
   if (input.confidence < REVIEW_CONFIDENCE_THRESHOLD) reasons.push('low_confidence')
-  if (isHazardousClassification({ types: input.types, flags: input.flags })) reasons.push('hazardous')
+  const confirmedHazardous = isHazardousClassification({ types: input.types, flags: input.flags })
+  if (confirmedHazardous) reasons.push('hazardous')
+  else if (input.aiClassification && isHazardousClassification(input.aiClassification)) {
+    reasons.push('hazard_cleared_by_resident')
+  }
   if (input.flags.includes('insufficient_text') || (input.text.trim().length < 10 && !input.hasImage)) {
     reasons.push('insufficient_text')
   }
@@ -43,7 +48,12 @@ export function normalizeClassificationFlags(
 export function stampClassification(
   classification: Omit<Classification, 'needsReview' | 'reviewReasons' | 'source'> &
     Partial<Pick<Classification, 'needsReview' | 'reviewReasons' | 'source'>>,
-  context: { text: string; hasImage: boolean; source: ClassificationSource },
+  context: {
+    text: string
+    hasImage: boolean
+    source: ClassificationSource
+    aiClassification?: { types: ReadonlyArray<{ type: string; share: number }>; flags: readonly string[] }
+  },
 ): Classification {
   const flags = normalizeClassificationFlags(classification.flags, {
     hasImage: context.hasImage,
@@ -55,6 +65,7 @@ export function stampClassification(
     flags,
     text: context.text,
     hasImage: context.hasImage,
+    aiClassification: context.aiClassification,
   })
   return {
     ...classification,

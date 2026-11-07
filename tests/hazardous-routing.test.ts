@@ -50,6 +50,31 @@ describe('isHazardousClassification', () => {
     expect(ordinary.needsReview).toBe(false)
   })
 
+  it('asks for review when a stored hazardous classification is cleared, and still routes', () => {
+    const ai = stampClassification(draft(0.4, ['hazardous_present']), { text, hasImage: true, source: 'mock' })
+    const corrected = stampClassification(draft(0, []), {
+      text,
+      hasImage: true,
+      source: 'manual',
+      aiClassification: ai,
+    })
+    expect(ai.flags).toContain('hazardous_present')
+    expect(corrected.flags).not.toContain('hazardous_present')
+    expect(corrected.reviewReasons).toContain('hazard_cleared_by_resident')
+    expect(corrected.needsReview).toBe(true)
+    expect(isHazardousClassification(corrected)).toBe(false)
+    const depot = { lat: -8.67, lng: 115.21, name: 'TPA Suwung', label: 'simulated depot (operational status unverified)' }
+    const plan = solvePlan({
+      depot,
+      trucks: [{ id: 't1', capacityLiters: 1000 }],
+      crews: 1,
+      shift: { start: '06:00', end: '18:00' },
+      stops: [{ id: 'cleared', lat: -8.66, lng: 115.22, liters: 10, urgency: 'low', hazardous: isHazardousClassification(corrected) }],
+    })
+    expect(plan.routes[0]?.stopIds).toEqual(['cleared'])
+    expect(plan.unassigned).toEqual([])
+  })
+
   it('clears a forced flag when the share is set to 0 and hazardous is unchecked', () => {
     const ai = stampClassification(draft(0.4, []), { text, hasImage: true, source: 'mock' })
     expect(ai.flags).toContain('hazardous_present')

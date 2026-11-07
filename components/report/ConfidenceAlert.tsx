@@ -6,6 +6,7 @@ const REASON_TEXT: Record<ReviewReason, string> = {
   insufficient_text: 'the description is very short and there is no photo',
   contradictory: 'the description and photo disagree',
   low_image_quality: 'the photo is hard to read',
+  hazard_cleared_by_resident: 'a hazardous classification was cleared and still needs a check',
 }
 
 export function ConfidenceAlert({

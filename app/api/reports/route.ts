@@ -63,6 +63,7 @@ export async function POST(request: Request) {
       text: parsed.data.text,
       hasImage,
       source: parsed.data.aiClassification ? (process.env.GEMINI_API_KEY?.trim() ? 'gemini' : 'mock') : 'manual',
+      aiClassification: parsed.data.aiClassification,
     })
     const bodyHash = canonicalReportBodyHash({
       text: parsed.data.text,

@@ -24,7 +24,7 @@ MIME: image/jpeg, image/png, image/webp. Max 3,000,000 bytes decoded (~4.0 MB as
   rationale: string /*≤280 chars*/,
   flags: Array<'hazardous_present'|'low_image_quality'|'no_image'|'insufficient_text'|'contradictory'>,
   needsReview: boolean,
-  reviewReasons: Array<'low_confidence'|'hazardous'|'insufficient_text'|'contradictory'|'low_image_quality'>,
+  reviewReasons: Array<'low_confidence'|'hazardous'|'insufficient_text'|'contradictory'|'low_image_quality'|'hazard_cleared_by_resident'>,
   source: 'gemini'|'mock'|'manual'
 }
 needsReview is computed on the server (lib/review.ts), never inside lib/ai. It is true exactly when reviewReasons is non-empty.
@@ -33,7 +33,7 @@ insufficient_text: flag set, or text under 10 characters and no image. contradic
 low_image_quality: flag set. no_image alone does not trigger review.
 POST /api/reports recomputes flags and reviewReasons and ignores a client needsReview value.
 A saved photo drops no_image. A text-only save drops low_image_quality and sets no_image. Those two flags are never stored together.
-A hazardous share above 0 forces hazardous_present. An explicit hazardous_present with share 0 stays. Setting the share to 0 and omitting the flag is an explicit correction and clears the flag. The original aiClassification is stored on the report for audit.
+A hazardous share above 0 forces hazardous_present. An explicit hazardous_present with share 0 stays. Setting the share to 0 and omitting the flag is an explicit correction and clears the flag. The original aiClassification is stored on the report for audit. When that stored classification was hazardous and the confirmed one is not, reviewReasons includes hazard_cleared_by_resident, needsReview is true, and the report still joins ordinary routes and dashboard totals.
 source is gemini in live mode, mock in demo mode, and manual for manual entry. needsReview never blocks submit.
 REVIEW_CONFIDENCE_THRESHOLD = 0.5.
 Defaults when the resident skips editing: use AI values as-is. Manual entry (no AI) default: types [{residual,1}], volume {50,'medium'}, urgency 'medium', confidence 0, flags ['no_image'] if none.

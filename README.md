@@ -45,6 +45,7 @@ Classification and the plan explanation call Gemini only when `GEMINI_API_KEY` i
 - `insufficient_text` when that flag is set, or the text is under 10 characters and there is no photo
 - `contradictory` when that flag is set
 - `low_image_quality` when that flag is set
+- `hazard_cleared_by_resident` when the stored AI classification was hazardous and the confirmed classification is not. The report still needs review and still joins an ordinary route.
 
 `no_image` by itself does not request review. Review never blocks submit.
 
