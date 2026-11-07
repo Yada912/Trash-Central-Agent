@@ -19,7 +19,7 @@ async function keepTwoTrucks(page: Page) {
 
 test('resident report, planner decisions, and reload', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Central Trash Agent Bali' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Central Trash Agent Bali', exact: true, level: 1 })).toBeVisible()
   await shot(page, '00-home')
 
   await page.getByRole('link', { name: 'Laporkan tumpukan', exact: true }).first().click()
