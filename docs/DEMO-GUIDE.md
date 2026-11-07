@@ -1,6 +1,6 @@
-# Panduan Demonstrasi & Skenario Uji — Central Trash Agent
+# Panduan Demonstrasi & Skenario Uji — Central Trash Agent Bali
 
-Panduan ini menjelaskan langkah demi langkah untuk mendemonstrasikan seluruh kapabilitas **Central Trash Agent** dari sisi **Warga** maupun **Petugas Pengelola Pengangkutan**.
+Panduan ini menjelaskan langkah demi langkah untuk mendemonstrasikan seluruh kapabilitas **Central Trash Agent Bali** dari sisi **Warga** maupun **Petugas Pengelola Pengangkutan**.
 
 ---
 

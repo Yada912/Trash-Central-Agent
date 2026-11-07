@@ -1,4 +1,4 @@
-# Proposal Teknis — Central Trash Agent
+# Proposal Teknis — Central Trash Agent Bali
 
 **AI Web Innovation Challenge — Bali DigiFest 2026**
 - **Kategori:** Mahasiswa / Umum
@@ -12,7 +12,7 @@
 
 ## 1. Latar Belakang & Rumusan Masalah
 
-**Central Trash Agent** menjawab kebutuhan untuk menghubungkan laporan tumpukan sampah dari warga dengan keputusan operasional pengangkutan di Kota Denpasar secara terstruktur, transparan, dan tetap berada di bawah kendali manusia (*human-in-the-loop*). Dalam pengelolaan harian, laporan warga yang dikirim melalui teks bebas atau foto sering kali belum memiliki struktur jenis material, estimasi volume (liter), tingkat urgensi, maupun penandaan limbah berbahaya (B3) yang konsisten untuk langsung diolah menjadi prioritas dan rute armada.
+**Central Trash Agent Bali** menjawab kebutuhan untuk menghubungkan laporan tumpukan sampah dari warga dengan keputusan operasional pengangkutan di Kota Denpasar secara terstruktur, transparan, dan tetap berada di bawah kendali manusia (*human-in-the-loop*). Dalam pengelolaan harian, laporan warga yang dikirim melalui teks bebas atau foto sering kali belum memiliki struktur jenis material, estimasi volume (liter), tingkat urgensi, maupun penandaan limbah berbahaya (B3) yang konsisten untuk langsung diolah menjadi prioritas dan rute armada.
 
 Sebagai konteks skala wilayah:
 - Pemerintah Provinsi Bali dalam rilis resmi tanggal 29 Agustus 2025 menyebutkan estimasi timbulan sampah Provinsi Bali sekitar **3.400 ton/hari** [1].
@@ -38,7 +38,7 @@ Aplikasi ini dirancang sebagai sistem pendukung keputusan (*decision-support sys
 
 ## 3. Solusi yang Diimplementasikan
 
-Central Trash Agent menerapkan alur kerja ujung-ke-ujung dengan pemisahan tegas antara **interpretasi/penjelasan AI** dan **perhitungan optimasi deterministik**:
+Central Trash Agent Bali menerapkan alur kerja ujung-ke-ujung dengan pemisahan tegas antara **interpretasi/penjelasan AI** dan **perhitungan optimasi deterministik**:
 
 1. **Pelaporan Warga dengan Konfirmasi Manusia (`/report`):**
    - Warga memasukkan deskripsi teks (1–1.000 karakter) dan/atau foto opsional (dikompresi di sisi klien ke maksimum 1280 px JPEG, $\le 3\text{ MB}$).
@@ -107,7 +107,7 @@ Seluruh fitur inti telah diimplementasikan dan diverifikasi melalui pengujian ot
 
 ## 7. Inovasi & Diferensiasi
 
-Berbeda dari layanan pengaduan warga umum yang hanya meneruskan tiket laporan (seperti FixMyStreet [5] atau LAPOR! [6]) maupun platform penjemputan terpilah komersial (seperti Waste4Change [4] atau Rekosistem [5]), **Central Trash Agent** mengintegrasikan empat lapisan secara utuh dalam konteks regulasi Bali:
+Berbeda dari layanan pengaduan warga umum yang hanya meneruskan tiket laporan (seperti FixMyStreet [5] atau LAPOR! [6]) maupun platform penjemputan terpilah komersial (seperti Waste4Change [4] atau Rekosistem [5]), **Central Trash Agent Bali** mengintegrasikan empat lapisan secara utuh dalam konteks regulasi Bali:
 1. **Edukasi & Pemetaan Regulasi Lokal:** Menghubungkan langsung 5 kategori pemilahan sumber **Pergub Bali No. 47 Tahun 2019 Pasal 6 ayat (2)** ke dalam 4 aliran jadwal operasional kota.
 2. **Ekstraksi Multimodal Terkoreksi Warga:** Mengubah foto/teks tidak terstruktur menjadi estimasi komposisi dan volume liter yang wajib dikonfirmasi warga sebelum disimpan, dilengkapi pelacakan audit jika warga menghapus penanda B3.
 3. **Pemisahan AI dari Optimasi Matematis:** Menggunakan solver VRP deterministik untuk menghitung kelayakan kapasitas dan sif, sementara LLM dibatasi hanya sebagai penerjemah naratif yang tunduk pada pemeriksaan kesesuaian (*staleness check*).

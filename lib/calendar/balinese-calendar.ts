@@ -593,7 +593,7 @@ export function buildIcsContent(input: ExternalCalendarEventInput): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Central Trash Agent Denpasar//ID',
+    'PRODID:-//Central Trash Agent Bali//ID',
     'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
     `UID:${uid}`,

@@ -34,12 +34,14 @@ export function ScheduleView() {
   const [kecamatan, setKecamatan] = useState<Kecamatan | ''>('')
   const [stream, setStream] = useState<WasteStream | ''>('')
   const [accountType, setAccountType] = useState<AccountType>('household')
-  const [viewRole, setViewRole] = useState<'resident' | 'officer'>('resident')
   const [checkedAvailability, setCheckedAvailability] = useState(false)
   const [data, setData] = useState<ScheduleResponse | null>(null)
   const [mode, setMode] = useState<ApiMode | null>(null)
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const isPetugas = activeAccount?.role === 'petugas'
+  const viewRole: 'resident' | 'officer' = isPetugas ? 'officer' : 'resident'
 
   const loadSchedule = useCallback(async () => {
     setBusy(true)
@@ -89,20 +91,14 @@ export function ScheduleView() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ModeBadge mode={mode} />
-          <Button
-            variant={viewRole === 'resident' ? 'primary' : 'secondary'}
-            onClick={() => setViewRole('resident')}
+          <span
+            className={`vector-pill text-xs font-black flex items-center gap-1.5 ${
+              isPetugas ? 'bg-lavender text-ink' : 'bg-mint text-ink'
+            }`}
           >
-            <MaterialIcon name="person" size="sm" />
-            Tampilan Warga
-          </Button>
-          <Button
-            variant={viewRole === 'officer' ? 'primary' : 'secondary'}
-            onClick={() => setViewRole('officer')}
-          >
-            <MaterialIcon name="table_chart" size="sm" />
-            Tabel Area Petugas
-          </Button>
+            <MaterialIcon name={isPetugas ? 'badge' : 'person'} size="sm" />
+            <span>{isPetugas ? 'Mode Petugas Operasional' : 'Mode Warga Denpasar'}</span>
+          </span>
         </div>
       </div>
 
@@ -354,12 +350,14 @@ export function ScheduleView() {
               Batas muatan per penjemputan dan cadangan kapasitas saat terjadi lonjakan hari raya/upacara.
             </p>
           </div>
-          <Button asChild variant="secondary">
-            <Link href="/akun">
-              <MaterialIcon name="edit_calendar" size="sm" />
-              Ubah Leeway (Mode Petugas)
-            </Link>
-          </Button>
+          {isPetugas ? (
+            <Button asChild variant="secondary">
+              <Link href="/petugas#leeway-manager">
+                <MaterialIcon name="edit_calendar" size="sm" />
+                Ubah Leeway di Portal Petugas
+              </Link>
+            </Button>
+          ) : null}
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           {filteredTimetable.map((slot) => (

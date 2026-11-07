@@ -62,6 +62,21 @@ export type PersonalPickupRecord = {
 
 export type CurrentTrashCondition = 'terkendali' | 'menumpuk' | 'meluber' | 'pasca_upacara'
 
+export type AgentChatMessage = {
+  id: string
+  sender: 'user' | 'agent'
+  text: string
+  timestamp: string
+  modelUpdateSummary?: string
+}
+
+export type AgentMemoryItem = {
+  id: string
+  fact: string
+  createdAt: string
+  category?: 'upacara' | 'kebiasaan' | 'lokasi' | 'wadah'
+}
+
 export type ResidentWasteProfile = {
   currentCondition: CurrentTrashCondition
   conditionNote: string
@@ -73,6 +88,8 @@ export type ResidentWasteProfile = {
   specialEvents: SpecialEventSurge[]
   selectedBalineseEventIds?: string[]
   pickupHistory?: PersonalPickupRecord[]
+  chatMessages?: AgentChatMessage[]
+  agentMemory?: AgentMemoryItem[]
 }
 
 export type UserAccount = {

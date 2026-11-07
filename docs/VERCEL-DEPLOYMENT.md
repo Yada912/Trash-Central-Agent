@@ -1,6 +1,6 @@
-# Panduan Deployment ke Vercel — Central Trash Agent
+# Panduan Deployment ke Vercel — Central Trash Agent Bali
 
-Dokumen ini menjelaskan langkah demi langkah untuk men-deploy **Central Trash Agent** ke **Vercel** baik melalui dasbor web Vercel (terhubung ke GitHub) maupun melalui **Vercel CLI**.
+Dokumen ini menjelaskan langkah demi langkah untuk men-deploy **Central Trash Agent Bali** ke **Vercel** baik melalui dasbor web Vercel (terhubung ke GitHub) maupun melalui **Vercel CLI**.
 
 ---
 

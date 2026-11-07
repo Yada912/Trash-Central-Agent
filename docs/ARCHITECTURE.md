@@ -1,6 +1,6 @@
-# Arsitektur Teknis — Central Trash Agent
+# Arsitektur Teknis — Central Trash Agent Bali
 
-Dokumen ini menjelaskan arsitektur sistem, pemisahan tanggung jawab antara kecerdasan buatan (AI) dan algoritma deterministik, desain antarmuka pengguna, serta mekanisme kendali manusia (*human-in-the-loop*) pada **Central Trash Agent**.
+Dokumen ini menjelaskan arsitektur sistem, pemisahan tanggung jawab antara kecerdasan buatan (AI) dan algoritma deterministik, desain antarmuka pengguna, serta mekanisme kendali manusia (*human-in-the-loop*) pada **Central Trash Agent Bali**.
 
 ---
 

@@ -150,6 +150,20 @@ const OFFICER_ROUTES = [
   },
 ]
 
+function buildGoogleMapsDirectionsUrl(stops: Array<{ lat: number; lng: number }>): string {
+  if (stops.length < 2) return 'https://maps.google.com'
+  const origin = `${stops[0].lat},${stops[0].lng}`
+  const destination = `${stops[stops.length - 1].lat},${stops[stops.length - 1].lng}`
+  const waypoints = stops
+    .slice(1, -1)
+    .map((s) => `${s.lat},${s.lng}`)
+    .join('|')
+  const base = 'https://www.google.com/maps/dir/?api=1'
+  return `${base}&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}${
+    waypoints ? `&waypoints=${encodeURIComponent(waypoints)}` : ''
+  }&travelmode=driving`
+}
+
 export function PetugasPortal() {
   const { activeAccount, accounts, isSignedIn, timetable, updateTimetable, login } = useAccount()
   const { reports, loading: loadingReports, reload } = useDashboard()
@@ -760,8 +774,17 @@ export function PetugasPortal() {
                   </ol>
                 </div>
 
-                <div className="pt-1">
-                  <Button asChild className="w-full">
+                <div className="grid gap-2 pt-1">
+                  <a
+                    href={buildGoogleMapsDirectionsUrl(activeRoute.stops)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-tactile w-full bg-mint text-ink font-black flex items-center justify-center gap-2 py-2.5 text-xs text-center border-2 border-ink shadow-[2px_2px_0_#1F2933] hover:bg-mint/85"
+                  >
+                    <MaterialIcon name="navigation" size="sm" className="text-primary" />
+                    <span>Buka Rute Pengemudi di Google Maps (Pra-Muat Semua Titik)</span>
+                  </a>
+                  <Button asChild variant="secondary" className="w-full text-xs font-bold">
                     <Link href="/planner">
                       <MaterialIcon name="tune" size="sm" />
                       Optimasi Rute Lebih Lanjut di Perencana VRP (/planner)

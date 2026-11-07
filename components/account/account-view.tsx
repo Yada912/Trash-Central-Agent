@@ -60,7 +60,7 @@ const CONDITION_OPTIONS: Array<{
 
 export function AccountView() {
   const router = useRouter()
-  const { activeAccount, timetable, optimization, busy, login, switchAccount, updateProfile, updateTimetable } =
+  const { activeAccount, timetable, optimization, busy, login, logout, switchAccount, updateProfile, updateTimetable } =
     useAccount()
 
   const [profileDraft, setProfileDraft] = useState<ResidentWasteProfile | null>(null)
@@ -184,6 +184,11 @@ export function AccountView() {
     router.push('/warga')
   }
 
+  function handleLogout() {
+    logout()
+    router.push('/masuk')
+  }
+
   return (
     <main id="main" className="grid gap-8">
       {/* Header Section: Single Account Context */}
@@ -215,17 +220,28 @@ export function AccountView() {
                 : 'Pengelolaan ritme sampah rumah tangga/usaha Anda secara personal. Sistem menyesuaikan jadwal jemput TPS3R desa dan kalender rahinan/otonan keluarga Anda.'}
             </p>
           </div>
-          {activeAccount.role === 'warga' ? (
-            <Button onClick={() => void saveWargaProfile()} disabled={busy}>
-              <MaterialIcon name="save" />
-              Simpan Profil & Otonan
-            </Button>
-          ) : (
-            <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
-              <MaterialIcon name="person" />
-              Kembali ke Mode Warga
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {activeAccount.role === 'warga' ? (
+              <Button onClick={() => void saveWargaProfile()} disabled={busy}>
+                <MaterialIcon name="save" />
+                Simpan Profil & Otonan
+              </Button>
+            ) : (
+              <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
+                <MaterialIcon name="person" />
+                Kembali ke Mode Warga
+              </Button>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn-tactile bg-coral text-white px-3.5 py-2 rounded-md border-2 border-ink text-xs font-black flex items-center gap-1.5 shadow-[2px_2px_0_#1F2933] hover:bg-coral/90"
+              data-testid="logout-button"
+            >
+              <MaterialIcon name="logout" size="sm" />
+              <span>Keluar dari Akun</span>
+            </button>
+          </div>
         </div>
 
         {/* Highlighted Otonan & Decentralized Node Card */}
@@ -889,6 +905,27 @@ export function AccountView() {
           </div>
         </section>
       )}
+
+      {/* Sesi Akun / Logout */}
+      <section className="vector-card bg-card p-5 flex flex-wrap items-center justify-between gap-3 border-2 border-ink">
+        <div className="flex items-center gap-2.5">
+          <MaterialIcon name="manage_accounts" size="sm" className="text-primary" />
+          <div>
+            <p className="text-sm font-extrabold text-ink">Keluar dari Sesi Aplikasi</p>
+            <p className="text-xs text-ink/70">
+              Keluar dari akun {activeAccount.name} ({activeAccount.email}).
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="btn-tactile bg-coral text-white px-4 py-2 rounded-md border-2 border-ink text-xs font-black flex items-center gap-1.5 shadow-[2px_2px_0_#1F2933] hover:bg-coral/90"
+        >
+          <MaterialIcon name="logout" size="sm" />
+          <span>Keluar dari Akun (Logout)</span>
+        </button>
+      </section>
     </main>
   )
 }
