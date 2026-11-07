@@ -22,7 +22,7 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Central Trash Agent' })).toBeVisible()
   await shot(page, '00-home')
 
-  await page.getByRole('link', { name: 'Laporkan tumpukan' }).click()
+  await page.getByRole('link', { name: 'Laporkan tumpukan', exact: true }).first().click()
   await page.getByLabel('Apa yang Anda lihat?').fill('plastik')
   await page.getByRole('button', { name: 'Klasifikasi' }).click()
   await expect(page.getByText('Demo output: this note is too short to estimate the waste type or volume without guessing.')).toBeVisible()

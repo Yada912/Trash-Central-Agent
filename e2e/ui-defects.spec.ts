@@ -10,7 +10,7 @@ test('hazard share edit clears the stale flag and review filters move the totals
   await page.getByLabel('hazardous %').fill('0')
   await page.getByLabel('plastic %').fill('100')
   await expect(page.getByRole('checkbox', { name: 'Sertakan hazardous_present pada klasifikasi terkonfirmasi' })).not.toBeChecked()
-  await expect(page.getByText('Confirmed flags: no_image')).toBeVisible()
+  await expect(page.getByText('Bendera terkonfirmasi: no_image')).toBeVisible()
   await expect(page.getByText('Hazard cleared by resident, needs check')).toBeVisible()
 
   await page.getByLabel('Lintang (Latitude)').fill('-8.670000')
