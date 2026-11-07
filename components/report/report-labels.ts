@@ -12,6 +12,13 @@ export function storedRecordLabel(input: {
   return `Stored resident report · ${source}`
 }
 
+export const DEMO_MOCK_LABEL = 'Demo mock: keyword rules, not AI'
+
+/** Shown beside a classification when the response mode is demo. Null in live mode. */
+export function demoMockLabel(mode: 'live' | 'demo' | null): string | null {
+  return mode === 'demo' ? DEMO_MOCK_LABEL : null
+}
+
 export function classifierHeading(mode: 'live' | 'demo' | null, model: string | null): string {
   if (model === 'demo-mock') return `Demo template result · model ${model}`
   if (mode === 'demo' && model) return `Demo result · model ${model}`

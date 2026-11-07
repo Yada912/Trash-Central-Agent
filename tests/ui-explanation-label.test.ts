@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { explanationFieldLine, explanationHeading } from '@/components/planner/explanation-label'
+import { explanationFieldLine, explanationHeading, templateTextLabel } from '@/components/planner/explanation-label'
 
 describe('explanation heading', () => {
   it('labels demo-mock as a demo template from the response fields', () => {
@@ -50,6 +50,8 @@ describe('explanation heading', () => {
     )
     expect(explanationHeading(live, { provenance: { source: 'gemini', model: 'gemini-2.5-flash' } })).not.toContain('AI-generated')
     expect(explanationFieldLine(live, stored)).toContain('explanation.provenance.source template')
+    expect(templateTextLabel(stored)).toBe('Template text')
+    expect(templateTextLabel({ provenance: { source: 'gemini', model: 'gemini-2.5-flash' } })).toBeNull()
   })
 
   it('never heads a template or demo explanation as AI-generated', () => {

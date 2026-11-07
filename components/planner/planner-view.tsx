@@ -4,7 +4,8 @@ import { useMemo } from 'react'
 import { useDashboard } from '@/components/dashboard/use-dashboard'
 import { CityMap } from '@/components/map/map-loader'
 import { canApprovePlan } from '@/components/planner/decision-request'
-import { explanationFieldLine, explanationHeading } from '@/components/planner/explanation-label'
+import { explanationFieldLine, explanationHeading, templateTextLabel } from '@/components/planner/explanation-label'
+import { demoMockLabel } from '@/components/report/report-labels'
 import { movableStopIds, ordinaryStopIds, shownUnassigned } from '@/components/planner/route-display'
 import { routeStyle } from '@/components/planner/route-style'
 import { usePlanner } from '@/components/planner/use-planner'
@@ -235,6 +236,10 @@ export function PlannerView() {
               <h3 id="ai-explanation" className="text-lg font-semibold" data-testid="explanation-heading">
                 {explanationHeading(planner.explanationMeta, plan.explanation)}
               </h3>
+              {demoMockLabel(planner.explanationMeta?.mode ?? null) ? (
+                <p className="text-sm font-semibold">{demoMockLabel(planner.explanationMeta?.mode ?? null)}</p>
+              ) : null}
+              {templateTextLabel(plan.explanation) ? <p className="text-sm font-semibold">{templateTextLabel(plan.explanation)}</p> : null}
               <p className="text-sm">{explanationFieldLine(planner.explanationMeta, plan.explanation)}</p>
               {plan.explanation.stale ? (
                 <p className="rounded-md border border-gold bg-gold/10 px-3 py-2 text-sm font-semibold">

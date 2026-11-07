@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifierHeading, reasonSentence, storedRecordLabel } from '@/components/report/report-labels'
+import { DEMO_MOCK_LABEL, classifierHeading, demoMockLabel, reasonSentence, storedRecordLabel } from '@/components/report/report-labels'
 
 describe('stored record labels', () => {
   it('does not call a demo-mode save "Not demo data"', () => {
@@ -15,6 +15,15 @@ describe('stored record labels', () => {
     expect(storedRecordLabel({ isDemo: false, source: 'manual' })).toBe('Stored resident report · classification source manual')
     expect(storedRecordLabel({ isDemo: false, source: 'gemini', mode: 'live' })).toContain('response mode live')
     expect(storedRecordLabel({ isDemo: false, source: 'mock', mode: 'demo' })).not.toContain('Not demo data')
+  })
+})
+
+describe('demo source label', () => {
+  it('names keyword rules when there is no live key', () => {
+    expect(demoMockLabel('demo')).toBe(DEMO_MOCK_LABEL)
+    expect(demoMockLabel('demo')).toBe('Demo mock: keyword rules, not AI')
+    expect(demoMockLabel('live')).toBeNull()
+    expect(demoMockLabel(null)).toBeNull()
   })
 })
 

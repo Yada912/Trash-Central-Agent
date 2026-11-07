@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import '@fontsource/inter/latin-400.css'
 import '@fontsource/inter/latin-600.css'
 import '@fontsource/inter/latin-700.css'
+import { ModeBadge } from '@/components/mode-badge'
 import { SiteHeader } from '@/components/site-header'
 import './globals.css'
 
@@ -20,9 +21,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteHeader />
         <div className="mx-auto min-h-[70vh] max-w-6xl px-4 py-6">{children}</div>
         <footer className="border-t border-ink/10 px-4 py-6 text-sm text-ink">
-          <p className="mx-auto max-w-6xl">
-            Demo product for Bali DigiFest 2026. Routes are simulated. Nothing is sent to DLH.
-          </p>
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
+            <p>Demo product for Bali DigiFest 2026. Routes are simulated. Nothing is sent to DLH.</p>
+            <ModeBadge />
+          </div>
         </footer>
       </body>
     </html>

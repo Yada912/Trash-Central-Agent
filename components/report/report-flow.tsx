@@ -11,7 +11,7 @@ import { HazardWarning } from '@/components/report/HazardWarning'
 import { LocationPicker } from '@/components/report/LocationPicker'
 import { PhotoUploader } from '@/components/report/PhotoUploader'
 import { ResidentApproval } from '@/components/report/ResidentApproval'
-import { classifierHeading, storedRecordLabel } from '@/components/report/report-labels'
+import { classifierHeading, demoMockLabel, storedRecordLabel } from '@/components/report/report-labels'
 import { HAZARDOUS_LABEL, isSeparateHazard } from '@/components/report/hazard-policy'
 import { useReportFlow } from '@/components/report/use-report-flow'
 import { Button } from '@/components/ui/button'
@@ -94,6 +94,7 @@ export function ReportFlow() {
           <ClassificationStatus
             busy={flow.busy === 'classify'}
             heading={heading}
+            demoLabel={demoMockLabel(flow.mode)}
             notTrashReason={flow.notTrashReason}
             insufficient={flow.insufficient}
             classification={flow.shown}
@@ -113,6 +114,7 @@ export function ReportFlow() {
       ) : null}
       {flow.hasDraft ? (
         <>
+          {demoMockLabel(flow.mode) ? <p className="text-sm font-semibold">{demoMockLabel(flow.mode)}</p> : null}
           <ClassificationEditor
             percents={flow.percents}
             liters={flow.liters}

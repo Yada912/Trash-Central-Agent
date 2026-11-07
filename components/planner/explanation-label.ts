@@ -29,6 +29,11 @@ export function readStoredExplanation(explanation: object | null | undefined): {
   return { source, model, persisted: false }
 }
 
+/** Extra label when the stored explanation source is template. Does not change the heading. */
+export function templateTextLabel(explanation?: object | null): string | null {
+  return readStoredExplanation(explanation).source === 'template' ? 'Template text' : null
+}
+
 export function explanationHeading(meta: ExplanationMeta | null, explanation?: object | null): string {
   const stored = readStoredExplanation(explanation)
   if (stored.source === 'template') {

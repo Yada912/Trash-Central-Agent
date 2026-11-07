@@ -9,12 +9,14 @@ const MISSING_TEXT: Record<InsufficientMissing, string> = {
 export function ClassificationStatus({
   busy,
   heading,
+  demoLabel,
   notTrashReason,
   insufficient,
   classification,
 }: {
   busy: boolean
   heading: string
+  demoLabel?: string | null
   notTrashReason: string | null
   insufficient: { reason: string; missing: readonly InsufficientMissing[] } | null
   classification: Classification | null
@@ -25,6 +27,7 @@ export function ClassificationStatus({
       <h2 id="classification-heading" className="text-xl font-semibold">
         {heading}
       </h2>
+      {demoLabel ? <p className="text-sm font-semibold">{demoLabel}</p> : null}
       {busy ? <p>Classifying…</p> : null}
       {notTrashReason ? (
         <div className="grid gap-2">

@@ -32,6 +32,7 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await page.getByLabel('What do you see?').fill('Ada sampah plastik di gang dekat rumah')
   await page.getByRole('button', { name: 'Classify' }).click()
   await expect(page.getByText('Demo output: keyword placeholder because GEMINI_API_KEY is unset.')).toBeVisible()
+  await expect(page.getByText('Demo mock: keyword rules, not AI').first()).toBeVisible()
   await page.getByLabel('Latitude').fill('-8.650000')
   await page.getByLabel('Longitude').fill('115.220000')
   await page.getByRole('checkbox', { name: "I've reviewed this" }).check()
@@ -67,6 +68,9 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await expect(page.getByTestId('explanation-heading')).toContainText('source template')
   await expect(page.getByTestId('explanation-heading')).toContainText('demo-template')
   await expect(page.getByText('AI-generated explanation')).toHaveCount(0)
+  await expect(page.getByText('Template text')).toBeVisible()
+  await expect(page.getByText('Demo mock: keyword rules, not AI').first()).toBeVisible()
+  await expect(page.getByTestId('mode-badge')).toContainText('demo')
   await shot(page, '03-plan')
 
   await page.locator('#move-stop').selectOption(reportId)

@@ -4,6 +4,18 @@
 
 Central Trash Agent is a web app for the Bali DigiFest 2026 AI Web Innovation Challenge (Bali Smart Society). A resident describes a waste pile. The app suggests a classification. An officer reviews a pickup proposal for Denpasar and approves, edits, or rejects it. People stay in the loop: nothing is dispatched on its own, and nothing is sent to the city environmental office (DLH).
 
+## Deploying
+
+Without `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` the store is in memory. On Vercel serverless, a plan made on one instance returns 404 on another. A judged demo therefore needs Supabase configured, or it has to run on a single warm instance or locally with `pnpm start`.
+
+Run the SQL in `supabase/migrations` before the first Supabase request.
+
+| Name | Role |
+| --- | --- |
+| `GEMINI_API_KEY` | Server-only. Unset means demo mode: labelled keyword rules, not a live model. |
+| `SUPABASE_URL` | With the service-role key, selects Supabase. Without it, the store is in memory. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only. Bypasses row level security. Never use a `NEXT_PUBLIC_` prefix. |
+
 ## Problem & Target User
 
 Residents need a simple way to describe a pile. Officers need a map of reports and a pickup proposal they can change. This MVP is a demonstration of that loop. It is not an operational dispatch system.
@@ -169,7 +181,7 @@ This README does not add waste statistics.
 
 ## Deployment URL
 
-Not deployed from this repository yet. Import the repo into Vercel Hobby. No environment variables are required for the demo.
+Not deployed from this repository yet. Import the repo into Vercel Hobby only after the Deploying section above: run `supabase/migrations`, set the three environment variables when the demo must survive more than one serverless instance, or run `pnpm start` on one machine.
 
 ## Demo Account (jika diperlukan - jangan simpan password sensitif di public repo)
 
