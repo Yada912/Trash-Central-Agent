@@ -19,18 +19,29 @@ export function LocationPicker({
 }) {
   const latNum = Number(lat)
   const lngNum = Number(lng)
-  const pin = Number.isFinite(latNum) && Number.isFinite(lngNum) && lat !== '' && lng !== '' ? { lat: latNum, lng: lngNum } : null
+  const pin =
+    Number.isFinite(latNum) && Number.isFinite(lngNum) && lat !== '' && lng !== ''
+      ? { lat: latNum, lng: lngNum }
+      : null
   return (
-    <section className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4" aria-labelledby="location-heading">
+    <section
+      className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4"
+      aria-labelledby="location-heading"
+    >
       <div className="grid gap-2">
         <h2 id="location-heading" className="text-xl font-semibold">
-          Location
+          Lokasi
         </h2>
-        <p className="text-sm">Location is only needed when you submit. Geolocation is optional. You can drop a pin or type coordinates.</p>
-        <p className="text-sm">Denpasar bounds: latitude -8.75 to -8.57, longitude 115.16 to 115.28.</p>
+        <p className="text-sm">
+          Lokasi hanya diperlukan saat Anda mengirim laporan. Geolokasi bersifat opsional —
+          Anda dapat menaruh pin di peta atau mengetik koordinat.
+        </p>
+        <p className="text-sm">
+          Batas wilayah Denpasar: lintang -8.75 s/d -8.57, bujur 115.16 s/d 115.28.
+        </p>
       </div>
       <Button variant="secondary" onClick={onGeolocate}>
-        Use my location
+        Gunakan lokasi saya
       </Button>
       {geoMessage ? <p className="text-sm">{geoMessage}</p> : null}
       <CityMap

@@ -7,22 +7,25 @@ import { SiteHeader } from '@/components/site-header'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Central Trash Agent',
-  description: 'Report a waste pile in Denpasar, review the classification, and plan a pickup with a person in the loop.',
+  title: 'Agen Sampah Terpusat — Denpasar',
+  description:
+    'Laporkan tumpukan sampah di Denpasar, tinjau klasifikasi AI, dan rencanakan rute pengangkutan dengan manusia dalam kendali.',
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <body>
         <a className="skip-link" href="#main">
-          Skip to content
+          Lewati ke konten utama
         </a>
         <SiteHeader />
         <div className="mx-auto min-h-[70vh] max-w-6xl px-4 py-6">{children}</div>
         <footer className="border-t border-ink/10 px-4 py-6 text-sm text-ink">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
-            <p>Demo product for Bali DigiFest 2026. Routes are simulated. Nothing is sent to DLH.</p>
+            <p>
+              Produk demonstrasi untuk Bali DigiFest 2026. Rute bersifat simulasi dan tidak dikirim otomatis ke DLH.
+            </p>
             <ModeBadge />
           </div>
         </footer>

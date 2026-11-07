@@ -121,25 +121,25 @@ export function usePlanner() {
   function runPlan() {
     const ids = trucks.map((truck) => truck.id.trim())
     if (ids.some((id) => id.length === 0)) {
-      setFormError('Every truck needs an ID.')
+      setFormError('Setiap truk wajib memiliki ID.')
       return
     }
     if (new Set(ids).size !== ids.length) {
-      setFormError('Truck IDs must be unique.')
+      setFormError('ID truk harus unik.')
       return
     }
     const parsedTrucks = trucks.map((truck) => ({ id: truck.id.trim(), capacityLiters: Number(truck.capacity) }))
     if (parsedTrucks.some((truck) => !Number.isFinite(truck.capacityLiters) || truck.capacityLiters <= 0)) {
-      setFormError('Every truck needs a capacity greater than 0.')
+      setFormError('Setiap truk wajib memiliki kapasitas lebih dari 0.')
       return
     }
     const crewCount = Number(crews)
     if (!Number.isInteger(crewCount) || crewCount < 1) {
-      setFormError('Crews must be a whole number of at least 1.')
+      setFormError('Jumlah kru harus bilangan bulat minimal 1.')
       return
     }
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(shiftStart) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(shiftEnd) || shiftEnd <= shiftStart) {
-      setFormError('Shift end must be after shift start. Use 24-hour HH:MM.')
+      setFormError('Jam akhir sif harus setelah jam mulai sif. Gunakan format 24 jam HH:MM.')
       return
     }
     setFormError(null)

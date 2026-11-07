@@ -1,4 +1,6 @@
-/** Reports saved while GEMINI_API_KEY is unset are demo records. */
+import { hasGeminiApiKey } from '@/lib/ai/keys'
+
+/** Reports saved while no Gemini API key is configured are demo records. */
 export function savedReportIsDemo(): boolean {
-  return !process.env.GEMINI_API_KEY?.trim()
+  return !hasGeminiApiKey()
 }

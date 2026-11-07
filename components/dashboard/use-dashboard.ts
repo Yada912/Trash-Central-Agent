@@ -23,7 +23,7 @@ export function useDashboard() {
       setDashboard(dashboardResponse.data)
       setMeta(dashboardResponse.meta)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'The dashboard could not be loaded.')
+      setError(caught instanceof Error ? caught.message : 'Dasbor tidak dapat dimuat.')
     } finally {
       setLoading(false)
     }
@@ -42,7 +42,7 @@ export function useDashboard() {
         setDashboard(dashboardResponse.data)
         setMeta(dashboardResponse.meta)
       } catch (caught) {
-        if (!cancelled) setError(caught instanceof Error ? caught.message : 'The dashboard could not be loaded.')
+        if (!cancelled) setError(caught instanceof Error ? caught.message : 'Dasbor tidak dapat dimuat.')
       } finally {
         if (!cancelled) setLoading(false)
       }
