@@ -67,6 +67,9 @@ export function ClassificationStatus({
             {classification.confidence < 0.5 ? ' — Perlu tinjauan tambahan' : ' — Akurat'}
           </p>
           <p className="text-xs font-medium text-ink/85">Catatan Analisis: {classification.rationale}</p>
+          <p className="text-xs font-semibold">
+            Classifier flags: {classification.flags.length > 0 ? classification.flags.join(', ') : 'none'}
+          </p>
           {classification.flags.includes('hazardous_present') ? (
             <p className="text-xs font-bold text-alert">
               Perhatian: Terdeteksi potensi sampah berbahaya (B3). Pastikan tidak dicampur dengan sampah organik.
