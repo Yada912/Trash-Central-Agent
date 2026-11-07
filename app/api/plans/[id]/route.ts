@@ -11,7 +11,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const { id } = await context.params
     const plan = await getStore().getPlan(id)
     if (!plan) return jsonErr(requestId, 404, 'NOT_FOUND', 'Plan not found.')
-    return jsonOk(requestId, plan)
+    return jsonOk(requestId, plan, { model: plan.explanation.provenance.model })
   } catch (error) {
     console.error(error)
     return jsonErr(requestId, 500, 'INTERNAL', 'Something went wrong.')

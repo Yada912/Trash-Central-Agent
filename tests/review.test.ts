@@ -38,6 +38,31 @@ describe('reviewReasonsFor', () => {
     expect(reviewReasonsFor({ ...base, flags: ['low_image_quality'] })).toEqual(['low_image_quality'])
   })
 
+  it('normalizes contradictory flags and ignores a client needsReview value', () => {
+    const textOnly = stampClassification(
+      {
+        ...sample(),
+        confidence: 0.8,
+        types: [{ type: 'hazardous', share: 0.05 }, { type: 'residual', share: 0.95 }],
+        flags: ['low_image_quality'],
+        needsReview: false,
+        reviewReasons: [],
+      },
+      { text: base.text, hasImage: false, source: 'manual' },
+    )
+    expect(textOnly.flags).toEqual(['hazardous_present', 'no_image'])
+    expect(textOnly.needsReview).toBe(true)
+    expect(textOnly.reviewReasons).toEqual(['hazardous'])
+
+    const withPhoto = stampClassification(
+      { ...sample(), confidence: 0.8, flags: ['no_image', 'low_image_quality'], needsReview: true, reviewReasons: ['low_confidence'] },
+      { text: base.text, hasImage: true, source: 'manual' },
+    )
+    expect(withPhoto.flags).toEqual(['low_image_quality'])
+    expect(withPhoto.needsReview).toBe(true)
+    expect(withPhoto.reviewReasons).toEqual(['low_image_quality'])
+  })
+
   it('sets needsReview only when at least one reason is present', () => {
     const stamped = stampClassification(sample(), {
       text: 'hi',

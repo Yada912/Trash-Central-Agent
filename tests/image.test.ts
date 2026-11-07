@@ -13,5 +13,8 @@ describe('image limits', () => {
     expect(imageFieldErrors({ base64: Buffer.from('notanimage').toString('base64'), mimeType: 'image/png' })?.image?.[0]).toMatch(/do not match/)
     expect(flagsForSavedReport(['no_image', 'hazardous_present'], true)).toEqual(['hazardous_present'])
     expect(flagsForSavedReport(['no_image'], false)).toEqual(['no_image'])
+    expect(flagsForSavedReport([], false)).toEqual(['no_image'])
+    expect(flagsForSavedReport(['low_image_quality', 'no_image'], false)).toEqual(['no_image'])
+    expect(flagsForSavedReport(['low_image_quality'], true)).toEqual(['low_image_quality'])
   })
 })

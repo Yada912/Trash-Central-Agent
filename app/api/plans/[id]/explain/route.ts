@@ -29,7 +29,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     })
     await store.savePlan(updated)
     return jsonOk(requestId, updated, {
-      model: process.env.GEMINI_API_KEY ? 'gemini-2.5-flash' : 'demo-mock',
+      model: updated.explanation.provenance.model,
       latencyMs: Date.now() - started,
     })
   } catch (error) {

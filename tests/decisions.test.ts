@@ -63,7 +63,13 @@ function plan(overrides: Partial<Plan> = {}): Plan {
       unassigned: [{ id: 'haz', reason: 'hazardous_separate' }],
       totals: { distanceKm: 1, liters: 22, stops: 2 },
     },
-    explanation: { summary: 'Demo output: existing', perRoute: [], risks: [], stale: false },
+    explanation: {
+      summary: 'Demo output: existing',
+      perRoute: [],
+      risks: [],
+      stale: false,
+      provenance: { source: 'template', model: 'demo-template' },
+    },
     decisions: [],
     ...overrides,
   }
@@ -119,6 +125,7 @@ describe('plan decisions', () => {
     expect(edited.plan.status).toBe('edited_pending')
     expect(edited.plan.version).toBe(3)
     expect(edited.plan.explanation.stale).toBe(true)
+    expect(edited.plan.explanation.provenance).toEqual({ source: 'template', model: 'demo-template' })
     expect(edited.plan.result.routes.find((route) => route.truckId === 't1')?.stopIds).not.toContain('b')
     expect(edited.plan.result.routes.find((route) => route.truckId === 't2')?.stopIds).toContain('b')
     expect(edited.releasedReportIds).toEqual(['a', 'b'])

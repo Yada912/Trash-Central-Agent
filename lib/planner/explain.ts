@@ -372,6 +372,7 @@ function render(plan: PlanResult, input: SolvePlanInput, interpretation: Interpr
     perRoute,
     risks: RISK_CODES.filter((code) => riskSet.has(code)).map((code) => riskText(code, input)),
     stale: false,
+    provenance: { source: 'gemini', model: EXPLAIN_MODEL_ID },
   }
 }
 
@@ -390,6 +391,7 @@ function demoExplain(plan: PlanResult, input: SolvePlanInput): Explanation {
       'Demo output: Listed truck capacity is not confirmation that a vehicle is available.',
     ],
     stale: false,
+    provenance: { source: 'template', model: 'demo-template' },
   }
 }
 

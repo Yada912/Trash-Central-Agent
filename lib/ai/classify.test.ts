@@ -156,7 +156,7 @@ describe('classifyReport live model', () => {
     expect(at.classification.needsReview).toBe(false)
   })
 
-  it('reviews any hazardous share above 0 and excludes ordinary routes only from 0.2', async () => {
+  it('reviews any hazardous share above 0 and forces hazardous_present', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
     const image = { base64: 'AAAA', mimeType: 'image/png' }
     generate.mockResolvedValue({
@@ -200,8 +200,10 @@ describe('classifyReport live model', () => {
       expect(outcome.classification.flags).not.toContain('no_image')
     }
     if (flagged.kind !== 'trash' || trace.kind !== 'trash' || fifth.kind !== 'trash') return
+    expect(trace.classification.flags).toContain('hazardous_present')
+    expect(fifth.classification.flags).toContain('hazardous_present')
     expect(isHazardousClassification(flagged.classification)).toBe(true)
-    expect(isHazardousClassification(trace.classification)).toBe(false)
+    expect(isHazardousClassification(trace.classification)).toBe(true)
     expect(isHazardousClassification(fifth.classification)).toBe(true)
   })
 

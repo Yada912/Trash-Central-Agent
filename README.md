@@ -36,7 +36,7 @@ Package versions are pinned exactly. The package manager is pnpm 10.33.4.
 
 ## AI Implementation
 
-Classification and the plan explanation call Gemini only when `GEMINI_API_KEY` is set. The modules are placeholders in `lib/ai/classify.ts` and `lib/planner/explain.ts`. A teammate will replace those files. The route layer depends on the exported functions and on `lib/schemas.ts`.
+Classification and the plan explanation call Gemini only when `GEMINI_API_KEY` is set. `lib/ai/classify.ts` and `lib/planner/explain.ts` are the integrated modules. The route layer depends on the exported functions and on `lib/schemas.ts`.
 
 `needsReview` is not decided by the model. `lib/review.ts` computes it. It is true only when `reviewReasons` is not empty:
 
@@ -48,9 +48,13 @@ Classification and the plan explanation call Gemini only when `GEMINI_API_KEY` i
 
 `no_image` by itself does not request review. Review never blocks submit.
 
+`POST /api/reports` recomputes flags and review reasons and ignores a client `needsReview` value. A saved photo drops `no_image`. A text-only save drops `low_image_quality` and sets `no_image`. A hazardous share above 0 forces `hazardous_present`. The same `Idempotency-Key` with a different body is 409 CONFLICT; an identical repeat returns the original report.
+
 `source` is `gemini` in live mode, `mock` in demo mode, and `manual` when the resident enters the classification without the model.
 
-The pickup order comes from `lib/planner/vrp.ts`, a deterministic placeholder (haversine distance, high urgency first, capacity and shift limits, a short 2-opt pass). Hazardous stops are left unassigned with reason `hazardous_separate`.
+The pickup order comes from `lib/planner/vrp.ts` (haversine distance, high urgency first, capacity and shift limits, a short 2-opt pass). Hazardous stops are left unassigned with reason `hazardous_separate`.
+
+Each explanation stores provenance: `source` is `template` in demo mode and `gemini` when the model wrote it, plus the model id. `GET /api/plans/:id` and `POST /api/plans/:id/decision` return that model on `meta.model` together with `meta.mode`, so a reload still shows which explanation was stored.
 
 ## Architecture / Data Flow
 

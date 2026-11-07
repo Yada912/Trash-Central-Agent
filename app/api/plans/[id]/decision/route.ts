@@ -38,7 +38,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       const report = await store.getReport(reportId)
       if (report && report.status !== 'collected') await store.updateReport(reportId, { status: 'planned' })
     }
-    return jsonOk(requestId, saved)
+    return jsonOk(requestId, saved, { model: saved.explanation.provenance.model })
   } catch (error) {
     if (error instanceof PlanInputError) {
       return jsonErr(requestId, 400, 'VALIDATION', error.message, error.reportId ? { reportIds: [error.reportId] } : undefined)

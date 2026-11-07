@@ -31,6 +31,9 @@ needsReview is computed on the server (lib/review.ts), never inside lib/ai. It i
 low_confidence: confidence < 0.5 (0.50 is not low). hazardous: hazardous share > 0 or flag hazardous_present.
 insufficient_text: flag set, or text under 10 characters and no image. contradictory: flag set.
 low_image_quality: flag set. no_image alone does not trigger review.
+POST /api/reports recomputes flags and reviewReasons and ignores a client needsReview value.
+A saved photo drops no_image. A text-only save drops low_image_quality and sets no_image. Those two flags are never stored together.
+A hazardous share above 0 forces hazardous_present.
 source is gemini in live mode, mock in demo mode, and manual for manual entry. needsReview never blocks submit.
 REVIEW_CONFIDENCE_THRESHOLD = 0.5.
 Defaults when the resident skips editing: use AI values as-is. Manual entry (no AI) default: types [{residual,1}], volume {50,'medium'}, urgency 'medium', confidence 0, flags ['no_image'] if none.
@@ -42,20 +45,25 @@ POST /api/reports/classify  { text: string(1–1000), image?: { base64, mimeType
    not_trash is a normal 200 result (no fabricated trash). insufficient means the input is too vague to estimate without inventing numbers; it is not a claim that there is no trash.
    UI shows the returned reason for both, keeps the resident's text and photo, and offers manual entry. POST /api/reports always requires a full Classification.
    Module: classifyReport() returns ClassifyOutcome; it throws only for real failures (timeout/upstream/invalid model output).
-POST /api/reports           { text, lat, lng, image?, classification: Classification, aiClassification?: Classification } -> Report
+POST /api/reports           { text, lat, lng, image?, classification: Classification, aiClassification?: Classification, clientRequestId? } -> Report
+   Header Idempotency-Key wins over clientRequestId. An identical repeat returns the original report.
+   The same key with a different canonical body is 409 CONFLICT and does not create a second row.
    lat/lng must be inside the Denpasar bbox (-8.75..-8.57, 115.16..115.28) else VALIDATION.
 GET  /api/reports?kecamatan=&status=&since=ISO -> Report[]
    Report = { id, isDemo, createdAt, lat, lng, kecamatan, desa?, description, photoUrl?, classification, edited: boolean, status }
 GET  /api/dashboard -> { totals: { byType: Record<TrashType, liters>, byKecamatan: Record<Kecamatan,{reports,liters}>, byUrgency: Record<Urgency,number> }, zones: Array<{ id, centroid:[lat,lng], reportIds, liters, dominantType }>, facilities: Facility[] }
 POST /api/plans  { trucks: Array<{ id, capacityLiters }>, crews: number, shift: { start:'HH:MM', end:'HH:MM' }, reportIds?: string[] } -> Plan
 POST /api/plans/:id/decision  { action: 'approve'|'reject'|'edit', note?: string, edits?: { moveStop?: { stopId, toTruckId } } } -> Plan
+   Success meta includes mode and model from the stored explanation provenance.
 GET  /api/plans/:id -> Plan
+   Success meta includes mode and model from that same stored provenance.
 POST /api/plans/:id/explain  {} -> Plan
    Re-runs explainPlan on the plan's current version and sets explanation.stale=false.
    Never changes status, version, or decisions, and never approves.
    Demo mode (GEMINI_API_KEY unset) returns a labelled mock explanation. A live failure is an error, never a silent mock.
 
-Plan = { id, status: PlanStatus, version: number, input, result: { routes: Array<{ truckId, stopIds, loadLiters, capacityLiters, distanceKm, durationMin, feasible: boolean, violations: string[], polyline: [lat,lng][] }>, unassigned: Array<{ id, reason }>, totals: { distanceKm, liters, stops } }, explanation: { summary, perRoute, risks, stale: boolean }, decisions: Array<{ action, note?, at, version }> }
+Plan = { id, status: PlanStatus, version: number, input, result: { routes: Array<{ truckId, stopIds, loadLiters, capacityLiters, distanceKm, durationMin, feasible: boolean, violations: string[], polyline: [lat,lng][] }>, unassigned: Array<{ id, reason }>, totals: { distanceKm, liters, stops } }, explanation: { summary, perRoute, risks, stale: boolean, provenance: { source: 'gemini'|'template', model: string } }, decisions: Array<{ action, note?, at, version }> }
+   provenance is written with the explanation and kept on reload. Demo explanations use source template. Live explanations use source gemini.
 
 ## Decision rules (human in the loop)
 - edit: server recomputes loads, distance, duration, feasibility for affected routes; status -> 'edited_pending'; version+1; explanation.stale = true (re-explained async or on request). Never keeps a prior approval.

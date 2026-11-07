@@ -1,5 +1,5 @@
 import { MAX_IMAGE_BYTES } from '@/lib/limits'
-import type { ClassificationFlag } from '@/lib/schemas'
+import { CLASSIFICATION_FLAGS, type ClassificationFlag } from '@/lib/schemas'
 
 export function decodedBase64Bytes(base64: string): number | null {
   if (base64.includes('data:') || base64.includes(',') || /\s/.test(base64)) return null
@@ -41,8 +41,16 @@ export function imageFieldErrors(image: { base64: string; mimeType: string } | u
   return null
 }
 
-/** A saved photo must not keep or gain the no_image flag. */
+/**
+ * A saved photo drops no_image. A text-only save drops low_image_quality and
+ * always has no_image. Those two flags are never stored together.
+ */
 export function flagsForSavedReport(flags: readonly ClassificationFlag[], hasImage: boolean): ClassificationFlag[] {
-  if (!hasImage) return [...flags]
-  return flags.filter((flag) => flag !== 'no_image')
+  const selected = new Set(flags)
+  if (hasImage) selected.delete('no_image')
+  else {
+    selected.delete('low_image_quality')
+    selected.add('no_image')
+  }
+  return CLASSIFICATION_FLAGS.filter((flag) => selected.has(flag))
 }

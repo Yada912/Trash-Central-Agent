@@ -21,8 +21,8 @@
 //
 // Hazardous stops are those with hazardous === true. The API sets that boolean
 // when the hazardous share is >= 0.2 or the flag hazardous_present is present
-// (isHazardousClassification). Clearing a stale hazardous_present flag when the
-// hazardous share is 0 is Hensen and Huang's classification normalization.
+// (isHazardousClassification). stampClassification forces hazardous_present
+// when the hazardous share is above 0, so a trace share is separated too.
 // This solver trusts the confirmed boolean and does not recompute it.
 //
 // Active trucks are the first min(trucks.length, crews) trucks in input order.

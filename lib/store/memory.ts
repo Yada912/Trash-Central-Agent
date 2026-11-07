@@ -8,7 +8,7 @@ type MemoryState = {
   reports: Report[]
   facilities: Facility[]
   plans: Plan[]
-  idempotency: Record<string, string>
+  idempotency: Record<string, { reportId: string; bodyHash: string }>
 }
 
 const globalStore = globalThis as typeof globalThis & { __ctaMemory?: MemoryState }
@@ -44,16 +44,19 @@ export function getMemoryStore(): Store {
     async getReport(id) {
       return state().reports.find((report) => report.id === id) ?? null
     },
-    async createReport(report, idempotencyKey) {
+    async createReport(report, idempotency) {
       const memory = state()
-      if (idempotencyKey) {
-        const existingId = memory.idempotency[idempotencyKey]
-        const existing = existingId ? memory.reports.find((item) => item.id === existingId) : undefined
-        if (existing) return { report: existing, created: false }
+      if (idempotency) {
+        const existing = memory.idempotency[idempotency.key]
+        if (existing) {
+          if (existing.bodyHash !== idempotency.bodyHash) return { status: 'conflict' }
+          const saved = memory.reports.find((item) => item.id === existing.reportId)
+          if (saved) return { status: 'replay', report: saved }
+        }
       }
       memory.reports.unshift(report)
-      if (idempotencyKey) memory.idempotency[idempotencyKey] = report.id
-      return { report, created: true }
+      if (idempotency) memory.idempotency[idempotency.key] = { reportId: report.id, bodyHash: idempotency.bodyHash }
+      return { status: 'created', report }
     },
     async updateReport(id, patch) {
       const reports = state().reports

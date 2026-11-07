@@ -200,8 +200,8 @@ export type ClassifyRequest = z.infer<typeof classifyRequestSchema>
 
 /**
  * POST /api/reports idempotency: send header `Idempotency-Key` and/or `clientRequestId`.
- * The header wins when both are present. A repeat of the same key returns the original report id
- * and does not create another row. Omitting both creates a new report every time.
+ * The header wins when both are present. An identical repeat returns the original report id.
+ * The same key with a different canonical body is 409 CONFLICT. Omitting both creates a new report every time.
  */
 export const createReportSchema = z
   .object({
@@ -347,11 +347,18 @@ export const planResultSchema = z.object({
 })
 export type PlanResult = z.infer<typeof planResultSchema>
 
+export const explanationProvenanceSchema = z.object({
+  source: z.enum(['gemini', 'template']),
+  model: z.string().min(1),
+})
+export type ExplanationProvenance = z.infer<typeof explanationProvenanceSchema>
+
 export const explanationSchema = z.object({
   summary: z.string(),
   perRoute: z.array(z.string()),
   risks: z.array(z.string()),
   stale: z.boolean(),
+  provenance: explanationProvenanceSchema,
 })
 export type Explanation = z.infer<typeof explanationSchema>
 

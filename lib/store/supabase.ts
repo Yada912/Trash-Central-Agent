@@ -111,21 +111,46 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
       if (error) throw new Error(error.message)
       return data ? toReport(data as ReportRow) : null
     },
-    async createReport(report, idempotencyKey) {
-      if (idempotencyKey) {
-        const existing = await client.from('reports').select('*').eq('client_request_id', idempotencyKey).maybeSingle()
+    async createReport(report, idempotency) {
+      if (idempotency) {
+        const existing = await client
+          .from('reports')
+          .select('*, idempotency_body_hash')
+          .eq('client_request_id', idempotency.key)
+          .maybeSingle()
         if (existing.error) throw new Error(existing.error.message)
-        if (existing.data) return { report: toReport(existing.data as ReportRow), created: false }
+        if (existing.data) {
+          const stored = existing.data as ReportRow & { idempotency_body_hash?: string | null }
+          if (stored.idempotency_body_hash && stored.idempotency_body_hash !== idempotency.bodyHash) {
+            return { status: 'conflict' }
+          }
+          return { status: 'replay', report: toReport(stored) }
+        }
       }
-      const row = { ...toReportRow(report), ...(idempotencyKey ? { client_request_id: idempotencyKey } : {}) }
+      const row = {
+        ...toReportRow(report),
+        ...(idempotency
+          ? { client_request_id: idempotency.key, idempotency_body_hash: idempotency.bodyHash }
+          : {}),
+      }
       const { error } = await client.from('reports').insert(row)
-      if (error && idempotencyKey && error.code === '23505') {
-        const again = await client.from('reports').select('*').eq('client_request_id', idempotencyKey).maybeSingle()
+      if (error && idempotency && error.code === '23505') {
+        const again = await client
+          .from('reports')
+          .select('*, idempotency_body_hash')
+          .eq('client_request_id', idempotency.key)
+          .maybeSingle()
         if (again.error) throw new Error(again.error.message)
-        if (again.data) return { report: toReport(again.data as ReportRow), created: false }
+        if (again.data) {
+          const stored = again.data as ReportRow & { idempotency_body_hash?: string | null }
+          if (stored.idempotency_body_hash && stored.idempotency_body_hash !== idempotency.bodyHash) {
+            return { status: 'conflict' }
+          }
+          return { status: 'replay', report: toReport(stored) }
+        }
       }
       if (error) throw new Error(error.message)
-      return { report, created: true }
+      return { status: 'created', report }
     },
     async updateReport(id, patch) {
       const existing = await this.getReport(id)

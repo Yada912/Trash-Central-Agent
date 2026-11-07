@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     return jsonOk(
       requestId,
       plan,
-      { model: process.env.GEMINI_API_KEY ? 'gemini-2.5-flash' : 'demo-mock', latencyMs: Date.now() - started },
+      { model: plan.explanation.provenance.model, latencyMs: Date.now() - started },
       201,
     )
   } catch (error) {
