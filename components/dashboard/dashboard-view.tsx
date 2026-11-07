@@ -1,8 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
 import { EMPTY_FILTERS, filterDashboard, filtersAreActive, type ReportListFilters } from '@/components/dashboard/filter-reports'
 import { CityMap } from '@/components/map/map-loader'
+import { ModeBadge } from '@/components/mode-badge'
 import { ErrorNotice } from '@/components/report/ErrorNotice'
 import { useDashboard } from '@/components/dashboard/use-dashboard'
 import { Button } from '@/components/ui/button'
@@ -103,14 +105,33 @@ export function DashboardView() {
               <MaterialIcon name="space_dashboard" size="sm" />
               Tampilan petugas
             </span>
+            <div className="rounded border-2 border-ink bg-amber px-2.5 py-0.5">
+              <ModeBadge mode={meta?.mode === 'live' ? 'live' : meta?.mode === 'demo' ? 'demo' : null} />
+            </div>
             {reports.some((report) => report.isDemo) ? (
               <span className="vector-pill bg-amber text-ink">DEMO — laporan sintetis</span>
             ) : null}
           </div>
-          <Button variant="secondary" onClick={() => void reload()} disabled={loading}>
-            <MaterialIcon name="refresh" size="sm" />
-            Muat ulang laporan
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/petugas"
+              className="vector-btn inline-flex items-center gap-1 rounded-md border-2 border-ink bg-lavender px-3 py-1.5 text-xs font-extrabold text-ink"
+            >
+              <MaterialIcon name="badge" size="sm" />
+              Pusat Petugas
+            </Link>
+            <Link
+              href="/planner"
+              className="vector-btn inline-flex items-center gap-1 rounded-md border-2 border-ink bg-primary px-3 py-1.5 text-xs font-extrabold text-white"
+            >
+              <MaterialIcon name="route" size="sm" />
+              Perencana
+            </Link>
+            <Button variant="secondary" onClick={() => void reload()} disabled={loading}>
+              <MaterialIcon name="refresh" size="sm" />
+              Muat ulang laporan
+            </Button>
+          </div>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight">Dasbor</h1>
         <p className="max-w-3xl text-lg font-medium">Pantau laporan warga. Tentukan prioritas pengangkutan.</p>

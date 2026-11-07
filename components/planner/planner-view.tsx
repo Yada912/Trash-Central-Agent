@@ -1,8 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
+import Link from 'next/link'
 import { useDashboard } from '@/components/dashboard/use-dashboard'
 import { CityMap } from '@/components/map/map-loader'
+import { ModeBadge } from '@/components/mode-badge'
 import { canApprovePlan } from '@/components/planner/decision-request'
 import { explanationFieldLine, explanationHeading, templateTextLabel } from '@/components/planner/explanation-label'
 import { demoMockLabel } from '@/components/report/report-labels'
@@ -66,10 +68,33 @@ export function PlannerView() {
   return (
     <main id="main" className="grid gap-8">
       <div className="vector-card bg-card p-6 grid gap-3">
-        <span className="vector-pill bg-lavender text-ink w-fit tilt-left">
-          <MaterialIcon name="route" size="sm" />
-          Perencana petugas
-        </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="vector-pill bg-lavender text-ink w-fit tilt-left">
+              <MaterialIcon name="route" size="sm" />
+              Perencana petugas
+            </span>
+            <div className="rounded border-2 border-ink bg-amber px-2.5 py-0.5">
+              <ModeBadge mode={planner.mode === 'live' ? 'live' : planner.mode === 'demo' ? 'demo' : null} />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/petugas"
+              className="vector-btn inline-flex items-center gap-1 rounded-md border-2 border-ink bg-lavender px-3 py-1.5 text-xs font-extrabold text-ink"
+            >
+              <MaterialIcon name="badge" size="sm" />
+              Pusat Petugas
+            </Link>
+            <Link
+              href="/dashboard"
+              className="vector-btn inline-flex items-center gap-1 rounded-md border-2 border-ink bg-sky px-3 py-1.5 text-xs font-extrabold text-ink"
+            >
+              <MaterialIcon name="space_dashboard" size="sm" />
+              Dasbor
+            </Link>
+          </div>
+        </div>
         <h1 className="text-3xl font-extrabold tracking-tight">Perencana</h1>
         <p className="max-w-3xl text-lg font-medium">Atur kapasitas armada. Perhitungan rute terpisah dari penjelasan naratif.</p>
         {planner.mode ? <p className="text-xs text-ink/75">Mode API: {planner.mode}. Angka rute berasal dari solver deterministik. Label penjelasan di bawah mengikuti kolom model pada respons.</p> : null}

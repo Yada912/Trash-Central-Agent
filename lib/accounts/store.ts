@@ -1,4 +1,5 @@
 import type { AccountType, Kecamatan, TrashType, WasteStream } from '@/lib/schemas'
+import { BALINESE_CALENDAR_EVENTS_2026 } from '@/lib/calendar/balinese-calendar'
 
 export type UserRole = 'warga' | 'petugas'
 
@@ -44,6 +45,17 @@ export type SpecialEventSurge = {
   notes: string
 }
 
+export type PersonalPickupRecord = {
+  id: string
+  date: string // YYYY-MM-DD
+  window: string // HH:MM–HH:MM WITA
+  stream: WasteStream
+  liters: number
+  containersLabel: string
+  status: 'completed' | 'scheduled' | 'requested'
+  notes: string
+}
+
 export type CurrentTrashCondition = 'terkendali' | 'menumpuk' | 'meluber' | 'pasca_upacara'
 
 export type ResidentWasteProfile = {
@@ -55,12 +67,15 @@ export type ResidentWasteProfile = {
   sortingReadiness: 'sudah_dipilah' | 'sebagian' | 'belum_dipilah'
   compositionPct: Record<TrashType, number>
   specialEvents: SpecialEventSurge[]
+  selectedBalineseEventIds?: string[]
+  pickupHistory?: PersonalPickupRecord[]
 }
 
 export type UserAccount = {
   id: string
   name: string
   email: string
+  password?: string
   role: UserRole
   badgeId?: string
   kecamatan: Kecamatan
@@ -100,6 +115,7 @@ export type StreamOptimizationAdvice = {
 export type ResidentOptimizationSummary = {
   baseWeeklyLiters: number
   eventExtraLiters: number
+  balineseCalendarExtraLiters: number
   totalWeeklyLiters: number
   equivalentContainers: number
   containerLabel: string
@@ -110,11 +126,14 @@ export type ResidentOptimizationSummary = {
   actionItems: string[]
 }
 
+const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
+
 const DEFAULT_ACCOUNTS: UserAccount[] = [
   {
     id: 'usr_warga_01',
     name: 'I Made Adi Wijaya',
     email: 'made.adi@warga.denpasar.id',
+    password: 'warga123',
     role: 'warga',
     kecamatan: 'Denpasar Barat',
     desa: 'Pemecutan',
@@ -137,33 +156,97 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
         residual: 8,
         hazardous: 0,
       },
+      selectedBalineseEventIds: DEFAULT_SELECTED_BALI_EVENTS,
       specialEvents: [
         {
           id: 'evt_galungan',
           name: 'Hari Raya Galungan & Kuningan / Penampahan',
-          frequency: 'Setiap 210 hari (aktif minggu ini)',
-          extraLiters: 90,
+          frequency: 'Setiap 210 hari (aktif bulan ini)',
+          extraLiters: 60,
           dominantStream: 'organik',
           activeThisWeek: true,
           notes: 'Lonjakan janur, sampian, canang sari, daun pisang, dan sisa olahan dapur.',
         },
         {
-          id: 'evt_odalan',
-          name: 'Upacara Odalan / Piodalan Pemerajan',
-          frequency: 'Setiap 6 bulan',
-          extraLiters: 120,
-          dominantStream: 'organik',
-          activeThisWeek: false,
-          notes: 'Dominan banten, janur, buah, serta gelas/botol plastik kemasan tamu.',
-        },
-        {
           id: 'evt_akhir_pekan',
-          name: 'Kumpul Keluarga / Akhir Pekan',
+          name: 'Kumpul Keluarga Akhir Pekan',
           frequency: 'Mingguan (Sabtu–Minggu)',
           extraLiters: 30,
           dominantStream: 'anorganik',
-          activeThisWeek: true,
+          activeThisWeek: false,
           notes: 'Tambahan botol plastik, kardus makanan, dan kaleng minuman.',
+        },
+      ],
+      pickupHistory: [
+        {
+          id: 'pkp_past_01',
+          date: '2026-11-02',
+          window: '06:00–09:00 WITA',
+          stream: 'organik',
+          liters: 30,
+          containersLabel: '2 Kantong Kresek',
+          status: 'completed',
+          notes: 'Diangkut tepat waktu oleh Armada Kompos Barat-01.',
+        },
+        {
+          id: 'pkp_past_02',
+          date: '2026-11-03',
+          window: '08:00–11:30 WITA',
+          stream: 'anorganik',
+          liters: 30,
+          containersLabel: '2 Kantong Kresek',
+          status: 'completed',
+          notes: 'Botol plastik & kardus terpilah disalurkan ke TPS3R.',
+        },
+        {
+          id: 'pkp_past_03',
+          date: '2026-11-04',
+          window: '06:00–09:00 WITA',
+          stream: 'organik',
+          liters: 60,
+          containersLabel: '4 Kantong Kresek',
+          status: 'completed',
+          notes: 'Lonjakan Galungan (janur & daun pisang) terangkut dalam batas leeway.',
+        },
+        {
+          id: 'pkp_past_04',
+          date: '2026-11-06',
+          window: '06:00–09:00 WITA',
+          stream: 'organik',
+          liters: 45,
+          containersLabel: '3 Kantong Kresek',
+          status: 'completed',
+          notes: 'Sisa lungsuran Umanis Galungan selesai diangkut.',
+        },
+        {
+          id: 'pkp_next_01',
+          date: '2026-11-09',
+          window: '06:00–09:00 WITA',
+          stream: 'organik',
+          liters: 45,
+          containersLabel: '3 Kantong Kresek',
+          status: 'scheduled',
+          notes: 'Bertepatan dengan Tilem Sasih Kelima — siapkan kantong canang sebelum 06:00 WITA.',
+        },
+        {
+          id: 'pkp_next_02',
+          date: '2026-11-10',
+          window: '08:00–11:30 WITA',
+          stream: 'anorganik',
+          liters: 30,
+          containersLabel: '2 Kantong Kresek',
+          status: 'scheduled',
+          notes: 'Penjemputan rutin plastik, kertas, dan kaleng.',
+        },
+        {
+          id: 'pkp_next_03',
+          date: '2026-11-13',
+          window: '06:00–09:00 WITA',
+          stream: 'organik',
+          liters: 60,
+          containersLabel: '4 Kantong Kresek',
+          status: 'scheduled',
+          notes: 'Penampahan Kuningan — toleransi leeway armada +35% aktif.',
         },
       ],
     },
@@ -172,6 +255,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_warga_02',
     name: 'Ni Luh Putu Sari (Warung Sari Sanur)',
     email: 'putu.sari@umkm.denpasar.id',
+    password: 'warga123',
     role: 'warga',
     kecamatan: 'Denpasar Selatan',
     desa: 'Sanur',
@@ -194,6 +278,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
         residual: 5,
         hazardous: 0,
       },
+      selectedBalineseEventIds: ['bali_galungan', 'bali_kuningan', 'bali_purnama_keenam'],
       specialEvents: [
         {
           id: 'evt_libur_panjang',
@@ -205,12 +290,35 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
           notes: 'Kenaikan pelanggan warung meningkatkan sisa makanan dan botol PET.',
         },
       ],
+      pickupHistory: [
+        {
+          id: 'pkp_umkm_01',
+          date: '2026-11-04',
+          window: '06:30–09:30 WITA',
+          stream: 'organik',
+          liters: 100,
+          containersLabel: '2 Karung Besar',
+          status: 'completed',
+          notes: 'Diangkut Armada Sanur-02.',
+        },
+        {
+          id: 'pkp_umkm_02',
+          date: '2026-11-09',
+          window: '06:30–09:30 WITA',
+          stream: 'organik',
+          liters: 100,
+          containersLabel: '2 Karung Besar',
+          status: 'scheduled',
+          notes: 'Penjemputan pagi koridor Danau Tamblingan.',
+        },
+      ],
     },
   },
   {
     id: 'usr_petugas_01',
     name: 'I Wayan Gde Surya Wirawan',
     email: 'surya.wirawan@dlhk.denpasar.id',
+    password: 'petugas123',
     role: 'petugas',
     badgeId: 'DLHK-DPS-042',
     kecamatan: 'Denpasar Barat',
@@ -392,7 +500,16 @@ export function computeResidentOptimization(
 
   const preset = CONTAINER_PRESETS[profile.containerPreset] ?? CONTAINER_PRESETS.kantong_15l
   const activeEvents = profile.specialEvents.filter((event) => event.activeThisWeek)
-  const eventExtraLiters = activeEvents.reduce((sum, event) => sum + event.extraLiters, 0)
+  const customExtraLiters = activeEvents.reduce((sum, event) => sum + event.extraLiters, 0)
+
+  // Also include selected Balinese calendar events occurring in the upcoming 7-day horizon (2026-11-07 .. 2026-11-14)
+  const selectedBaliSet = new Set(profile.selectedBalineseEventIds ?? DEFAULT_SELECTED_BALI_EVENTS)
+  const upcomingBaliEvents = BALINESE_CALENDAR_EVENTS_2026.filter(
+    (ev) => selectedBaliSet.has(ev.id) && ev.date >= '2026-11-07' && ev.date <= '2026-11-14',
+  )
+  const balineseCalendarExtraLiters = upcomingBaliEvents.reduce((sum, ev) => sum + ev.extraLitersHousehold, 0)
+
+  const eventExtraLiters = customExtraLiters + balineseCalendarExtraLiters
   const baseWeeklyLiters = profile.weeklyRegularLiters
   const totalWeeklyLiters = baseWeeklyLiters + eventExtraLiters
   const equivalentContainers = Math.max(1, Math.ceil(totalWeeklyLiters / preset.liters))
@@ -408,6 +525,9 @@ export function computeResidentOptimization(
   for (const event of activeEvents) {
     streamWeeklyLiters[event.dominantStream] += event.extraLiters
   }
+  // Balinese ceremonies add ~80% organic (canang, janur, daun) and ~20% anorganik (kemasan)
+  streamWeeklyLiters.organik += Math.round(balineseCalendarExtraLiters * 0.8)
+  streamWeeklyLiters.anorganik += Math.round(balineseCalendarExtraLiters * 0.2)
 
   const streams: StreamOptimizationAdvice[] = (['organik', 'anorganik', 'residu', 'B3'] as const).map((stream) => {
     const weeklyLiters = streamWeeklyLiters[stream]
@@ -419,12 +539,12 @@ export function computeResidentOptimization(
         litersPerPickup: weeklyLiters,
         maxAllowedWithLeeway: 0,
         status: 'on_request_b3',
-        windowLabel: 'Berdasarkan Permintaan (Penanganan Khusus DLH)',
-        leewayLabel: 'Dipisahkan dari truk biasa',
+        windowLabel: 'Opsional (Jemput Khusus bila ada)',
+        leewayLabel: 'Terpisah dari kantong harian',
         recommendation:
           weeklyLiters > 0
-            ? `Terdapat ${weeklyLiters} L limbah B3. Simpan dalam wadah tertutup terpisah dan ajukan penjemputan khusus via halaman Lapor.`
-            : 'Tidak ada timbulan B3 rutin minggu ini. Jika ada baterai/lampu/kaleng cat, jangan dicampur ke kantong biasa.',
+            ? `Ada ${weeklyLiters} L barang khusus (baterai/lampu). Simpan terpisah dan minta jemputan saat diperlukan.`
+            : 'Tidak ada barang khusus minggu ini.',
       }
     }
 
@@ -453,7 +573,7 @@ export function computeResidentOptimization(
       recommendation = `Beban ${litersPerPickup} L/penjemputan melebihi batas normal (${baseMax} L), namun MASIH TERTAMPUNG dalam toleransi leeway petugas (maks. ${maxAllowedWithLeeway} L). Keluarkan kantong 15 menit sebelum pukul ${slot?.windowStart ?? '06:00'} WITA.`
     } else if (status === 'needs_extra_pickup') {
       const overflow = litersPerPickup - maxAllowedWithLeeway
-      recommendation = `Beban ${litersPerPickup} L/penjemputan melampaui batas leeway petugas (${maxAllowedWithLeeway} L) sebesar +${overflow} L. Bagi ke ${pickupsPerWeek} hari angkut atau kirim laporan penjemputan tambahan di halaman Lapor.`
+      recommendation = `Beban ${litersPerPickup} L/penjemputan melampaui batas leeway petugas (${maxAllowedWithLeeway} L) sebesar +${overflow} L. Bagi ke ${pickupsPerWeek} hari angkut atau kirim permintaan jemput tambahan.`
     }
 
     return {
@@ -478,19 +598,19 @@ export function computeResidentOptimization(
       : 'optimal'
 
   const actionItems: string[] = []
-  if (profile.sortingReadiness !== 'sudah_dipilah') {
+  if (upcomingBaliEvents.length > 0) {
     actionItems.push(
-      'Pisahkan sampah mudah terurai (canang, daun, sisa dapur) dari plastik kemasan agar petugas dapat mengangkut di jadwal organik tanpa tertolak.',
+      `Kalender Bali minggu ini mencatat ${upcomingBaliEvents.map((e) => e.name).join(', ')} (+${balineseCalendarExtraLiters} L). ${upcomingBaliEvents[0].preparationTip}`,
     )
   }
-  if (activeEvents.length > 0) {
+  if (profile.sortingReadiness !== 'sudah_dipilah') {
     actionItems.push(
-      `Minggu ini ada ${activeEvents.map((e) => e.name).join(' & ')} (+${eventExtraLiters} L). Ikat terpisah kantong sisa upacara/acara agar muat dalam kuota leeway armada.`,
+      'Pisahkan sampah mudah terurai (canang, daun, sisa dapur) dari botol plastik agar petugas dapat mengangkut di jadwal organik tanpa tertolak.',
     )
   }
   if (profile.currentCondition === 'menumpuk' || profile.currentCondition === 'meluber') {
     actionItems.push(
-      'Kondisi sampah Anda saat ini tercatat menumpuk/meluber. Gunakan tombol "Lapor & Minta Angkut Sekarang" di bawah untuk mengirim foto dan titik jemput ke petugas.',
+      'Kondisi sampah Anda saat ini tercatat menumpuk/meluber. Gunakan tombol "Lapor & Minta Angkut" untuk mengirim foto ke petugas.',
     )
   }
   if (actionItems.length === 0) {
@@ -501,16 +621,17 @@ export function computeResidentOptimization(
     overallStatus === 'optimal'
       ? 'Seluruh timbulan mingguan Anda tertampung nyaman di jadwal rutin petugas.'
       : overallStatus === 'leeway_used'
-        ? 'Lonjakan sampah minggu ini menggunakan kuota toleransi (leeway) armada petugas.'
-        : 'Lonjakan sampah melampaui batas leeway rutin — disarankan kirim laporan jemput tambahan.'
+        ? 'Lonjakan hari raya/acara minggu ini tertampung dalam kuota toleransi (leeway) armada petugas.'
+        : 'Lonjakan sampah melampaui batas leeway rutin — disarankan minta penjemputan tambahan.'
 
   return {
     baseWeeklyLiters,
     eventExtraLiters,
+    balineseCalendarExtraLiters,
     totalWeeklyLiters,
     equivalentContainers,
     containerLabel: preset.label,
-    activeEventNames: activeEvents.map((e) => e.name),
+    activeEventNames: [...activeEvents.map((e) => e.name), ...upcomingBaliEvents.map((e) => e.name)],
     overallStatus,
     headline,
     streams,
@@ -560,6 +681,18 @@ export function setActiveAccountId(accountId: string): UserAccount | null {
   return found
 }
 
+export function authenticateAccount(email: string, password?: string): UserAccount | null {
+  const state = getAccountState()
+  const normalizedEmail = email.trim().toLowerCase()
+  const found = state.accounts.find((acc) => acc.email.toLowerCase() === normalizedEmail)
+  if (!found) return null
+  if (found.password && password && found.password !== password) {
+    return null
+  }
+  state.activeAccountId = found.id
+  return found
+}
+
 export function updateAccountProfile(
   accountId: string,
   patch: Partial<Pick<UserAccount, 'name' | 'kecamatan' | 'desa' | 'address' | 'lat' | 'lng' | 'accountType'>> & {
@@ -582,6 +715,7 @@ export function updateAccountProfile(
 export function createAccount(input: {
   name: string
   email: string
+  password?: string
   role: UserRole
   kecamatan: Kecamatan
   desa: string
@@ -607,6 +741,7 @@ export function createAccount(input: {
             residual: 10,
             hazardous: 0,
           },
+          selectedBalineseEventIds: DEFAULT_SELECTED_BALI_EVENTS,
           specialEvents: [
             {
               id: `evt_${Date.now().toString(36)}`,
@@ -618,6 +753,18 @@ export function createAccount(input: {
               notes: 'Tambahan janur, canang, daun, dan kemasan.',
             },
           ],
+          pickupHistory: [
+            {
+              id: `pkp_${Date.now().toString(36)}`,
+              date: '2026-11-09',
+              window: '06:00–09:00 WITA',
+              stream: 'organik',
+              liters: 30,
+              containersLabel: '2 Kantong Kresek',
+              status: 'scheduled',
+              notes: 'Penjemputan organik terjadwal berikutnya.',
+            },
+          ],
         }
       : undefined
 
@@ -625,6 +772,7 @@ export function createAccount(input: {
     id,
     name: input.name.trim(),
     email: input.email.trim(),
+    password: input.password || 'warga123',
     role: input.role,
     ...(input.role === 'petugas' ? { badgeId: `DLHK-DPS-${Math.floor(100 + Math.random() * 899)}` } : {}),
     kecamatan: input.kecamatan,

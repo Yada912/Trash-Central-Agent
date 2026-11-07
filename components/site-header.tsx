@@ -5,17 +5,42 @@ import { usePathname } from 'next/navigation'
 import { useAccount } from '@/components/account/use-account'
 import { MaterialIcon } from '@/components/ui/material-icon'
 
-const NAV_ITEMS = [
-  { href: '/report', label: 'Lapor', icon: 'add_a_photo', actor: 'warga' },
-  { href: '/schedule', label: 'Jadwal', icon: 'calendar_month', actor: 'all' },
-  { href: '/dashboard', label: 'Dasbor', icon: 'space_dashboard', actor: 'petugas' },
-  { href: '/planner', label: 'Perencana', icon: 'route', actor: 'petugas' },
-  { href: '/akun', label: 'Profil & Akun', icon: 'account_circle', actor: 'all' },
-] as const
+type NavItem = {
+  href: string
+  label: string
+  icon: string
+}
+
+const WARGA_NAV_ITEMS: NavItem[] = [
+  { href: '/warga', label: 'Dasbor Warga', icon: 'home' },
+  { href: '/report', label: 'Lapor', icon: 'add_a_photo' },
+  { href: '/schedule', label: 'Jadwal', icon: 'calendar_month' },
+  { href: '/akun', label: 'Profil & Akun', icon: 'account_circle' },
+]
+
+const PETUGAS_NAV_ITEMS: NavItem[] = [
+  { href: '/petugas', label: 'Pusat Petugas', icon: 'badge' },
+  { href: '/dashboard', label: 'Dasbor', icon: 'space_dashboard' },
+  { href: '/planner', label: 'Perencana', icon: 'route' },
+  { href: '/schedule', label: 'Jadwal', icon: 'calendar_month' },
+  { href: '/akun', label: 'Akun', icon: 'account_circle' },
+]
+
+const GUEST_NAV_ITEMS: NavItem[] = [
+  { href: '/', label: 'Beranda & Uji Coba', icon: 'public' },
+  { href: '/schedule', label: 'Jadwal Kota', icon: 'calendar_month' },
+  { href: '/masuk', label: 'Masuk / Daftar', icon: 'login' },
+]
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const { activeAccount, accounts, switchAccount } = useAccount()
+  const { activeAccount, accounts, isSignedIn, switchAccount } = useAccount()
+
+  const navItems: NavItem[] = !isSignedIn || !activeAccount
+    ? GUEST_NAV_ITEMS
+    : activeAccount.role === 'petugas'
+      ? PETUGAS_NAV_ITEMS
+      : WARGA_NAV_ITEMS
 
   return (
     <>
@@ -49,9 +74,9 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation (Strictly Scoped to Active Actor Role) */}
           <nav aria-label="Utama" className="hidden md:flex flex-wrap items-center gap-2 text-sm">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active = pathname === item.href
               return (
                 <Link
@@ -70,7 +95,7 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* Active Account Quick Switcher */}
+          {/* Active Account Quick Switcher & Sign In Button */}
           <div className="flex items-center gap-2 text-xs">
             <label htmlFor="account-Role-switcher" className="sr-only">
               Pilih Akun Aktif
@@ -84,10 +109,19 @@ export function SiteHeader() {
               <select
                 id="account-Role-switcher"
                 aria-label="Peran demo"
-                value={activeAccount?.id ?? ''}
-                onChange={(event) => void switchAccount(event.target.value)}
+                value={isSignedIn && activeAccount ? activeAccount.id : ''}
+                onChange={(event) => {
+                  if (event.target.value) {
+                    void switchAccount(event.target.value)
+                  }
+                }}
                 className="bg-transparent font-bold text-white focus:outline-none cursor-pointer"
               >
+                {!isSignedIn ? (
+                  <option value="" className="text-ink">
+                    Tamu (Belum Masuk)
+                  </option>
+                ) : null}
                 {accounts.length === 0 ? (
                   <option value="" className="text-ink">
                     Warga / Petugas
@@ -101,16 +135,23 @@ export function SiteHeader() {
                 )}
               </select>
             </div>
+            <Link
+              href="/masuk"
+              className="inline-flex items-center gap-1 rounded-md border-2 border-white bg-gold px-2.5 py-1.5 font-extrabold text-ink hover:bg-amber"
+            >
+              <MaterialIcon name="login" size="sm" />
+              <span>{isSignedIn ? 'Akun' : 'Masuk'}</span>
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* Adaptive Mobile Bottom Tab Bar (Apple HIG Reachability) */}
+      {/* Adaptive Mobile Bottom Tab Bar */}
       <nav
         aria-label="Navigasi Seluler"
-        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5 border-t-4 border-ink bg-card px-1 py-1.5 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t-4 border-ink bg-card px-1 py-1.5 md:hidden"
       >
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const active = pathname === item.href
           return (
             <Link
@@ -118,8 +159,8 @@ export function SiteHeader() {
               href={item.href}
               className={
                 active
-                  ? 'flex flex-col items-center justify-center rounded-md bg-primary/15 py-1 text-[11px] font-extrabold text-primary'
-                  : 'flex flex-col items-center justify-center py-1 text-[11px] font-semibold text-ink/75'
+                  ? 'flex flex-col items-center justify-center rounded-md bg-primary/15 px-2 py-1 text-[11px] font-extrabold text-primary'
+                  : 'flex flex-col items-center justify-center px-2 py-1 text-[11px] font-semibold text-ink/75'
               }
             >
               <MaterialIcon name={item.icon} size="md" />
