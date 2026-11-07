@@ -70,18 +70,54 @@ body {
    ========================================================================== */
 @layer components {
   .vector-card {
-    @apply rounded-lg border-2 border-ink bg-card;
-    border-bottom-width: 5px;
+    @apply rounded-xl border-2 border-ink bg-card;
+    box-shadow: 4px 4px 0 #1F2933;
   }
 
   .vector-card-soft {
-    @apply rounded-lg border-2 border-ink/80 bg-card;
-    border-bottom-width: 4px;
+    @apply rounded-xl border-2 border-ink/80 bg-card;
+    box-shadow: 3px 3px 0 #1F2933;
+  }
+
+  .vector-card-3d {
+    @apply rounded-xl border-2 border-ink bg-card transition-all duration-150;
+    box-shadow: 5px 5px 0 #1F2933;
+  }
+
+  .vector-card-3d:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #1F2933;
+  }
+
+  .vector-interactive-3d {
+    @apply cursor-pointer rounded-xl border-2 border-ink bg-card transition-all duration-150;
+    box-shadow: 3px 3px 0 #1F2933;
+  }
+
+  .vector-interactive-3d:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #1F2933;
+  }
+
+  .vector-interactive-3d:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #1F2933;
   }
 
   .vector-pill {
     @apply inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1 text-xs font-bold tracking-wide uppercase;
-    border-bottom-width: 3px;
+    box-shadow: 2px 2px 0 #1F2933;
+  }
+
+  .vector-input-3d {
+    @apply rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm text-ink transition-all duration-150 focus:outline-none focus:ring-0;
+    box-shadow: 2px 2px 0 #1F2933;
+  }
+
+  .vector-input-3d:focus {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #00A676;
+    border-color: #00A676;
   }
 
   .tilt-left {
@@ -93,17 +129,18 @@ body {
   }
 
   .btn-tactile {
-    @apply relative inline-flex min-h-11 items-center justify-center gap-2 rounded-md border-2 border-ink px-4 py-2 text-sm font-bold tracking-tight transition-transform duration-75 select-none;
-    border-bottom-width: 4px;
+    @apply relative inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border-2 border-ink px-4 py-2 text-sm font-bold tracking-tight transition-all duration-100 select-none;
+    box-shadow: 4px 4px 0 #1F2933;
   }
 
   .btn-tactile:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 #1F2933;
   }
 
   .btn-tactile:active:not(:disabled) {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 #1F2933;
   }
 }
 

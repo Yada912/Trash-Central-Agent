@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAccount } from '@/components/account/use-account'
 import { useDashboard } from '@/components/dashboard/use-dashboard'
 import { InteractiveCalendar } from '@/components/calendar/interactive-calendar'
+import { CityMap } from '@/components/map/map-loader'
 import { ModeBadge } from '@/components/mode-badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,11 +34,128 @@ type EvalResponseData = {
   checks: EvalCheckResult[]
 }
 
+const OFFICER_ROUTES = [
+  {
+    id: 'today_organik',
+    title: 'Rute Hari Ini: Koridor Organik Barat-01',
+    date: '2026-11-07',
+    dayLabel: 'Sabtu, 7 November 2026 (Hari Ini)',
+    stream: 'organik' as const,
+    streamLabel: 'Sampah Organik (Kompos)',
+    armadaName: 'Truk Kompos Barat-01 (Kapasitas 2.000 L)',
+    isToday: true,
+    loadLiters: 1620,
+    maxCapacityLiters: 2000,
+    stops: [
+      { seq: 1, name: 'Posko Armada DLHK / TPS3R Pemecutan', action: 'Mulai Rute', lat: -8.6595, lng: 115.2165, volumeText: '0 L' },
+      { seq: 2, name: 'Banjar Pekambingan (Rumah I Made Adi)', action: 'Jemput 3 Kantong Canang & Janur', lat: -8.6562, lng: 115.2124, volumeText: '+45 L' },
+      { seq: 3, name: 'Koridor Pemukiman Dauh Puri Kelod', action: 'Jemput 18 Titik Organik', lat: -8.6630, lng: 115.2140, volumeText: '+820 L' },
+      { seq: 4, name: 'Kawasan Pasar Tradisional Badung Barat', action: 'Jemput Sisa Sayur & Buah Terpilah', lat: -8.6530, lng: 115.2180, volumeText: '+755 L' },
+      { seq: 5, name: 'TPST Padangsambian (Unit Kompos & RDF)', action: 'Bongkar Muatan & Selesai', lat: -8.6480, lng: 115.1880, volumeText: 'Total 1.620 L' },
+    ],
+    routes: [
+      {
+        id: 'r_today',
+        positions: [
+          [-8.6595, 115.2165],
+          [-8.6562, 115.2124],
+          [-8.6630, 115.2140],
+          [-8.6530, 115.2180],
+          [-8.6480, 115.1880],
+        ] as [number, number][],
+        color: '#00A676',
+      },
+    ],
+    markers: [
+      { id: 'm1', lat: -8.6595, lng: 115.2165, label: '1. Posko DLHK Pemecutan', color: '#1F2933' },
+      { id: 'm2', lat: -8.6562, lng: 115.2124, label: '2. Br. Pekambingan (I Made Adi)', color: '#00A676' },
+      { id: 'm3', lat: -8.6630, lng: 115.2140, label: '3. Dauh Puri Kelod', color: '#00A676' },
+      { id: 'm4', lat: -8.6530, lng: 115.2180, label: '4. Pasar Tradisional', color: '#00A676' },
+      { id: 'm5', lat: -8.6480, lng: 115.1880, label: '5. TPST Padangsambian (Akhir)', color: '#DC2626' },
+    ],
+  },
+  {
+    id: 'future_organik_tilem',
+    title: 'Rute Mendatang: Penjemputan Tilem Sasih Kelima',
+    date: '2026-11-09',
+    dayLabel: 'Senin, 9 November 2026 (Mendatang)',
+    stream: 'organik' as const,
+    streamLabel: 'Sampah Organik (Surge Tilem)',
+    armadaName: 'Truk Kompos Barat-02 (Kapasitas 2.000 L)',
+    isToday: false,
+    loadLiters: 1840,
+    maxCapacityLiters: 2000,
+    stops: [
+      { seq: 1, name: 'TPS3R Pemecutan Kaja', action: 'Mulai Rute', lat: -8.6450, lng: 115.2050, volumeText: '0 L' },
+      { seq: 2, name: 'Koridor Pura & Banjar Busungyeh', action: 'Jemput Canang Tilem', lat: -8.6520, lng: 115.2090, volumeText: '+680 L' },
+      { seq: 3, name: 'Banjar Tegal Harum', action: 'Jemput Lungsuran Upacara', lat: -8.6610, lng: 115.2010, volumeText: '+720 L' },
+      { seq: 4, name: 'Sentra Kompos Tahura Ngurah Rai', action: 'Bongkar Muatan', lat: -8.7050, lng: 115.2250, volumeText: 'Total 1.840 L' },
+    ],
+    routes: [
+      {
+        id: 'r_future_tilem',
+        positions: [
+          [-8.6450, 115.2050],
+          [-8.6520, 115.2090],
+          [-8.6610, 115.2010],
+          [-8.7050, 115.2250],
+        ] as [number, number][],
+        color: '#60A5FA',
+        dashArray: '6, 6',
+      },
+    ],
+    markers: [
+      { id: 'ft1', lat: -8.6450, lng: 115.2050, label: '1. TPS3R Pemecutan Kaja', color: '#1F2933' },
+      { id: 'ft2', lat: -8.6520, lng: 115.2090, label: '2. Br. Busungyeh', color: '#60A5FA' },
+      { id: 'ft3', lat: -8.6610, lng: 115.2010, label: '3. Br. Tegal Harum', color: '#60A5FA' },
+      { id: 'ft4', lat: -8.7050, lng: 115.2250, label: '4. Sentra Tahura', color: '#DC2626' },
+    ],
+  },
+  {
+    id: 'future_anorganik_bank',
+    title: 'Rute Mendatang: Jalur Bank Sampah & Daur Ulang Sanur',
+    date: '2026-11-10',
+    dayLabel: 'Selasa, 10 November 2026 (Mendatang)',
+    stream: 'anorganik' as const,
+    streamLabel: 'Sampah Anorganik Terpilah',
+    armadaName: 'Cikar Listrik Daur Ulang Sanur-01 (Kapasitas 1.500 L)',
+    isToday: false,
+    loadLiters: 1180,
+    maxCapacityLiters: 1500,
+    stops: [
+      { seq: 1, name: 'TPS3R Sanur Kauh', action: 'Mulai', lat: -8.6950, lng: 115.2520, volumeText: '0 L' },
+      { seq: 2, name: 'Koridor Danau Tamblingan (Warung Sari Sanur)', action: 'Jemput Botol PET & Kardus', lat: -8.6915, lng: 115.2623, volumeText: '+240 L' },
+      { seq: 3, name: 'Kawasan Wisata Sindu Sanur', action: 'Jemput Pilahan Wisatawan', lat: -8.6830, lng: 115.2610, volumeText: '+520 L' },
+      { seq: 4, name: 'Bank Sampah Induk Banjar Intaran', action: 'Setor Bahan Daur Ulang', lat: -8.6920, lng: 115.2580, volumeText: 'Total 1.180 L' },
+    ],
+    routes: [
+      {
+        id: 'r_future_bank',
+        positions: [
+          [-8.6950, 115.2520],
+          [-8.6915, 115.2623],
+          [-8.6830, 115.2610],
+          [-8.6920, 115.2580],
+        ] as [number, number][],
+        color: '#F59E0B',
+        dashArray: '6, 6',
+      },
+    ],
+    markers: [
+      { id: 'fb1', lat: -8.6950, lng: 115.2520, label: '1. TPS3R Sanur Kauh', color: '#1F2933' },
+      { id: 'fb2', lat: -8.6915, lng: 115.2623, label: '2. Warung Sari (Ni Luh Putu Sari)', color: '#F59E0B' },
+      { id: 'fb3', lat: -8.6830, lng: 115.2610, label: '3. Kawasan Sindu', color: '#F59E0B' },
+      { id: 'fb4', lat: -8.6920, lng: 115.2580, label: '4. Bank Sampah Br. Intaran', color: '#DC2626' },
+    ],
+  },
+]
+
 export function PetugasPortal() {
   const { activeAccount, accounts, isSignedIn, timetable, updateTimetable, login } = useAccount()
   const { reports, loading: loadingReports, reload } = useDashboard()
 
   const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan>('Denpasar Barat')
+  const [selectedRouteId, setSelectedRouteId] = useState<string>('today_organik')
   const [evalData, setEvalData] = useState<EvalResponseData | null>(null)
   const [runningEval, setRunningEval] = useState(false)
   const [timetableToast, setTimetableToast] = useState<string | null>(null)
@@ -503,7 +621,160 @@ export function PetugasPortal() {
         />
       </section>
 
-      {/* 5. Active Priority Queue Preview */}
+      {/* 5. Daily & Future Route Planner Map (Peta Rute Harian & Mendatang Petugas) */}
+      {(() => {
+        const activeRoute = OFFICER_ROUTES.find((r) => r.id === selectedRouteId) ?? OFFICER_ROUTES[0]
+        const pctUsed = Math.round((activeRoute.loadLiters / activeRoute.maxCapacityLiters) * 100)
+
+        return (
+          <section
+            aria-labelledby="petugas-route-heading"
+            data-testid="petugas-route-section"
+            className="vector-card bg-card p-6 grid gap-5"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink pb-3">
+              <div>
+                <span className="vector-pill bg-mint text-ink">
+                  <MaterialIcon name="alt_route" size="sm" />
+                  Rute Operasional Armada DLHK
+                </span>
+                <h2 id="petugas-route-heading" className="mt-1 text-2xl font-extrabold">
+                  Peta Rute Harian & Rute Penjemputan Mendatang
+                </h2>
+                <p className="text-xs text-ink/75">
+                  Visualisasi sekuens titik henti armada, estimasi beban muatan per rute, dan tujuan akhir pengolahan (TPS3R/TPST).
+                </p>
+              </div>
+
+              {/* Selector for Daily vs Potential Future Routes */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-extrabold">
+                {OFFICER_ROUTES.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setSelectedRouteId(r.id)}
+                    className={[
+                      'rounded-lg border-2 border-ink px-3 py-1.5 transition-all flex items-center gap-1.5',
+                      selectedRouteId === r.id
+                        ? 'bg-primary text-white shadow-[2px_2px_0_#1F2933]'
+                        : 'bg-card text-ink hover:bg-amber/30',
+                    ].join(' ')}
+                  >
+                    <span
+                      className={[
+                        'h-2 w-2 rounded-full',
+                        r.isToday ? 'bg-mint' : 'bg-sky',
+                      ].join(' ')}
+                    />
+                    <span>{r.dayLabel}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+              {/* Map Canvas with CityMap */}
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="flex items-center gap-1 text-ink">
+                    <MaterialIcon name="map" size="sm" className="text-primary" />
+                    Peta Lintasan Truk ({activeRoute.stops.length} Titik Henti Terurut)
+                  </span>
+                  <span className="text-ink/75 font-mono">
+                    Depot: Posko DLHK/TPS3R → Akhir: TPST
+                  </span>
+                </div>
+                <CityMap
+                  height="380px"
+                  routes={activeRoute.routes}
+                  markers={activeRoute.markers}
+                />
+              </div>
+
+              {/* Route Details & Stop Sequence */}
+              <div className="vector-card-soft bg-bg p-4 grid content-start gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink/20 pb-2">
+                  <div>
+                    <span
+                      className={[
+                        'vector-pill text-xs',
+                        activeRoute.isToday ? 'bg-mint text-ink' : 'bg-sky text-ink',
+                      ].join(' ')}
+                    >
+                      {activeRoute.isToday ? 'Rute Berjalan Hari Ini' : 'Rute Terencana Mendatang'}
+                    </span>
+                    <h3 className="mt-1 font-black text-lg">{activeRoute.title}</h3>
+                    <p className="text-xs font-bold text-ink/75">{activeRoute.armadaName}</p>
+                  </div>
+                </div>
+
+                {/* Capacity & Load Bar */}
+                <div className="rounded-lg border-2 border-ink bg-card p-3 grid gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-extrabold">
+                    <span>Estimasi Beban Muatan:</span>
+                    <span className="text-primary font-black">
+                      {activeRoute.loadLiters} L / {activeRoute.maxCapacityLiters} L ({pctUsed}%)
+                    </span>
+                  </div>
+                  <div className="h-3 w-full overflow-hidden rounded-full border border-ink bg-ink/10">
+                    <div
+                      className={[
+                        'h-full transition-all',
+                        pctUsed > 90 ? 'bg-coral' : pctUsed > 75 ? 'bg-amber' : 'bg-mint',
+                      ].join(' ')}
+                      style={{ width: `${Math.min(100, pctUsed)}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-ink/70">
+                    {pctUsed <= 95
+                      ? '✓ Muatan dalam batas aman kapasitas armada dan toleransi leeway kecamatan.'
+                      : '⚠ Mendekati batas maksimum — siapkan armada cadangan jika ada tambahan permintaan warga.'}
+                  </p>
+                </div>
+
+                {/* Ordered Stop Sequence */}
+                <div className="grid gap-1.5">
+                  <span className="text-xs font-extrabold uppercase text-primary">
+                    Sekuens Perjalanan Armada:
+                  </span>
+                  <ol className="grid gap-2 text-xs">
+                    {activeRoute.stops.map((stop) => (
+                      <li
+                        key={stop.seq}
+                        className="rounded-lg border border-ink/40 bg-card p-2.5 flex items-start justify-between gap-2"
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink text-white font-bold text-[10px]">
+                            {stop.seq}
+                          </span>
+                          <div>
+                            <p className="font-extrabold text-ink">{stop.name}</p>
+                            <p className="text-[11px] text-ink/75">{stop.action}</p>
+                          </div>
+                        </div>
+                        <span className="rounded border border-ink/30 bg-bg px-1.5 py-0.5 text-[10px] font-bold shrink-0">
+                          {stop.volumeText}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div className="pt-1">
+                  <Button asChild className="w-full">
+                    <Link href="/planner">
+                      <MaterialIcon name="tune" size="sm" />
+                      Optimasi Rute Lebih Lanjut di Perencana VRP (/planner)
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )
+      })()}
+
+      {/* 6. Active Priority Queue Preview */}
       <section className="vector-card bg-card p-6 grid gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-xl font-extrabold flex items-center gap-2">

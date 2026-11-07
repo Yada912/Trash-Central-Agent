@@ -2,7 +2,11 @@ import type { Kecamatan, WasteStream } from '@/lib/schemas'
 import type { PetugasTimetableSlot } from '@/lib/accounts/store'
 import { sanitizeIcsField } from '@/lib/security/guard'
 
-export type BalineseEventCategory = 'rahinan_besar' | 'rahinan_rutin' | 'adat_keluarga'
+export type BalineseEventCategory =
+  | 'rahinan_besar'
+  | 'purnama_tilem'
+  | 'tumpek_kajeng'
+  | 'adat_keluarga'
 
 export type BalineseCalendarEvent = {
   id: string
@@ -17,9 +21,205 @@ export type BalineseCalendarEvent = {
   typicalWasteItems: string[]
   preparationTip: string
   postEventTip: string
+  isPersonalOtonan?: boolean
+}
+
+const WUKU_NAMES = [
+  'Sinta',
+  'Landep',
+  'Ukir',
+  'Kulantir',
+  'Tolu',
+  'Gumbreg',
+  'Wariga',
+  'Warigadean',
+  'Julungwangi',
+  'Sungsang',
+  'Dungulan',
+  'Kuningan',
+  'Langkir',
+  'Medangsia',
+  'Pujut',
+  'Pahang',
+  'Krulut',
+  'Merakih',
+  'Tambir',
+  'Medangkungan',
+  'Matal',
+  'Uye',
+  'Menail',
+  'Prangbakat',
+  'Bala',
+  'Ugu',
+  'Wayang',
+  'Kelawu',
+  'Dukut',
+  'Watugunung',
+] as const
+
+const SAPTAWARA_NAMES = [
+  'Redite (Minggu)',
+  'Soma (Senin)',
+  'Anggara (Selasa)',
+  'Buda (Rabu)',
+  'Wraspati (Kamis)',
+  'Sukra (Jumat)',
+  'Saniscara (Sabtu)',
+] as const
+
+const PANCAWARA_NAMES = ['Umanis', 'Paing', 'Pon', 'Wage', 'Kliwon'] as const
+
+export type UserOtonanSummary = {
+  birthDate: string
+  wukuName: string
+  saptawaraName: string
+  pancawaraName: string
+  pawukonLabel: string
+  nextOtonanDate: string
+  calendarHighlightDate: string // Date shown on the active November 2026 calendar
+  daysUntilNextOtonan: number
+  extraLitersHousehold: number
+  organicSurgePct: number
+  anorganikSurgePct: number
+  EventItem: BalineseCalendarEvent
+}
+
+// Reference epoch: 2026-11-04 is Buda (3) Kliwon (4) Wuku Dungulan (index 10 -> day 73 in 0..209 Pawukon cycle)
+const EPOCH_MS = Date.UTC(2026, 10, 4)
+const EPOCH_PAWUKON_DAY = 10 * 7 + 3 // Wuku Dungulan (10), Buda (3) = 73
+const EPOCH_PANCAWARA_INDEX = 4 // Kliwon
+
+function parseIsoUtc(dateIso: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateIso.trim())
+  if (!m) return null
+  const year = Number(m[1])
+  const month = Number(m[2])
+  const day = Number(m[3])
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null
+  return Date.UTC(year, month - 1, day)
+}
+
+function formatIsoUtc(ms: number): string {
+  const d = new Date(ms)
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+export function computeUserOtonanFromBirthDate(
+  birthDate: string,
+  referenceDate = '2026-11-07',
+): UserOtonanSummary | null {
+  const birthMs = parseIsoUtc(birthDate)
+  const refMs = parseIsoUtc(referenceDate) ?? EPOCH_MS
+  if (birthMs === null) return null
+
+  const diffFromEpochDays = Math.round((birthMs - EPOCH_MS) / 86_400_000)
+  const pawukonDay = ((EPOCH_PAWUKON_DAY + diffFromEpochDays) % 210 + 210) % 210
+  const wukuIndex = Math.floor(pawukonDay / 7)
+  const saptawaraIndex = pawukonDay % 7
+  const pancawaraIndex = ((EPOCH_PANCAWARA_INDEX + diffFromEpochDays) % 5 + 5) % 5
+
+  const wukuName = WUKU_NAMES[wukuIndex] ?? 'Dungulan'
+  const saptawaraName = SAPTAWARA_NAMES[saptawaraIndex] ?? 'Buda (Rabu)'
+  const pancawaraName = PANCAWARA_NAMES[pancawaraIndex] ?? 'Kliwon'
+  const pawukonLabel = `${saptawaraName.split(' ')[0]} ${pancawaraName} Wuku ${wukuName}`
+
+  // Next 210-day cycle occurrence on or after referenceDate
+  const daysSinceBirth = Math.max(0, Math.round((refMs - birthMs) / 86_400_000))
+  const remainder = daysSinceBirth % 210
+  const daysUntilNextOtonan = remainder === 0 ? 0 : 210 - remainder
+  const nextOtonanMs = refMs + daysUntilNextOtonan * 86_400_000
+  const nextOtonanDate = formatIsoUtc(nextOtonanMs)
+
+  // Also map a deterministic highlight date inside November 2026 so the user can see and click their Otonan on the current calendar view
+  const novDay = (pawukonDay % 28) + 2 // 2..29 November 2026
+  const calendarHighlightDate =
+    nextOtonanDate.startsWith('2026-11-')
+      ? nextOtonanDate
+      : `2026-11-${String(novDay).padStart(2, '0')}`
+
+  const eventItem: BalineseCalendarEvent = {
+    id: 'bali_personal_otonan',
+    name: `Otonan Pribadi (${pawukonLabel})`,
+    balineseName: `${pawukonLabel} · Siklus 210 Hari`,
+    date: calendarHighlightDate,
+    category: 'adat_keluarga',
+    defaultSelected: true,
+    organicSurgePct: 45,
+    anorganikSurgePct: 15,
+    extraLitersHousehold: 30,
+    typicalWasteItems: [
+      'Banten otonan, sesayut & tumpeng',
+      'Janur sampian & canang sari',
+      'Kemasan hidangan keluarga',
+    ],
+    preparationTip: `Otonan Anda jatuh pada ${pawukonLabel} (berikutnya: ${nextOtonanDate}). Siapkan 2 wadah organik terpisah untuk lungsuran banten otonan.`,
+    postEventTip:
+      'Sisa organik banten otonan diangkut oleh petugas swakelola menuju TPS3R pada jadwal Organik terdekat (Senin/Rabu/Kamis/Sabtu).',
+    isPersonalOtonan: true,
+  }
+
+  return {
+    birthDate,
+    wukuName,
+    saptawaraName,
+    pancawaraName,
+    pawukonLabel,
+    nextOtonanDate,
+    calendarHighlightDate,
+    daysUntilNextOtonan,
+    extraLitersHousehold: 30,
+    organicSurgePct: 45,
+    anorganikSurgePct: 15,
+    EventItem: eventItem,
+  }
 }
 
 export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
+  {
+    id: 'bali_sugihan_jawa',
+    name: 'Sugihan Jawa',
+    balineseName: 'Wraspati Wage Sungsang',
+    date: '2026-10-29',
+    category: 'rahinan_besar',
+    defaultSelected: false,
+    organicSurgePct: 35,
+    anorganikSurgePct: 10,
+    extraLitersHousehold: 25,
+    typicalWasteItems: ['Canang raka, banten arerebuan', 'Dedaunan pembersihan merajan'],
+    preparationTip: 'Kumpulkan pangkasan daun dan bunga merajan ke kantong organik menuju TPS3R.',
+    postEventTip: 'Dijemput armada organik Sabtu pagi.',
+  },
+  {
+    id: 'bali_sugihan_bali',
+    name: 'Sugihan Bali',
+    balineseName: 'Sukra Kliwon Sungsang',
+    date: '2026-10-30',
+    category: 'rahinan_besar',
+    defaultSelected: false,
+    organicSurgePct: 40,
+    anorganikSurgePct: 10,
+    extraLitersHousehold: 25,
+    typicalWasteItems: ['Banten penglukatan, bungkak kelapa muda', 'Janur & bunga'],
+    preparationTip: 'Belah atau pisahkan batok kelapa muda (bungkak) agar mudah dicacah di TPS3R.',
+    postEventTip: 'Diangkut pada jadwal organik Sabtu pagi.',
+  },
+  {
+    id: 'bali_penyekeban_galungan',
+    name: 'Penyekeban & Penyajaan Galungan',
+    balineseName: 'Redite Paing – Soma Pon Dungulan',
+    date: '2026-11-01',
+    category: 'rahinan_besar',
+    defaultSelected: false,
+    organicSurgePct: 45,
+    anorganikSurgePct: 20,
+    extraLitersHousehold: 30,
+    typicalWasteItems: ['Daun pisang pembungkus tape', 'Kulit buah & ampas kelapa', 'Plastik bahan jaje'],
+    preparationTip: 'Pisahkan plastik kemasan tepung/gula dari daun pisang sejak tahap persiapan.',
+    postEventTip: 'Organik diangkut Senin pagi; plastik kemasan diangkut Selasa.',
+  },
   {
     id: 'bali_penampahan_galungan',
     name: 'Penampahan Galungan',
@@ -32,7 +232,7 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
     extraLitersHousehold: 45,
     typicalWasteItems: ['Sisa olahan dapur & lawar', 'Daun pisang', 'Potongan bambu & janur penjor'],
     preparationTip: 'Siapkan 2 kantong kompos/organik terpisah sejak pagi untuk sisa olahan dapur dan potongan janur.',
-    postEventTip: 'Ikat rapat sisa organik basah agar siap diangkut armada organik Rabu pagi.',
+    postEventTip: 'Ikat rapat sisa organik basah agar siap diangkut armada swakelola TPS3R Rabu pagi.',
   },
   {
     id: 'bali_galungan',
@@ -46,7 +246,7 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
     extraLitersHousehold: 60,
     typicalWasteItems: ['Canang sari & banten', 'Janur & sampian', 'Kemasan minuman tamu'],
     preparationTip: 'Pisahkan tusuk bambu/semat tajam dari daun canang, dan kumpulkan botol plastik tamu di wadah khusus.',
-    postEventTip: 'Lungsuran banten & canang dapat dikeluarkan pada jadwal truk organik Jumat pagi (masuk kuota leeway hari raya).',
+    postEventTip: 'Lungsuran banten & canang diangkut ke TPS3R pada jadwal organik Kamis & Sabtu pagi.',
   },
   {
     id: 'bali_umanis_galungan',
@@ -59,15 +259,29 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
     anorganikSurgePct: 40,
     extraLitersHousehold: 35,
     typicalWasteItems: ['Lungsuran canang & buah', 'Botol plastik & kardus makanan keluarga'],
-    preparationTip: 'Kempiskan botol plastik dan lipat kardus agar hemat ruang sambil menunggu jadwal angkut anorganik Sabtu.',
+    preparationTip: 'Kempiskan botol plastik dan lipat kardus agar hemat ruang untuk jadwal anorganik Jumat.',
     postEventTip: 'Pastikan residu tisu/bungkus makanan tidak tercampur ke kantong canang organik.',
+  },
+  {
+    id: 'bali_pemaridan_guru',
+    name: 'Pemaridan Guru (Ngelungsur Galungan)',
+    balineseName: 'Saniscara Pon Dungulan',
+    date: '2026-11-07',
+    category: 'rahinan_besar',
+    defaultSelected: true,
+    organicSurgePct: 55,
+    anorganikSurgePct: 15,
+    extraLitersHousehold: 35,
+    typicalWasteItems: ['Lungsuran banten Galungan', 'Buah, jaje & janur kering'],
+    preparationTip: 'Hari ini adalah jadwal angkut Organik Sabtu! Pisahkan buah/jaje dari tusuk semat sebelum diserahkan ke petugas TPS3R.',
+    postEventTip: 'Sisa anorganik akan dijemput besok (Minggu) pada jadwal Bank Sampah/Anorganik.',
   },
   {
     id: 'bali_kajeng_kliwon_1',
     name: 'Kajeng Kliwon Enyitan',
-    balineseName: 'Kajeng Kliwon',
+    balineseName: 'Kajeng Kliwon Kuningan',
     date: '2026-11-08',
-    category: 'rahinan_rutin',
+    category: 'tumpek_kajeng',
     defaultSelected: false,
     organicSurgePct: 20,
     anorganikSurgePct: 5,
@@ -79,9 +293,9 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
   {
     id: 'bali_tilem_kelima',
     name: 'Tilem Sasih Kelima',
-    balineseName: 'Tilem Kelima',
+    balineseName: 'Soma Paing Kuningan · Tilem',
     date: '2026-11-09',
-    category: 'rahinan_rutin',
+    category: 'purnama_tilem',
     defaultSelected: true,
     organicSurgePct: 30,
     anorganikSurgePct: 10,
@@ -100,9 +314,9 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
     organicSurgePct: 65,
     anorganikSurgePct: 20,
     extraLitersHousehold: 40,
-    typicalWasteItems: ['Janur tamiang & endongan', 'Daun pandan & pisang', 'Sisa bahan masakan kuning'],
+    typicalWasteItems: ['Janur tamiang & endongan', 'Daun pandan & pisang', 'Sisa bahan nasi kuning'],
     preparationTip: 'Potong kecil sisa janur dan daun pandan agar tidak meluber dari kantong organik.',
-    postEventTip: 'Armada DLHK membuka toleransi leeway ekstra +35% untuk pengangkutan pasca-Kuningan.',
+    postEventTip: 'Armada TPS3R & DLHK membuka toleransi leeway ekstra +35% untuk pengangkutan Sabtu pagi.',
   },
   {
     id: 'bali_kuningan',
@@ -116,28 +330,28 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
     extraLitersHousehold: 55,
     typicalWasteItems: ['Tamiang, kolem & endongan', 'Canang & tebog', 'Kemasan plastik'],
     preparationTip: 'Sembahyang selesai sebelum tengah hari; pisahkan wadah plastik dari lungsuran banten organik.',
-    postEventTip: 'Truk anorganik beroperasi Sabtu siang, sedangkan lungsuran organik dijemput Senin pagi.',
+    postEventTip: 'Truk anorganik beroperasi Minggu pagi, sedangkan lungsuran organik dijemput Senin pagi ke TPS3R.',
   },
   {
     id: 'bali_pegat_uwakan',
-    name: 'Buda Kliwon Pegat Uwakan',
-    balineseName: 'Buda Kliwon Pahang (Cabut Penjor)',
+    name: 'Buda Kliwon Pegat Uwakan (Cabut Penjor)',
+    balineseName: 'Buda Kliwon Pahang',
     date: '2026-11-18',
-    category: 'rahinan_rutin',
+    category: 'tumpek_kajeng',
     defaultSelected: false,
-    organicSurgePct: 40,
+    organicSurgePct: 45,
     anorganikSurgePct: 15,
-    extraLitersHousehold: 30,
+    extraLitersHousehold: 35,
     typicalWasteItems: ['Janur penjor kering', 'Bambu & hiasan sampian penjor'],
-    preparationTip: 'Potong bambu/janur penjor sepanjang maks. 60 cm dan ikat rapi agar mudah dimuat petugas.',
-    postEventTip: 'Letakkan ikatan penjor di samping kantong organik pada jadwal angkut Rabu/Jumat.',
+    preparationTip: 'Potong bambu/janur penjor sepanjang maks. 60 cm dan ikat rapi agar mudah dimuat motor cikar TPS3R.',
+    postEventTip: 'Letakkan ikatan penjor di samping kantong organik pada jadwal angkut Rabu/Kamis.',
   },
   {
     id: 'bali_kajeng_kliwon_2',
     name: 'Kajeng Kliwon Uwudan',
-    balineseName: 'Kajeng Kliwon',
+    balineseName: 'Kajeng Kliwon Pahang',
     date: '2026-11-23',
-    category: 'rahinan_rutin',
+    category: 'tumpek_kajeng',
     defaultSelected: false,
     organicSurgePct: 20,
     anorganikSurgePct: 5,
@@ -149,30 +363,44 @@ export const BALINESE_CALENDAR_EVENTS_2026: BalineseCalendarEvent[] = [
   {
     id: 'bali_purnama_keenam',
     name: 'Purnama Sasih Keenam',
-    balineseName: 'Purnama Keenam',
+    balineseName: 'Anggara Pon Krulut · Purnama',
     date: '2026-11-24',
-    category: 'rahinan_rutin',
+    category: 'purnama_tilem',
     defaultSelected: true,
     organicSurgePct: 35,
     anorganikSurgePct: 10,
     extraLitersHousehold: 25,
     typicalWasteItems: ['Canang sari, daksina & bunga', 'Janur & buah lungsuran'],
     preparationTip: 'Kelompokkan canang dan daun ke kantong organik; simpan batok kelapa daksina terpisah.',
-    postEventTip: 'Dijemput pada jadwal organik Rabu pagi.',
+    postEventTip: 'Dijemput pada jadwal organik Rabu/Kamis pagi menuju TPS3R.',
   },
   {
     id: 'bali_tumpek_krulut',
-    name: 'Tumpek Krulut (Hari Kasih Sayang Bali)',
+    name: 'Tumpek Krulut (Rahinan Kasih Sayang & Gong)',
     balineseName: 'Saniscara Kliwon Krulut',
     date: '2026-11-28',
-    category: 'rahinan_rutin',
+    category: 'tumpek_kajeng',
     defaultSelected: false,
-    organicSurgePct: 30,
+    organicSurgePct: 35,
     anorganikSurgePct: 20,
     extraLitersHousehold: 25,
     typicalWasteItems: ['Banten otonan gamelan/seni', 'Canang & kemasan acara keluarga'],
-    preparationTip: 'Pisahkan botol/gelas plastik acara keluarga untuk diangkut truk anorganik hari Sabtu.',
-    postEventTip: 'Sisa organik banten dijemput Senin pagi.',
+    preparationTip: 'Hari Sabtu adalah hari angkut Organik; keluarkan sisa daun/bunga pagi hari dan simpan botol plastik untuk Minggu.',
+    postEventTip: 'Anorganik dijemput Minggu pagi oleh unit Bank Sampah/TPS3R.',
+  },
+  {
+    id: 'bali_anggarakasih_merakih',
+    name: 'Anggarakasih Merakih',
+    balineseName: 'Anggara Kliwon Merakih',
+    date: '2026-12-01',
+    category: 'tumpek_kajeng',
+    defaultSelected: false,
+    organicSurgePct: 25,
+    anorganikSurgePct: 10,
+    extraLitersHousehold: 20,
+    typicalWasteItems: ['Canang reresik & banten merajan'],
+    preparationTip: 'Pisahkan sisa bunga/janur ke ember kompos rumah tangga.',
+    postEventTip: 'Diangkut pada jadwal organik Rabu pagi.',
   },
 ]
 
@@ -220,6 +448,7 @@ export function buildMonthCalendarGrid(params: {
   timetable: PetugasTimetableSlot[]
   weeklyRegularLiters: number
   selectedBalineseEventIds: string[]
+  birthDate?: string
 }): CalendarDayCell[] {
   const {
     year,
@@ -229,14 +458,19 @@ export function buildMonthCalendarGrid(params: {
     timetable,
     weeklyRegularLiters,
     selectedBalineseEventIds,
+    birthDate,
   } = params
 
   const slots = timetable.filter((s) => s.kecamatan === kecamatan)
   const selectedSet = new Set(selectedBalineseEventIds)
 
+  const otonanSummary = birthDate ? computeUserOtonanFromBirthDate(birthDate, todayDate) : null
+  const allEvents: BalineseCalendarEvent[] = otonanSummary
+    ? [...BALINESE_CALENDAR_EVENTS_2026, otonanSummary.EventItem]
+    : BALINESE_CALENDAR_EVENTS_2026
+
   const firstDay = new Date(Date.UTC(year, month - 1, 1))
   const startDow = firstDay.getUTCDay() // 0 = Sun
-  // Start grid on Monday (ISO week)
   const leadDays = startDow === 0 ? 6 : startDow - 1
   const gridStart = new Date(Date.UTC(year, month - 1, 1 - leadDays))
 
@@ -254,16 +488,17 @@ export function buildMonthCalendarGrid(params: {
     const isToday = dateIso === todayDate
     const isPast = dateIso < todayDate
 
-    const dayEvents = BALINESE_CALENDAR_EVENTS_2026.filter((ev) => ev.date === dateIso).map((ev) => ({
-      ...ev,
-      isSelectedByUser: selectedSet.has(ev.id),
-    }))
+    const dayEvents = allEvents
+      .filter((ev) => ev.date === dateIso)
+      .map((ev) => ({
+        ...ev,
+        isSelectedByUser: ev.isPersonalOtonan ? true : selectedSet.has(ev.id),
+      }))
 
-    // Also check if yesterday had a selected Balinese ceremony (post-ceremony waste surge happens on the day and +1 day)
     const prevDate = new Date(d.getTime() - 86_400_000)
     const prevIso = `${prevDate.getUTCFullYear()}-${String(prevDate.getUTCMonth() + 1).padStart(2, '0')}-${String(prevDate.getUTCDate()).padStart(2, '0')}`
-    const prevSelectedEvents = BALINESE_CALENDAR_EVENTS_2026.filter(
-      (ev) => ev.date === prevIso && selectedSet.has(ev.id),
+    const prevSelectedEvents = allEvents.filter(
+      (ev) => ev.date === prevIso && (ev.isPersonalOtonan || selectedSet.has(ev.id)),
     )
 
     const predictedExtraLiters =
@@ -322,7 +557,6 @@ export type ExternalCalendarEventInput = {
 }
 
 function toCompactUtcStamp(dateIso: string, timeHm: string): string {
-  // WITA is UTC+8, so subtract 8 hours to get UTC timestamp YYYYMMDDTHHMMSSZ
   const [y, m, d] = dateIso.split('-').map(Number)
   const [hh, mm] = timeHm.split(':').map(Number)
   const utcMs = Date.UTC(y, m - 1, d, hh - 8, mm, 0)

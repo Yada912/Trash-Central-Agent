@@ -26,7 +26,8 @@ export default function MasukPage() {
   const [regName, setRegName] = useState('')
   const [regEmail, setRegEmail] = useState('')
   const [regPassword, setRegPassword] = useState('')
-  const [regRole, setRegRole] = useState<'warga' | 'petugas'>('warga')
+  const [regBirthDate, setRegBirthDate] = useState('1998-07-15')
+  const [regBanjarName, setRegBanjarName] = useState('')
   const [regKecamatan, setRegKecamatan] = useState<Kecamatan>('Denpasar Barat')
   const [regDesa, setRegDesa] = useState('Padangsambian')
   const [regAddress, setRegAddress] = useState('')
@@ -72,9 +73,11 @@ export default function MasukPage() {
         name: regName.trim(),
         email: regEmail.trim(),
         password: regPassword,
-        role: regRole,
+        role: 'warga', // Selalu terdaftar sebagai akun Warga terlebih dahulu
         kecamatan: regKecamatan,
         desa: regDesa.trim() || 'Pemecutan',
+        banjarName: regBanjarName.trim() || `Banjar Lingkungan ${regDesa.trim() || 'Pemecutan'}`,
+        birthDate: regBirthDate.trim() || undefined,
         address: regAddress.trim() || `Wilayah ${regKecamatan}`,
         accountType: regAccountType,
       })
@@ -83,7 +86,7 @@ export default function MasukPage() {
         setError('Gagal mendaftarkan akun baru.')
         return
       }
-      router.push(created.role === 'petugas' ? '/petugas' : '/warga')
+      router.push('/warga')
     } catch {
       setBusy(false)
       setError('Gagal mendaftarkan akun baru. Silakan coba lagi.')
@@ -120,11 +123,17 @@ export default function MasukPage() {
           ) : null}
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight">
-          Masuk atau Daftar Akun
+          Masuk ke Akun Warga
         </h1>
         <p className="text-base font-medium text-ink/85">
-          Portal <strong>Warga</strong> dan Portal <strong>Petugas DLHK</strong> dipisahkan secara penuh. Masuk sesuai peran Anda untuk mengakses dasbor yang tepat.
+          Kelola ritme pemilahan sampah berbasis sumber di lingkungan rumah tangga atau usaha Anda sesuai <strong>Pergub Bali No. 47 Tahun 2019</strong>.
         </p>
+        <div className="rounded-lg border-2 border-ink bg-sky/20 p-3 text-xs text-ink/85 flex items-start gap-2">
+          <MaterialIcon name="info" size="sm" className="text-primary mt-0.5 shrink-0" />
+          <span>
+            <strong>Bagi Petugas Armada DLHK / TPS3R:</strong> Semua pengguna masuk melalui portal Warga terlebih dahulu. Untuk membuka akses pengelolaan jadwal dan rute operasional, masuk ke menu <strong>Pengaturan Akun (/akun)</strong> dan lakukan otentikasi petugas di bagian paling bawah halaman.
+          </span>
+        </div>
 
         <div className="flex flex-wrap gap-2 pt-2">
           <Button
@@ -194,14 +203,14 @@ export default function MasukPage() {
             </Button>
           </form>
 
-          {/* 1-Click Quick Login Cards for Evaluation */}
+          {/* 1-Click Quick Login Cards for Warga */}
           <aside className="vector-card bg-sky/30 p-6 grid content-start gap-3">
             <h2 className="text-lg font-extrabold flex items-center gap-2">
               <MaterialIcon name="bolt" className="text-primary" />
-              Akses Cepat Akun Terdaftar
+              Akses Cepat Akun Warga
             </h2>
             <p className="text-xs font-medium text-ink/80">
-              Klik salah satu akun di bawah untuk langsung masuk ke portal peran terkait:
+              Pilih profil Warga di bawah untuk langsung mencoba dasbor jadwal & pemilahan:
             </p>
             <div className="grid gap-2.5">
               <button
@@ -213,12 +222,12 @@ export default function MasukPage() {
                 <div className="flex items-center justify-between">
                   <span className="vector-pill bg-mint text-ink text-[11px]">
                     <MaterialIcon name="home" size="sm" />
-                    Akun Warga (Rumah Tangga)
+                    Warga Rumah Tangga
                   </span>
                   <span className="text-xs font-extrabold text-primary">Masuk →</span>
                 </div>
                 <p className="mt-1 font-extrabold text-sm">I Made Adi Wijaya</p>
-                <p className="text-xs text-ink/75">Denpasar Barat · made.adi@warga.denpasar.id</p>
+                <p className="text-xs text-ink/75">Denpasar Barat · Banjar Pekambingan</p>
               </button>
 
               <button
@@ -230,29 +239,12 @@ export default function MasukPage() {
                 <div className="flex items-center justify-between">
                   <span className="vector-pill bg-amber text-ink text-[11px]">
                     <MaterialIcon name="storefront" size="sm" />
-                    Akun Warga (Warung / UMKM)
+                    Warga Pelaku UMKM / Warung
                   </span>
                   <span className="text-xs font-extrabold text-primary">Masuk →</span>
                 </div>
-                <p className="mt-1 font-extrabold text-sm">Ni Luh Putu Sari</p>
-                <p className="text-xs text-ink/75">Denpasar Selatan · putu.sari@umkm.denpasar.id</p>
-              </button>
-
-              <button
-                type="button"
-                data-testid="quick-login-petugas"
-                onClick={() => void handleQuickLogin('surya.wirawan@dlhk.denpasar.id', 'petugas123')}
-                className="vector-card-soft bg-card hover:bg-lavender/50 p-3 text-left transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="vector-pill bg-lavender text-ink text-[11px]">
-                    <MaterialIcon name="badge" size="sm" />
-                    Akun Petugas DLHK
-                  </span>
-                  <span className="text-xs font-extrabold text-primary">Masuk →</span>
-                </div>
-                <p className="mt-1 font-extrabold text-sm">I Wayan Gde Surya Wirawan</p>
-                <p className="text-xs text-ink/75">Koordinator Armada · surya.wirawan@dlhk.denpasar.id</p>
+                <p className="mt-1 font-extrabold text-sm">Ni Luh Putu Sari (Warung Sari)</p>
+                <p className="text-xs text-ink/75">Denpasar Selatan · Sanur</p>
               </button>
             </div>
           </aside>
@@ -301,15 +293,14 @@ export default function MasukPage() {
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-1">
-              <Label htmlFor="reg-role">Peran Akun</Label>
-              <Select
-                id="reg-role"
-                value={regRole}
-                onChange={(e) => setRegRole(e.target.value as 'warga' | 'petugas')}
-              >
-                <option value="warga">Warga (Rumah Tangga / Usaha)</option>
-                <option value="petugas">Petugas Armada DLHK</option>
-              </Select>
+              <Label htmlFor="reg-birthdate">Tanggal Lahir (Untuk Kalender Pawukon / Otonan)</Label>
+              <Input
+                id="reg-birthdate"
+                type="date"
+                value={regBirthDate}
+                onChange={(e) => setRegBirthDate(e.target.value)}
+                required
+              />
             </div>
             <div className="grid gap-1">
               <Label htmlFor="reg-kecamatan">Kecamatan</Label>
@@ -335,14 +326,23 @@ export default function MasukPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-1">
-              <Label htmlFor="reg-address">Alamat Lengkap / Banjar</Label>
+              <Label htmlFor="reg-banjar">Nama Banjar / Lingkungan</Label>
+              <Input
+                id="reg-banjar"
+                value={regBanjarName}
+                onChange={(e) => setRegBanjarName(e.target.value)}
+                placeholder="Contoh: Banjar Pekambingan"
+              />
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="reg-address">Alamat Lengkap Rumah / Usaha</Label>
               <Input
                 id="reg-address"
                 value={regAddress}
                 onChange={(e) => setRegAddress(e.target.value)}
-                placeholder="Jl. Gunung Agung, Br. ..."
+                placeholder="Jl. Hasanuddin Gang IV No. 12"
               />
             </div>
             <div className="grid gap-1">

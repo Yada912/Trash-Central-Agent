@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Textarea } from '@/components/ui/textarea'
+import { BaliVectorMap } from '@/components/home/bali-vector-map'
 import type { ClassifyOutcome } from '@/lib/schemas'
 
 const GUEST_LIMIT = 5
@@ -190,7 +191,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. About Section (Tentang Central Trash Agent) */}
+      {/* 2. Interactive 3D Vector Map: Bali Decentralized Waste Coverage */}
+      <section aria-labelledby="bali-map-heading" className="grid gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span className="vector-pill bg-mint text-ink tilt-left">
+              <MaterialIcon name="explore" size="sm" />
+              Sistem Desentralisasi Berbasis Sumber
+            </span>
+            <h2 id="bali-map-heading" className="mt-1 text-2xl font-extrabold tracking-tight">
+              Peta Operasional & Cakupan Wilayah Bali
+            </h2>
+          </div>
+          <p className="text-xs font-bold text-ink/75">
+            Sesuai Pergub Bali No. 47 Tahun 2019 & Perda Kota Denpasar No. 8 Tahun 2023
+          </p>
+        </div>
+        <BaliVectorMap />
+      </section>
+
+      {/* 3. About Section (Tentang Central Trash Agent) */}
       <section aria-labelledby="about-heading" className="grid gap-4 md:grid-cols-3">
         <div className="vector-card bg-card p-5 grid content-start gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-ink bg-mint">

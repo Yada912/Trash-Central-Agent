@@ -46,6 +46,9 @@ export async function POST(request: Request) {
       name?: string
       kecamatan?: Kecamatan
       desa?: string
+      banjarName?: string
+      tps3rNode?: string
+      birthDate?: string
       address?: string
       lat?: number
       lng?: number
@@ -59,6 +62,9 @@ export async function POST(request: Request) {
       role: UserRole
       kecamatan: Kecamatan
       desa: string
+      banjarName?: string
+      tps3rNode?: string
+      birthDate?: string
       address: string
       accountType: AccountType
     }
@@ -112,7 +118,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Akun tidak ditemukan.' } }, { status: 404 })
     }
   } else if (body.action === 'create_account' && body.newAccount) {
-    const { name, email, password, role, kecamatan, desa, address, accountType } = body.newAccount
+    const { name, email, password, role, kecamatan, desa, banjarName, tps3rNode, birthDate, address, accountType } =
+      body.newAccount
     const trimmedEmail = email?.trim().toLowerCase() ?? ''
     if (!name?.trim() || !trimmedEmail.includes('@') || !KECAMATAN.includes(kecamatan)) {
       return NextResponse.json(
@@ -133,7 +140,19 @@ export async function POST(request: Request) {
         { status: 409 },
       )
     }
-    createAccount({ name, email: trimmedEmail, password, role, kecamatan, desa, address, accountType })
+    createAccount({
+      name,
+      email: trimmedEmail,
+      password,
+      role,
+      kecamatan,
+      desa,
+      banjarName,
+      tps3rNode,
+      birthDate,
+      address,
+      accountType,
+    })
   } else if (body.action === 'update_timetable' && body.timetablePatch?.slotId) {
     const currentActor = getActiveAccount(body.accountId)
     if (currentActor.role !== 'petugas') {

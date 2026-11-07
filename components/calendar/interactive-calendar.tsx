@@ -27,12 +27,14 @@ export function InteractiveCalendar({
   timetable,
   weeklyRegularLiters,
   selectedBalineseEventIds,
+  birthDate,
   onToggleBalineseEvent,
 }: {
   kecamatan: Kecamatan
   timetable: PetugasTimetableSlot[]
   weeklyRegularLiters: number
   selectedBalineseEventIds: string[]
+  birthDate?: string
   onToggleBalineseEvent?: (eventId: string) => void
 }) {
   const [selectedDate, setSelectedDate] = useState<string>('2026-11-07')
@@ -48,8 +50,9 @@ export function InteractiveCalendar({
         timetable,
         weeklyRegularLiters,
         selectedBalineseEventIds,
+        birthDate,
       }),
-    [kecamatan, timetable, weeklyRegularLiters, selectedBalineseEventIds],
+    [kecamatan, timetable, weeklyRegularLiters, selectedBalineseEventIds, birthDate],
   )
 
   const activeCell: CalendarDayCell =
@@ -215,9 +218,8 @@ export function InteractiveCalendar({
             {activeCell.balineseEvents.map((ev) => (
               <div
                 key={ev.id}
-                className={`vector-card-soft p-3.5 grid gap-2 ${
-                  ev.isSelectedByUser ? 'bg-lavender/50' : 'bg-bg'
-                }`}
+                className={`vector-card-soft p-3.5 grid gap-2 ${ev.isSelectedByUser ? 'bg-lavender/50' : 'bg-bg'
+                  }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
@@ -354,4 +356,5 @@ export function InteractiveCalendar({
       </div>
     </div>
   )
+}
 }

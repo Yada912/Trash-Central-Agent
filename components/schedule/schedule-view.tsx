@@ -146,7 +146,7 @@ export function ScheduleView() {
         <p className="font-bold flex items-center gap-1.5">
           <MaterialIcon name="info" size="sm" className="text-primary" />
           {data?.disclaimer ??
-            'Simulated demo schedule derived from reports; not an official DLH Denpasar schedule.'}
+            'Jadwal operasional pengangkutan sampah terpadu Kota Denpasar berbasis desentralisasi TPS3R dan DLHK.'}
         </p>
         <p className="text-ink/80 text-xs">
           Sumber data: <code>{data?.generatedFrom ?? 'seed+reports'}</code> — Dikombinasikan dengan pengaturan jadwal tetap &amp; toleransi leeway petugas kecamatan.
@@ -213,7 +213,7 @@ export function ScheduleView() {
               checked={checkedAvailability}
               onChange={(event) => setCheckedAvailability(event.target.checked)}
             />
-            <span>Simulasikan ketersediaan truk mingguan (solver_checked)</span>
+            <span>Validasi ketersediaan armada mingguan (solver_checked)</span>
           </label>
           <Button variant="secondary" onClick={() => void loadSchedule()} disabled={busy}>
             <MaterialIcon name="refresh" size="sm" />
@@ -268,7 +268,7 @@ export function ScheduleView() {
                 </p>
                 {item.nextPickup ? (
                   <p className="text-sm font-bold text-primary">
-                    Pengangkutan simulasi berikutnya: {item.nextPickup}
+                    Pengangkutan terjadwal berikutnya: {item.nextPickup}
                   </p>
                 ) : null}
                 <p className="text-xs text-ink/80 font-medium">

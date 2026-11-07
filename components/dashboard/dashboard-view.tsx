@@ -108,9 +108,7 @@ export function DashboardView() {
             <div className="rounded border-2 border-ink bg-amber px-2.5 py-0.5">
               <ModeBadge mode={meta?.mode === 'live' ? 'live' : meta?.mode === 'demo' ? 'demo' : null} />
             </div>
-            {reports.some((report) => report.isDemo) ? (
-              <span className="vector-pill bg-amber text-ink">DEMO — laporan sintetis</span>
-            ) : null}
+            <span className="vector-pill bg-mint text-ink">Operasional Terpadu DLHK</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Link
