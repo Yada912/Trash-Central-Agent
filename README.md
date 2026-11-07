@@ -19,6 +19,7 @@ Two people use it:
 - Dashboard: a Denpasar map with pickup zones, totals, an accessible report list, and hazardous reports kept separate.
 - Planner: truck, crew, and shift inputs; a deterministic route proposal; an explanation; approve, edit, or reject, with an audit log.
 - Schedule: `GET /api/schedule` is a simulated demo schedule derived from reports. It is not the official DLH Denpasar schedule.
+- Folding the five Pergub Bali 47/2019 Pasal 6(2) source types into four pickup streams is a project logistics choice, not a legal taxonomy.
 - Demo mode when `GEMINI_API_KEY` is unset. Seeded reports are marked synthetic.
 
 Roadmap items that are not in this build: recycling points, an MSME marketplace, and bank sampah integration.
