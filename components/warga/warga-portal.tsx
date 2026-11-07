@@ -10,7 +10,9 @@ import { Label } from '@/components/ui/label'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import {
   BALINESE_CALENDAR_EVENTS_2026,
+  computeUserOtonanFromBirthDate,
   type BalineseCalendarEvent,
+  type BalineseEventCategory,
 } from '@/lib/calendar/balinese-calendar'
 import { computeResidentOptimization } from '@/lib/accounts/store'
 
@@ -20,6 +22,16 @@ export function WargaPortal() {
   const [bagCount, setBagCount] = useState<number>(() => Math.max(1, Math.round(weeklyLiters / 15)))
   const [savingProfile, setSavingProfile] = useState(false)
   const [savedToast, setSavedToast] = useState<string | null>(null)
+
+  // Progressive disclosure filter for Balinese calendar events
+  const [eventCategoryFilter, setEventCategoryFilter] = useState<BalineseEventCategory | 'all'>('all')
+  const [showAllEvents, setShowAllEvents] = useState(false)
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
+
+  const computedOtonan = useMemo(() => {
+    if (!activeAccount?.birthDate) return null
+    return computeUserOtonanFromBirthDate(activeAccount.birthDate)
+  }, [activeAccount?.birthDate])
 
   const selectedEventIds = activeAccount?.wasteProfile?.selectedBalineseEventIds ?? [
     'bali_penampahan_galungan',
@@ -135,10 +147,20 @@ export function WargaPortal() {
               <MaterialIcon name="home" size="sm" />
               Portal Warga · {activeAccount.kecamatan}
             </span>
+            <span className="vector-pill bg-sky text-ink">
+              <MaterialIcon name="account_balance" size="sm" />
+              {activeAccount.banjarName ?? 'Banjar Pekambingan'}
+            </span>
             <span className="vector-pill bg-amber text-ink">
               <MaterialIcon name="location_on" size="sm" />
               {activeAccount.desa} · {activeAccount.address}
             </span>
+            {computedOtonan ? (
+              <span className="vector-pill bg-lavender text-ink font-extrabold">
+                <MaterialIcon name="auto_awesome" size="sm" />
+                Otonan: {computedOtonan.pawukonLabel}
+              </span>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
@@ -149,11 +171,11 @@ export function WargaPortal() {
               Lapor Tumpukan / Foto Sampah
             </Link>
             <Link
-              href="/masuk"
+              href="/akun"
               className="vector-btn inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-bg px-3 py-2 text-xs font-bold text-ink"
             >
               <MaterialIcon name="manage_accounts" size="sm" />
-              Ganti Akun
+              Profil & Otonan
             </Link>
           </div>
         </div>
@@ -295,11 +317,12 @@ export function WargaPortal() {
           timetable={timetable}
           weeklyRegularLiters={weeklyLiters}
           selectedBalineseEventIds={selectedEventIds}
+          birthDate={activeAccount.birthDate}
           onToggleBalineseEvent={(eventId) => void handleToggleBalineseEvent(eventId)}
         />
       </section>
 
-      {/* 4. Balinese Calendar (Kalender Bali) Personal Selector & AI Surge Prediction */}
+      {/* 4. Balinese Calendar (Kalender Bali & Otonan) Progressive Disclosure Selector */}
       <section
         aria-labelledby="balinese-events-heading"
         data-testid="balinese-events-section"
@@ -309,58 +332,163 @@ export function WargaPortal() {
           <div className="grid gap-1">
             <span className="vector-pill bg-lavender text-ink w-fit">
               <MaterialIcon name="temple_hindu" size="sm" />
-              Prediksi Cerdas Kalender Bali
+              Prediksi Cerdas Kalender Bali & Otonan Pawukon
             </span>
             <h2 id="balinese-events-heading" className="text-2xl font-extrabold">
-              Pilih Hari Raya & Rahinan yang Mempengaruhi Rumah Anda
+              Pilih Hari Raya & Upacara yang Mempengaruhi Rumah Anda
             </h2>
             <p className="text-sm text-ink/80 max-w-3xl">
-              Kalender Bali memiliki banyak Rahinan. Centang hari raya atau upacara yang Anda rayakan di rumah/tempat usaha agar sistem memprediksi lonjakan sampah organik (canang, janur, penjor) dan menyesuaikan kuota jemputan petugas.
+              Pilih upacara yang Anda laksanakan agar AI dapat memprediksi lonjakan sampah organik (janur, canang, daun pisang) dan memastikan seluruhnya tertampung dalam kuota kelonggaran (leeway) pengangkutan TPS3R desa.
             </p>
           </div>
           <div className="vector-card-soft bg-mint/40 px-3.5 py-2 text-xs font-extrabold">
-            {selectedBaliEvents.length} dari {BALINESE_CALENDAR_EVENTS_2026.length} Rahinan dipilih
+            {selectedBaliEvents.length} Rahinan Terpilih (+{optimization?.balineseCalendarExtraLiters ?? 0} L Ekstra)
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {BALINESE_CALENDAR_EVENTS_2026.map((ev) => {
-            const checked = selectedEventIds.includes(ev.id)
-            return (
-              <label
-                key={ev.id}
-                data-testid={`bali-event-toggle-${ev.id}`}
-                className={[
-                  'cursor-pointer rounded-md border-2 p-3.5 transition-transform flex flex-col justify-between gap-2',
-                  checked
-                    ? 'border-ink bg-lavender/40 -translate-y-0.5'
-                    : 'border-ink/40 bg-bg hover:bg-card',
-                ].join(' ')}
-              >
-                <div className="grid gap-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-xs font-extrabold text-primary">{ev.date}</span>
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-primary"
-                      checked={checked}
-                      onChange={() => void handleToggleBalineseEvent(ev.id)}
-                    />
-                  </div>
-                  <p className="font-extrabold text-sm">{ev.name}</p>
-                  <p className="text-xs font-semibold text-ink/70">{ev.balineseName}</p>
-                </div>
-
-                <div className="grid gap-1 pt-2 border-t border-ink/20 text-xs">
-                  <span className="font-extrabold text-ink">
-                    Lonjakan: +{ev.extraLitersHousehold} L (Organik +{ev.organicSurgePct}%)
-                  </span>
-                  <span className="text-ink/75">{ev.typicalWasteItems.join(', ')}</span>
-                </div>
-              </label>
-            )
-          })}
+        {/* Category Tabs for Clean Progressive Hierarchy */}
+        <div className="flex flex-wrap items-center gap-1.5 border-b-2 border-ink pb-2 text-xs font-extrabold">
+          {[
+            { id: 'all', label: 'Semua (16 Rahinan)' },
+            { id: 'rahinan_besar', label: 'Galungan & Kuningan' },
+            { id: 'purnama_tilem', label: 'Purnama & Tilem' },
+            { id: 'tumpek_kajeng', label: 'Tumpek & Kajeng Kliwon' },
+            { id: 'adat_keluarga', label: 'Otonan & Adat Keluarga' },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => {
+                setEventCategoryFilter(cat.id as typeof eventCategoryFilter)
+                setShowAllEvents(true)
+              }}
+              className={[
+                'rounded-lg border-2 border-ink px-3 py-1 transition-all',
+                eventCategoryFilter === cat.id
+                  ? 'bg-primary text-white shadow-[2px_2px_0_#1F2933]'
+                  : 'bg-card text-ink hover:bg-amber/30',
+              ].join(' ')}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
+
+        {/* Display Events: Top 4 by default or all filtered events */}
+        {(() => {
+          const filtered = BALINESE_CALENDAR_EVENTS_2026.filter((ev) => {
+            if (eventCategoryFilter === 'all') return true
+            return ev.category === eventCategoryFilter
+          })
+          const eventsToDisplay = showAllEvents ? filtered : filtered.slice(0, 4)
+
+          return (
+            <div className="grid gap-3">
+              {/* If personal Otonan is computed, display it as a highlighted card */}
+              {computedOtonan && (eventCategoryFilter === 'all' || eventCategoryFilter === 'adat_keluarga') ? (
+                <div className="rounded-xl border-2 border-ink bg-lavender/50 p-4 transition-all" style={{ boxShadow: '3px 3px 0 #1F2933' }}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="vector-pill bg-gold text-ink font-extrabold text-[11px]">
+                      <MaterialIcon name="auto_awesome" size="sm" />
+                      Otonan Pribadi Pawukon Anda
+                    </span>
+                    <span className="text-xs font-bold text-ink">
+                      Berikutnya: {computedOtonan.nextOtonanDate}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <h3 className="text-lg font-black text-ink">{computedOtonan.pawukonLabel}</h3>
+                    <span className="text-xs text-ink/75">· Siklus 210 Hari</span>
+                  </div>
+                  <p className="mt-1 text-xs text-ink/80 leading-relaxed">
+                    {computedOtonan.EventItem.preparationTip}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-primary">
+                    Estimasi lonjakan sampah: +{computedOtonan.extraLitersHousehold} L (Organik banten otonan +{computedOtonan.organicSurgePct}%)
+                  </p>
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                {eventsToDisplay.map((ev) => {
+                  const checked = selectedEventIds.includes(ev.id)
+                  const isExpanded = expandedEventId === ev.id
+
+                  return (
+                    <div
+                      key={ev.id}
+                      data-testid={`bali-event-toggle-${ev.id}`}
+                      className={[
+                        'rounded-xl border-2 border-ink p-4 transition-all flex flex-col justify-between gap-2.5 bg-card',
+                        checked ? 'bg-amber/15 shadow-[3px_3px_0_#1F2933]' : 'bg-card opacity-85',
+                      ].join(' ')}
+                    >
+                      <div className="grid gap-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="rounded border border-ink bg-mint px-2 py-0.5 text-xs font-black text-ink">
+                            {ev.date}
+                          </span>
+                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-ink select-none">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 accent-primary cursor-pointer"
+                              checked={checked}
+                              onChange={() => void handleToggleBalineseEvent(ev.id)}
+                            />
+                            <span>{checked ? 'Aktif' : 'Non-aktif'}</span>
+                          </label>
+                        </div>
+                        <h4 className="font-black text-base text-ink mt-0.5">{ev.name}</h4>
+                        <p className="text-xs font-semibold text-ink/70">{ev.balineseName}</p>
+                      </div>
+
+                      <div className="border-t border-ink/20 pt-2 text-xs grid gap-1">
+                        <div className="flex items-center justify-between font-extrabold text-ink">
+                          <span>Lonjakan Timbulan:</span>
+                          <span className="text-primary font-black">+{ev.extraLitersHousehold} L</span>
+                        </div>
+                        <p className="text-[11px] text-ink/75 truncate">
+                          Komposisi: {ev.typicalWasteItems.join(', ')}
+                        </p>
+
+                        {/* Expandable details for progressive disclosure */}
+                        {isExpanded ? (
+                          <div className="mt-2 rounded-lg border border-ink bg-bg p-2.5 text-[11px] text-ink/85 grid gap-1.5">
+                            <p><strong>Tips Persiapan:</strong> {ev.preparationTip}</p>
+                            <p><strong>Pasca Acara:</strong> {ev.postEventTip}</p>
+                          </div>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          onClick={() => setExpandedEventId(isExpanded ? null : ev.id)}
+                          className="mt-1 text-left text-[11px] font-extrabold text-primary hover:underline flex items-center gap-1"
+                        >
+                          <MaterialIcon name={isExpanded ? 'expand_less' : 'expand_more'} size="sm" />
+                          <span>{isExpanded ? 'Tutup Panduan Pilah' : 'Lihat Panduan Pilah & Leeway'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Progressive disclosure toggle button */}
+              <div className="flex justify-center pt-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowAllEvents(!showAllEvents)}
+                  className="btn-tactile text-xs font-bold"
+                >
+                  <MaterialIcon name={showAllEvents ? 'unfold_less' : 'unfold_more'} size="sm" />
+                  {showAllEvents
+                    ? 'Sederhanakan Tampilan (Tampilkan 4 Rahinan Terdekat Saja)'
+                    : `Tampilkan Semua (${filtered.length} Rahinan & Upacara Kalender Bali)`}
+                </Button>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Personalized AI & Schedule Recommendation for Selected Balinese Events */}
         {optimization ? (

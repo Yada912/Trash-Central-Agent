@@ -33,6 +33,9 @@ type AccountContextValue = {
     name?: string
     kecamatan?: Kecamatan
     desa?: string
+    banjarName?: string
+    tps3rNode?: string
+    birthDate?: string
     address?: string
     lat?: number
     lng?: number
@@ -46,6 +49,9 @@ type AccountContextValue = {
     role: UserRole
     kecamatan: Kecamatan
     desa: string
+    banjarName?: string
+    tps3rNode?: string
+    birthDate?: string
     address: string
     accountType: AccountType
   }) => Promise<UserAccount | null>

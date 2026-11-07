@@ -34,7 +34,7 @@ const GUEST_NAV_ITEMS: NavItem[] = [
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const { activeAccount, accounts, isSignedIn, switchAccount } = useAccount()
+  const { activeAccount, isSignedIn } = useAccount()
 
   const navItems: NavItem[] = !isSignedIn || !activeAccount
     ? GUEST_NAV_ITEMS
@@ -95,53 +95,43 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* Active Account Quick Switcher & Sign In Button */}
+          {/* User Profile Pill & Account Settings (Single Account Context) */}
           <div className="flex items-center gap-2 text-xs">
-            <label htmlFor="account-Role-switcher" className="sr-only">
-              Pilih Akun Aktif
-            </label>
-            <div className="flex items-center gap-1.5 rounded-md border-2 border-white/40 bg-white/10 px-2.5 py-1.5">
-              <MaterialIcon
-                name={activeAccount?.role === 'petugas' ? 'badge' : 'person'}
-                size="sm"
-                className="text-gold"
-              />
-              <select
-                id="account-Role-switcher"
-                aria-label="Peran demo"
-                value={isSignedIn && activeAccount ? activeAccount.id : ''}
-                onChange={(event) => {
-                  if (event.target.value) {
-                    void switchAccount(event.target.value)
-                  }
-                }}
-                className="bg-transparent font-bold text-white focus:outline-none cursor-pointer"
+            {isSignedIn && activeAccount ? (
+              <>
+                <Link
+                  href="/akun"
+                  data-testid="header-user-profile-pill"
+                  className="flex items-center gap-1.5 rounded-lg border-2 border-white/60 bg-white/10 px-2.5 py-1.5 font-bold text-white hover:bg-white/20 transition-all"
+                  title="Lihat Profil & Pengaturan Akun"
+                >
+                  <MaterialIcon
+                    name={activeAccount.role === 'petugas' ? 'badge' : 'person'}
+                    size="sm"
+                    className={activeAccount.role === 'petugas' ? 'text-gold' : 'text-mint'}
+                  />
+                  <span className="max-w-[130px] truncate font-extrabold">{activeAccount.name}</span>
+                  <span className="rounded border border-white/40 bg-white/20 px-1 py-0.2 text-[10px] uppercase font-extrabold tracking-wider">
+                    {activeAccount.role === 'petugas' ? 'Petugas' : 'Warga'}
+                  </span>
+                </Link>
+                <Link
+                  href="/akun"
+                  className="inline-flex items-center gap-1 rounded-lg border-2 border-white bg-gold px-2.5 py-1.5 font-extrabold text-ink hover:bg-amber"
+                >
+                  <MaterialIcon name="settings" size="sm" />
+                  <span>Akun</span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/masuk"
+                className="inline-flex items-center gap-1 rounded-lg border-2 border-white bg-gold px-3 py-1.5 font-extrabold text-ink hover:bg-amber"
               >
-                {!isSignedIn ? (
-                  <option value="" className="text-ink">
-                    Tamu (Belum Masuk)
-                  </option>
-                ) : null}
-                {accounts.length === 0 ? (
-                  <option value="" className="text-ink">
-                    Warga / Petugas
-                  </option>
-                ) : (
-                  accounts.map((acc) => (
-                    <option key={acc.id} value={acc.id} className="text-ink font-semibold">
-                      {acc.role === 'petugas' ? 'Petugas' : 'Warga'}: {acc.name} ({acc.kecamatan})
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-            <Link
-              href="/masuk"
-              className="inline-flex items-center gap-1 rounded-md border-2 border-white bg-gold px-2.5 py-1.5 font-extrabold text-ink hover:bg-amber"
-            >
-              <MaterialIcon name="login" size="sm" />
-              <span>{isSignedIn ? 'Akun' : 'Masuk'}</span>
-            </Link>
+                <MaterialIcon name="login" size="sm" />
+                <span>Masuk Warga</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>

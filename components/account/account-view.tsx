@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAccount } from '@/components/account/use-account'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,9 +17,9 @@ import {
   type CurrentTrashCondition,
   type ResidentWasteProfile,
   type SpecialEventSurge,
-  type UserRole,
 } from '@/lib/accounts/store'
-import { KECAMATAN, type AccountType, type Kecamatan, type WasteStream } from '@/lib/schemas'
+import { computeUserOtonanFromBirthDate } from '@/lib/calendar/balinese-calendar'
+import { KECAMATAN, type Kecamatan, type WasteStream } from '@/lib/schemas'
 
 const CONDITION_OPTIONS: Array<{
   value: CurrentTrashCondition
@@ -58,23 +59,25 @@ const CONDITION_OPTIONS: Array<{
 ]
 
 export function AccountView() {
-  const { activeAccount, accounts, timetable, optimization, busy, switchAccount, updateProfile, createNewAccount, updateTimetable } =
+  const router = useRouter()
+  const { activeAccount, timetable, optimization, busy, login, switchAccount, updateProfile, updateTimetable } =
     useAccount()
 
   const [profileDraft, setProfileDraft] = useState<ResidentWasteProfile | null>(null)
+  const [nameDraft, setNameDraft] = useState('')
   const [addressDraft, setAddressDraft] = useState('')
   const [kecamatanDraft, setKecamatanDraft] = useState<Kecamatan>('Denpasar Barat')
   const [desaDraft, setDesaDraft] = useState('')
+  const [banjarDraft, setBanjarDraft] = useState('')
+  const [tps3rDraft, setTps3rDraft] = useState('')
+  const [birthDateDraft, setBirthDateDraft] = useState('1996-05-14')
   const [savedBanner, setSavedBanner] = useState<string | null>(null)
 
-  const [showRegister, setShowRegister] = useState(false)
-  const [newName, setNewName] = useState('')
-  const [newEmail, setNewEmail] = useState('')
-  const [newRole, setNewRole] = useState<UserRole>('warga')
-  const [newKecamatan, setNewKecamatan] = useState<Kecamatan>('Denpasar Barat')
-  const [newDesa, setNewDesa] = useState('Pemecutan')
-  const [newAddress, setNewAddress] = useState('')
-  const [newAccountType, setNewAccountType] = useState<AccountType>('household')
+  // Petugas Escalation Authentication State
+  const [petugasEmail, setPetugasEmail] = useState('surya.wirawan@dlhk.denpasar.id')
+  const [petugasPassword, setPetugasPassword] = useState('petugas123')
+  const [petugasLoginBusy, setPetugasLoginBusy] = useState(false)
+  const [petugasLoginError, setPetugasLoginError] = useState<string | null>(null)
 
   const [newEventName, setNewEventName] = useState('')
   const [newEventContainers, setNewEventContainers] = useState('4')
@@ -82,9 +85,13 @@ export function AccountView() {
 
   useEffect(() => {
     if (!activeAccount) return
+    setNameDraft(activeAccount.name)
     setAddressDraft(activeAccount.address)
     setKecamatanDraft(activeAccount.kecamatan)
     setDesaDraft(activeAccount.desa)
+    setBanjarDraft(activeAccount.banjarName ?? 'Banjar Pekambingan')
+    setTps3rDraft(activeAccount.tps3rNode ?? 'TPS3R Swakelola Desa')
+    setBirthDateDraft(activeAccount.birthDate ?? '1996-05-14')
     if (activeAccount.wasteProfile) {
       setProfileDraft(structuredClone(activeAccount.wasteProfile))
     } else {
@@ -101,6 +108,8 @@ export function AccountView() {
       </main>
     )
   }
+
+  const computedOtonan = birthDateDraft ? computeUserOtonanFromBirthDate(birthDateDraft) : null
 
   const preset = profileDraft ? CONTAINER_PRESETS[profileDraft.containerPreset] : CONTAINER_PRESETS.kantong_15l
   const weeklyContainerCount = profileDraft ? Math.max(1, Math.round(profileDraft.weeklyRegularLiters / preset.liters)) : 5
@@ -145,101 +154,114 @@ export function AccountView() {
 
   async function saveWargaProfile() {
     await updateProfile({
+      name: nameDraft.trim() || activeAccount?.name,
       kecamatan: kecamatanDraft,
       desa: desaDraft,
+      banjarName: banjarDraft,
+      tps3rNode: tps3rDraft,
+      birthDate: birthDateDraft,
       address: addressDraft,
       wasteProfile: profileDraft ?? undefined,
     })
-    setSavedBanner('Profil sampah & jadwal rumah tangga berhasil diperbarui!')
+    setSavedBanner('Profil sampah, banjar, dan tanggal lahir (Pawukon/Otonan) berhasil disimpan!')
     setTimeout(() => setSavedBanner(null), 4000)
   }
 
-  async function handleCreateAccount(e: React.FormEvent) {
-    e.preventDefault()
-    if (!newName.trim() || !newEmail.trim()) return
-    await createNewAccount({
-      name: newName,
-      email: newEmail,
-      role: newRole,
-      kecamatan: newKecamatan,
-      desa: newDesa,
-      address: newAddress,
-      accountType: newAccountType,
-    })
-    setNewName('')
-    setNewEmail('')
-    setNewAddress('')
-    setShowRegister(false)
-    setSavedBanner('Akun baru berhasil dibuat dan diaktifkan!')
-    setTimeout(() => setSavedBanner(null), 4000)
+  async function handlePetugasEscalation(email: string, pass: string) {
+    setPetugasLoginError(null)
+    setPetugasLoginBusy(true)
+    const authed = await login(email, pass)
+    setPetugasLoginBusy(false)
+    if (!authed || authed.role !== 'petugas') {
+      setPetugasLoginError('Otentikasi Petugas gagal. Pastikan email kedinasan dan kata sandi benar.')
+      return
+    }
+    router.push('/petugas')
+  }
+
+  async function handleReturnToWarga() {
+    await switchAccount('usr_warga_01')
+    router.push('/warga')
   }
 
   return (
     <main id="main" className="grid gap-8">
-      {/* Header Section */}
-      <section className="vector-card bg-gradient-to-br from-card via-card to-sky/40 p-6">
+      {/* Header Section: Single Account Context */}
+      <section className="vector-card bg-gradient-to-br from-card via-card to-sky/30 p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="grid gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="vector-pill bg-amber text-ink tilt-left">
                 <MaterialIcon name={activeAccount.role === 'petugas' ? 'badge' : 'person'} size="sm" />
-                Mode Akun: {activeAccount.role === 'petugas' ? 'Petugas DLHK' : 'Warga Denpasar'}
+                Mode Akun: {activeAccount.role === 'petugas' ? 'Petugas Operasional DLHK' : 'Warga Denpasar'}
               </span>
               <span className="vector-pill bg-mint text-ink">
                 <MaterialIcon name="location_on" size="sm" />
-                {activeAccount.kecamatan}
+                {activeAccount.kecamatan} · {activeAccount.desa}
+              </span>
+              <span className="vector-pill bg-sky text-ink">
+                <MaterialIcon name="account_balance" size="sm" />
+                {activeAccount.banjarName ?? 'Banjar Lingkungan'}
               </span>
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               {activeAccount.role === 'petugas'
-                ? 'Akun Petugas & Kendali Jadwal Armada'
-                : 'Profil Sampah Warga & Penyesuaian Jadwal'}
+                ? 'Akun Petugas & Kendali Operasional DLHK'
+                : 'Profil Pengelolaan Sampah Mandiri Warga'}
             </h1>
             <p className="max-w-3xl text-base text-ink/80">
               {activeAccount.role === 'petugas'
-                ? 'Atur jadwal tetap per kecamatan, batas kapasitas per penjemputan, dan toleransi kelonggaran (leeway) armada saat lonjakan hari raya/upacara.'
-                : 'Catat kondisi sampah Anda sekarang, kebiasaan timbulan mingguan (cukup hitung kantong/ember), serta lonjakan acara adat agar selaras dengan jadwal dan toleransi (leeway) petugas.'}
+                ? 'Pengaturan jadwal desentralisasi TPS3R per kecamatan, kapasitas angkut harian, batas toleransi (leeway) rahinan, dan rute VRP.'
+                : 'Pengelolaan ritme sampah rumah tangga/usaha Anda secara personal. Sistem menyesuaikan jadwal jemput TPS3R desa dan kalender rahinan/otonan keluarga Anda.'}
             </p>
           </div>
-          <Button variant="secondary" onClick={() => setShowRegister((prev) => !prev)}>
-            <MaterialIcon name="person_add" />
-            {showRegister ? 'Tutup Form Akun Baru' : 'Buat Akun Warga / Petugas'}
-          </Button>
+          {activeAccount.role === 'warga' ? (
+            <Button onClick={() => void saveWargaProfile()} disabled={busy}>
+              <MaterialIcon name="save" />
+              Simpan Profil & Otonan
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
+              <MaterialIcon name="person" />
+              Kembali ke Mode Warga
+            </Button>
+          )}
         </div>
 
-        {/* Account Switcher Cards */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {accounts.map((acc) => {
-            const isCurrent = acc.id === activeAccount.id
-            return (
-              <button
-                key={acc.id}
-                type="button"
-                onClick={() => void switchAccount(acc.id)}
-                aria-pressed={isCurrent}
-                className={
-                  isCurrent
-                    ? 'vector-card bg-primary text-white p-4 text-left transition-transform'
-                    : 'vector-card-soft bg-card hover:bg-amber/30 p-4 text-left transition-transform'
-                }
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider">
-                    <MaterialIcon name={acc.role === 'petugas' ? 'local_shipping' : acc.accountType === 'company' ? 'storefront' : 'home'} size="sm" />
-                    {acc.role === 'petugas' ? 'Petugas' : acc.accountType === 'company' ? 'Warga (Usaha)' : 'Warga (Rumah)'}
-                  </span>
-                  {isCurrent ? (
-                    <span className="rounded-full border border-white bg-white/20 px-2 py-0.5 text-xs font-bold">Aktif</span>
-                  ) : null}
-                </div>
-                <p className="mt-2 text-base font-extrabold">{acc.name}</p>
-                <p className={isCurrent ? 'text-xs text-white/90' : 'text-xs text-ink/70'}>
-                  {acc.kecamatan} · {acc.desa}
-                </p>
-              </button>
-            )
-          })}
-        </div>
+        {/* Highlighted Otonan & Decentralized Node Card */}
+        {activeAccount.role === 'warga' && computedOtonan ? (
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border-2 border-ink bg-lavender/40 p-4">
+              <div className="flex items-center gap-2">
+                <MaterialIcon name="auto_awesome" className="text-primary" size="sm" />
+                <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
+                  Pawukon & Otonan Pribadi Anda
+                </span>
+              </div>
+              <p className="mt-1 text-base font-extrabold text-ink">
+                {computedOtonan.pawukonLabel}
+              </p>
+              <p className="text-xs text-ink/75 mt-0.5">
+                Siklus 210 hari · Jatuh pada {computedOtonan.nextOtonanDate} (prediksi ekstra +30 L lungsuran banten otonan pada jadwal organik terdekat).
+              </p>
+            </div>
+
+            <div className="rounded-xl border-2 border-ink bg-mint/40 p-4">
+              <div className="flex items-center gap-2">
+                <MaterialIcon name="hub" className="text-primary" size="sm" />
+                <span className="text-xs font-extrabold uppercase tracking-wider text-ink">
+                  Node Desentralisasi TPS3R
+                </span>
+              </div>
+              <p className="mt-1 text-base font-extrabold text-ink">
+                {activeAccount.tps3rNode ?? 'TPS3R Swakelola Desa Pemecutan'}
+              </p>
+              <p className="text-xs text-ink/75 mt-0.5">
+                Pengelolaan Berbasis Sumber Pergub 47/2019: Organik diolah jadi kompos & eco-enzyme lokal; Anorganik disalurkan ke Bank Sampah.
+              </p>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {savedBanner ? (
@@ -249,32 +271,57 @@ export function AccountView() {
         </div>
       ) : null}
 
-      {/* New Account Registration Modal/Drawer */}
-      {showRegister ? (
-        <form onSubmit={(e) => void handleCreateAccount(e)} className="vector-card bg-amber/30 p-6 grid gap-4">
-          <div className="flex items-center gap-2">
-            <MaterialIcon name="badge" className="text-primary" size="lg" />
-            <h2 className="text-xl font-extrabold">Daftarkan Akun Baru (Warga / Petugas)</h2>
+      {/* Container: Identitas Warga & Tanggal Lahir untuk Pawukon / Otonan */}
+      {activeAccount.role === 'warga' ? (
+        <section className="vector-card p-6 grid gap-4 bg-card">
+          <div className="flex items-center justify-between gap-2 border-b-2 border-ink pb-3">
+            <div className="flex items-center gap-2">
+              <span className="vector-pill bg-lavender text-ink">00</span>
+              <h2 className="text-xl font-extrabold">Identitas Warga & Tanggal Lahir (Kalender Pawukon / Otonan)</h2>
+            </div>
+            <MaterialIcon name="person" className="text-primary" size="lg" />
           </div>
+          <p className="text-sm text-ink/75">
+            Tanggal lahir digunakan oleh AI untuk menghitung wuku kelahiran, siklus 210 hari Otonan Bali Anda, dan memprediksi kebutuhan ekstra wadah organik untuk lungsuran banten.
+          </p>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-1">
-              <Label htmlFor="reg-name">Nama Lengkap / Nama Usaha</Label>
-              <Input id="reg-name" required value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Mis. I Ketut Sudiana" />
+              <Label htmlFor="warga-name">Nama Lengkap / Nama Tempat</Label>
+              <Input
+                id="warga-name"
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                placeholder="Nama Anda"
+              />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="reg-email">Email</Label>
-              <Input id="reg-email" type="email" required value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="ketut@contoh.id" />
+              <Label htmlFor="warga-birthdate">Tanggal Lahir (Untuk Otonan)</Label>
+              <Input
+                id="warga-birthdate"
+                type="date"
+                value={birthDateDraft}
+                onChange={(e) => setBirthDateDraft(e.target.value)}
+              />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="reg-role">Peran Utama</Label>
-              <Select id="reg-role" value={newRole} onChange={(e) => setNewRole(e.target.value as UserRole)}>
-                <option value="warga">Warga (Pelapor & Rumah Tangga/Usaha)</option>
-                <option value="petugas">Petugas (Operator & Pengatur Jadwal)</option>
-              </Select>
+              <Label htmlFor="warga-banjar">Banjar / Lingkungan Swakelola</Label>
+              <Input
+                id="warga-banjar"
+                value={banjarDraft}
+                onChange={(e) => setBanjarDraft(e.target.value)}
+                placeholder="Mis. Banjar Pekambingan"
+              />
             </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-1">
-              <Label htmlFor="reg-kecamatan">Kecamatan</Label>
-              <Select id="reg-kecamatan" value={newKecamatan} onChange={(e) => setNewKecamatan(e.target.value as Kecamatan)}>
+              <Label htmlFor="warga-kecamatan">Kecamatan</Label>
+              <Select
+                id="warga-kecamatan"
+                value={kecamatanDraft}
+                onChange={(e) => setKecamatanDraft(e.target.value as Kecamatan)}
+              >
                 {KECAMATAN.map((k) => (
                   <option key={k} value={k}>
                     {k}
@@ -283,31 +330,23 @@ export function AccountView() {
               </Select>
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="reg-desa">Desa / Kelurahan</Label>
-              <Input id="reg-desa" value={newDesa} onChange={(e) => setNewDesa(e.target.value)} placeholder="Mis. Sesetan" />
+              <Label htmlFor="warga-desa">Desa / Kelurahan</Label>
+              <Input
+                id="warga-desa"
+                value={desaDraft}
+                onChange={(e) => setDesaDraft(e.target.value)}
+              />
             </div>
             <div className="grid gap-1">
-              <Label htmlFor="reg-type">Jenis Tempat</Label>
-              <Select id="reg-type" value={newAccountType} onChange={(e) => setNewAccountType(e.target.value as AccountType)}>
-                <option value="household">Rumah Tangga</option>
-                <option value="company">Tempat Usaha / Warung / Kantor</option>
-              </Select>
+              <Label htmlFor="warga-address">Alamat Rumah / Usaha</Label>
+              <Input
+                id="warga-address"
+                value={addressDraft}
+                onChange={(e) => setAddressDraft(e.target.value)}
+              />
             </div>
           </div>
-          <div className="grid gap-1">
-            <Label htmlFor="reg-addr">Alamat / Banjar</Label>
-            <Input id="reg-addr" value={newAddress} onChange={(e) => setNewAddress(e.target.value)} placeholder="Jl. Raya Sesetan Gang Melati No. 5" />
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={busy}>
-              <MaterialIcon name="check" />
-              Simpan & Aktifkan Akun
-            </Button>
-            <Button variant="secondary" onClick={() => setShowRegister(false)}>
-              Batal
-            </Button>
-          </div>
-        </form>
+        </section>
       ) : null}
 
       {/* WARGA VIEW: Curated Trash Situation + Weekly Output + Special Events + Timetable Optimization */}
@@ -754,6 +793,102 @@ export function AccountView() {
           </div>
         </section>
       ) : null}
+
+      {/* SECTION AT THE BOTTOM: Otentikasi Khusus Petugas Operasional */}
+      {activeAccount.role === 'warga' ? (
+        <section
+          data-testid="petugas-escalation-section"
+          className="vector-card bg-amber/20 border-2 border-ink p-6 grid gap-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink pb-3">
+            <div className="flex items-center gap-2">
+              <span className="vector-pill bg-lavender text-ink">Akses Khusus</span>
+              <h2 className="text-xl font-extrabold flex items-center gap-2">
+                <MaterialIcon name="badge" className="text-primary" />
+                Otentikasi Khusus Petugas Operasional (TPS3R / DLHK Kota Denpasar)
+              </h2>
+            </div>
+            <span className="text-xs font-extrabold text-ink/70">Akses Terlindungi</span>
+          </div>
+
+          <p className="text-sm text-ink/85">
+            Sesuai protokol sistem, seluruh personil masuk melalui portal Warga terlebih dahulu. Jika Anda adalah petugas armada kebersihan, pengawas TPS3R desa, atau perencana operasional DLHK, masukkan kredensial kedinasan Anda di bawah ini untuk mengaktifkan <strong>Mode Petugas</strong> dan membuka dasbor koordinasi armada serta rute VRP.
+          </p>
+
+          {petugasLoginError ? (
+            <div role="alert" className="vector-card bg-coral p-3 text-sm font-extrabold text-alert flex items-center gap-2">
+              <MaterialIcon name="error" size="sm" />
+              <span>{petugasLoginError}</span>
+            </div>
+          ) : null}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void handlePetugasEscalation(petugasEmail, petugasPassword)
+            }}
+            className="grid gap-4 sm:grid-cols-2 max-w-2xl"
+          >
+            <div className="grid gap-1">
+              <Label htmlFor="petugas-email">Email Kedinasan Petugas</Label>
+              <Input
+                id="petugas-email"
+                type="email"
+                value={petugasEmail}
+                onChange={(e) => setPetugasEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="petugas-password">Kata Sandi</Label>
+              <Input
+                id="petugas-password"
+                type="password"
+                value={petugasPassword}
+                onChange={(e) => setPetugasPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="sm:col-span-2 flex flex-wrap items-center gap-3 pt-1">
+              <Button type="submit" disabled={petugasLoginBusy}>
+                <MaterialIcon name="verified_user" size="sm" />
+                {petugasLoginBusy ? 'Memverifikasi…' : 'Otentikasi & Aktifkan Mode Petugas'}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => void handlePetugasEscalation('surya.wirawan@dlhk.denpasar.id', 'petugas123')}
+                disabled={petugasLoginBusy}
+              >
+                <MaterialIcon name="bolt" size="sm" />
+                Masuk Cepat Petugas Uji (I Wayan Gde Surya Wirawan)
+              </Button>
+            </div>
+          </form>
+        </section>
+      ) : (
+        <section
+          data-testid="petugas-escalation-section"
+          className="vector-card bg-lavender/30 border-2 border-ink p-6 grid gap-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="vector-pill bg-amber text-ink">Mode Aktif</span>
+              <h2 className="mt-1 text-xl font-extrabold flex items-center gap-2">
+                <MaterialIcon name="badge" className="text-primary" />
+                Anda Sedang Berada dalam Mode Petugas Operasional (DLHK Kota Denpasar)
+              </h2>
+              <p className="text-xs text-ink/75 mt-0.5">
+                Nomor Induk Petugas: <strong>{activeAccount.badgeId ?? 'DLHK-DPS-042'}</strong> · Wilayah Penugasan: <strong>{activeAccount.kecamatan}</strong>
+              </p>
+            </div>
+            <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
+              <MaterialIcon name="logout" size="sm" />
+              Keluar ke Mode Warga
+            </Button>
+          </div>
+        </section>
+      )}
     </main>
   )
 }

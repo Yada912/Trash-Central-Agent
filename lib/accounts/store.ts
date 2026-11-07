@@ -1,5 +1,9 @@
 import type { AccountType, Kecamatan, TrashType, WasteStream } from '@/lib/schemas'
-import { BALINESE_CALENDAR_EVENTS_2026 } from '@/lib/calendar/balinese-calendar'
+import {
+  BALINESE_CALENDAR_EVENTS_2026,
+  computeUserOtonanFromBirthDate,
+  type UserOtonanSummary,
+} from '@/lib/calendar/balinese-calendar'
 
 export type UserRole = 'warga' | 'petugas'
 
@@ -80,6 +84,9 @@ export type UserAccount = {
   badgeId?: string
   kecamatan: Kecamatan
   desa: string
+  banjarName?: string
+  tps3rNode?: string
+  birthDate?: string
   address: string
   lat: number
   lng: number
@@ -124,6 +131,12 @@ export type ResidentOptimizationSummary = {
   headline: string
   streams: StreamOptimizationAdvice[]
   actionItems: string[]
+  otonan: UserOtonanSummary | null
+  decentralizedNode: {
+    banjar: string
+    tps3r: string
+    ruleText: string
+  }
 }
 
 const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
@@ -137,6 +150,9 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     role: 'warga',
     kecamatan: 'Denpasar Barat',
     desa: 'Pemecutan',
+    banjarName: 'Banjar Pekambingan',
+    tps3rNode: 'TPS3R Pemecutan (Desa Berbasis Sumber)',
+    birthDate: '1996-05-14',
     address: 'Jl. Hasanuddin Gang IV No. 12, Banjar Pekambingan',
     lat: -8.6562,
     lng: 115.2124,
@@ -186,7 +202,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
           liters: 30,
           containersLabel: '2 Kantong Kresek',
           status: 'completed',
-          notes: 'Diangkut tepat waktu oleh Armada Kompos Barat-01.',
+          notes: 'Diangkut tepat waktu oleh Armada Kompos Swakelola Barat-01.',
         },
         {
           id: 'pkp_past_02',
@@ -196,7 +212,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
           liters: 30,
           containersLabel: '2 Kantong Kresek',
           status: 'completed',
-          notes: 'Botol plastik & kardus terpilah disalurkan ke TPS3R.',
+          notes: 'Botol plastik & kardus terpilah disalurkan ke Bank Sampah Banjar.',
         },
         {
           id: 'pkp_past_03',
@@ -210,13 +226,13 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
         },
         {
           id: 'pkp_past_04',
-          date: '2026-11-06',
+          date: '2026-11-05',
           window: '06:00–09:00 WITA',
           stream: 'organik',
           liters: 45,
           containersLabel: '3 Kantong Kresek',
           status: 'completed',
-          notes: 'Sisa lungsuran Umanis Galungan selesai diangkut.',
+          notes: 'Sisa lungsuran Umanis Galungan selesai diangkut ke TPS3R Pemecutan.',
         },
         {
           id: 'pkp_next_01',
@@ -236,17 +252,17 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
           liters: 30,
           containersLabel: '2 Kantong Kresek',
           status: 'scheduled',
-          notes: 'Penjemputan rutin plastik, kertas, dan kaleng.',
+          notes: 'Penjemputan rutin anorganik Bank Sampah (plastik, kertas, kaleng).',
         },
         {
           id: 'pkp_next_03',
-          date: '2026-11-13',
+          date: '2026-11-12',
           window: '06:00–09:00 WITA',
           stream: 'organik',
           liters: 60,
           containersLabel: '4 Kantong Kresek',
           status: 'scheduled',
-          notes: 'Penampahan Kuningan — toleransi leeway armada +35% aktif.',
+          notes: 'Penjemputan organik Kamis rutin TPS3R Pemecutan.',
         },
       ],
     },
@@ -259,6 +275,9 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     role: 'warga',
     kecamatan: 'Denpasar Selatan',
     desa: 'Sanur',
+    banjarName: 'Banjar Intaran',
+    tps3rNode: 'TPS3R Sanur Kauh',
+    birthDate: '1991-08-22',
     address: 'Jl. Danau Tamblingan No. 48, Sanur',
     lat: -8.6915,
     lng: 115.2623,
@@ -299,7 +318,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
           liters: 100,
           containersLabel: '2 Karung Besar',
           status: 'completed',
-          notes: 'Diangkut Armada Sanur-02.',
+          notes: 'Diangkut Cikar TPS3R Sanur-02.',
         },
         {
           id: 'pkp_umkm_02',
@@ -323,6 +342,8 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     badgeId: 'DLHK-DPS-042',
     kecamatan: 'Denpasar Barat',
     desa: 'Dauh Puri',
+    banjarName: 'Pos Koordinasi DLHK Denpasar',
+    tps3rNode: 'Sentra Koordinasi TPST & TPS3R Kota Denpasar',
     address: 'Pos Koordinasi Armada DLHK Kota Denpasar',
     lat: -8.6595,
     lng: 115.2165,
@@ -335,145 +356,145 @@ const DEFAULT_TIMETABLE: PetugasTimetableSlot[] = [
     id: 'slot_barat_organik',
     kecamatan: 'Denpasar Barat',
     stream: 'organik',
-    days: ['Mon', 'Wed', 'Fri'],
+    days: ['Mon', 'Wed', 'Thu', 'Sat'],
     windowStart: '06:00',
     windowEnd: '09:00',
     leewayMinutes: 45,
     surgeTolerancePct: 35,
     maxLitersPerPickup: 60,
-    notes: 'Truk kompos TPS3R menjemput pagi; toleransi ekstra +35% saat minggu hari raya adat.',
+    notes: 'Desentralisasi Pergub Bali 47/2019: Cikar swakelola TPS3R Pemecutan/Padangsambian menjemput organik untuk kompos lokal. Toleransi surge +35% saat rahinan adat.',
   },
   {
     id: 'slot_barat_anorganik',
     kecamatan: 'Denpasar Barat',
     stream: 'anorganik',
-    days: ['Tue', 'Sat'],
+    days: ['Tue', 'Fri', 'Sun'],
     windowStart: '08:00',
     windowEnd: '11:30',
     leewayMinutes: 60,
     surgeTolerancePct: 30,
     maxLitersPerPickup: 45,
-    notes: 'Penjemputan pilahan botol plastik, kardus, dan kaleng menuju Bank Sampah / TPS3R.',
+    notes: 'Jalur Bank Sampah Banjar & Unit Daur Ulang TPS3R: Botol plastik, kardus, dan kaleng wajib terpilah.',
   },
   {
     id: 'slot_barat_residu',
     kecamatan: 'Denpasar Barat',
     stream: 'residu',
-    days: ['Thu'],
+    days: ['Thu', 'Sun'],
     windowStart: '13:00',
     windowEnd: '16:00',
     leewayMinutes: 30,
     surgeTolerancePct: 15,
     maxLitersPerPickup: 35,
-    notes: 'Khusus residu yang tidak dapat dikomposkan atau didaur ulang.',
+    notes: 'Khusus sampah residu non-organik/non-daur ulang untuk diangkut armada DLHK menuju TPST Padangsambian.',
   },
   {
     id: 'slot_selatan_organik',
     kecamatan: 'Denpasar Selatan',
     stream: 'organik',
-    days: ['Mon', 'Wed', 'Fri'],
+    days: ['Mon', 'Wed', 'Thu', 'Sat'],
     windowStart: '06:30',
     windowEnd: '09:30',
     leewayMinutes: 45,
     surgeTolerancePct: 40,
     maxLitersPerPickup: 140,
-    notes: 'Jalur pesisir Sanur–Sesetan–Panjer dengan kapasitas cadangan untuk warung & rumah tangga.',
+    notes: 'Jalur pesisir Sanur–Sesetan–Panjer menuju TPS3R Sanur Kauh & Tahura Ngurah Rai.',
   },
   {
     id: 'slot_selatan_anorganik',
     kecamatan: 'Denpasar Selatan',
     stream: 'anorganik',
-    days: ['Tue', 'Sat'],
+    days: ['Tue', 'Fri', 'Sun'],
     windowStart: '08:30',
     windowEnd: '12:00',
     leewayMinutes: 45,
     surgeTolerancePct: 30,
     maxLitersPerPickup: 90,
-    notes: 'Jalur daur ulang botol plastik, kertas, dan logam.',
+    notes: 'Jalur daur ulang Bank Sampah Banjar Sanur & unit pilah TPS3R.',
   },
   {
     id: 'slot_selatan_residu',
     kecamatan: 'Denpasar Selatan',
     stream: 'residu',
-    days: ['Thu'],
+    days: ['Thu', 'Sun'],
     windowStart: '13:30',
     windowEnd: '16:30',
     leewayMinutes: 30,
     surgeTolerancePct: 20,
     maxLitersPerPickup: 60,
-    notes: 'Pengangkutan residu mingguan.',
+    notes: 'Pengangkutan residu resmi menuju TPST Tahura.',
   },
   {
     id: 'slot_timur_organik',
     kecamatan: 'Denpasar Timur',
     stream: 'organik',
-    days: ['Mon', 'Wed', 'Fri'],
+    days: ['Mon', 'Wed', 'Thu', 'Sat'],
     windowStart: '06:00',
     windowEnd: '09:00',
     leewayMinutes: 40,
     surgeTolerancePct: 30,
     maxLitersPerPickup: 65,
-    notes: 'Jalur Kesiman–Sumerta–Penatih menuju pengolahan kompos.',
+    notes: 'Jalur Kesiman–Sumerta–Penatih menuju TPS3R Biaung & TPST Kesiman Kertalangu.',
   },
   {
     id: 'slot_timur_anorganik',
     kecamatan: 'Denpasar Timur',
     stream: 'anorganik',
-    days: ['Tue', 'Sat'],
+    days: ['Tue', 'Fri', 'Sun'],
     windowStart: '09:00',
     windowEnd: '12:00',
     leewayMinutes: 45,
     surgeTolerancePct: 25,
     maxLitersPerPickup: 50,
-    notes: 'Jalur anorganik terpilah.',
+    notes: 'Jalur Bank Sampah terpilah Kesiman & Penatih.',
   },
   {
     id: 'slot_timur_residu',
     kecamatan: 'Denpasar Timur',
     stream: 'residu',
-    days: ['Thu'],
+    days: ['Thu', 'Sun'],
     windowStart: '14:00',
     windowEnd: '17:00',
     leewayMinutes: 30,
     surgeTolerancePct: 15,
     maxLitersPerPickup: 40,
-    notes: 'Pengangkutan residu.',
+    notes: 'Pengangkutan residu menuju TPST Kesiman Kertalangu.',
   },
   {
     id: 'slot_utara_organik',
     kecamatan: 'Denpasar Utara',
     stream: 'organik',
-    days: ['Mon', 'Wed', 'Fri'],
+    days: ['Mon', 'Wed', 'Thu', 'Sat'],
     windowStart: '06:00',
     windowEnd: '09:00',
     leewayMinutes: 45,
     surgeTolerancePct: 35,
     maxLitersPerPickup: 70,
-    notes: 'Jalur Ubung–Peguyangan–Tonja.',
+    notes: 'Jalur Ubung–Peguyangan–Tonja menuju TPS3R Swakelola Desa.',
   },
   {
     id: 'slot_utara_anorganik',
     kecamatan: 'Denpasar Utara',
     stream: 'anorganik',
-    days: ['Tue', 'Sat'],
+    days: ['Tue', 'Fri', 'Sun'],
     windowStart: '08:00',
     windowEnd: '11:00',
     leewayMinutes: 45,
     surgeTolerancePct: 30,
     maxLitersPerPickup: 50,
-    notes: 'Jalur anorganik layak daur ulang.',
+    notes: 'Jalur anorganik layak daur ulang Bank Sampah.',
   },
   {
     id: 'slot_utara_residu',
     kecamatan: 'Denpasar Utara',
     stream: 'residu',
-    days: ['Thu'],
+    days: ['Thu', 'Sun'],
     windowStart: '13:00',
     windowEnd: '16:00',
     leewayMinutes: 30,
     surgeTolerancePct: 15,
     maxLitersPerPickup: 40,
-    notes: 'Jalur residu mingguan.',
+    notes: 'Jalur residu mingguan menuju TPST DLHK Denpasar.',
   },
 ]
 
@@ -507,7 +528,14 @@ export function computeResidentOptimization(
   const upcomingBaliEvents = BALINESE_CALENDAR_EVENTS_2026.filter(
     (ev) => selectedBaliSet.has(ev.id) && ev.date >= '2026-11-07' && ev.date <= '2026-11-14',
   )
-  const balineseCalendarExtraLiters = upcomingBaliEvents.reduce((sum, ev) => sum + ev.extraLitersHousehold, 0)
+  // Check personal Otonan Pawukon
+  const otonan = account.birthDate ? computeUserOtonanFromBirthDate(account.birthDate) : null
+  let otonanExtraLiters = 0
+  if (otonan && otonan.calendarHighlightDate >= '2026-11-07' && otonan.calendarHighlightDate <= '2026-11-14') {
+    otonanExtraLiters = otonan.extraLitersHousehold
+  }
+
+  const balineseCalendarExtraLiters = upcomingBaliEvents.reduce((sum, ev) => sum + ev.extraLitersHousehold, 0) + otonanExtraLiters
 
   const eventExtraLiters = customExtraLiters + balineseCalendarExtraLiters
   const baseWeeklyLiters = profile.weeklyRegularLiters
@@ -549,7 +577,7 @@ export function computeResidentOptimization(
     }
 
     const slot = timetable.find((item) => item.kecamatan === account.kecamatan && item.stream === stream)
-    const pickupsPerWeek = Math.max(1, slot?.days.length ?? (stream === 'organik' ? 3 : stream === 'anorganik' ? 2 : 1))
+    const pickupsPerWeek = Math.max(1, slot?.days.length ?? (stream === 'organik' ? 4 : stream === 'anorganik' ? 3 : 2))
     const litersPerPickup = Math.ceil(weeklyLiters / pickupsPerWeek)
     const baseMax = slot?.maxLitersPerPickup ?? 60
     const surgePct = slot?.surgeTolerancePct ?? 25
@@ -562,7 +590,7 @@ export function computeResidentOptimization(
       status = 'within_leeway'
     }
 
-    const daysText = slot ? formatSlotDaysId(slot.days) : 'Senin, Rabu, Jumat'
+    const daysText = slot ? formatSlotDaysId(slot.days) : 'Senin, Rabu, Kamis, Sabtu'
     const windowLabel = slot ? `${daysText} · ${slot.windowStart}–${slot.windowEnd} WITA` : `${daysText} · 06:00–09:00 WITA`
     const leewayLabel = slot
       ? `Leeway waktu ±${slot.leewayMinutes} mnt · Kapasitas normal ${baseMax} L/angkut (+${surgePct}% toleransi s/d ${maxAllowedWithLeeway} L)`
@@ -598,6 +626,11 @@ export function computeResidentOptimization(
       : 'optimal'
 
   const actionItems: string[] = []
+  if (otonan) {
+    actionItems.push(
+      `Otonan Pribadi Pawukon Anda jatuh pada ${otonan.pawukonLabel} (siklus 210 hari; berikutnya: ${otonan.nextOtonanDate}). Timbulan banten otonan (+${otonan.extraLitersHousehold} L) siap diserap oleh jadwal Organik TPS3R.`,
+    )
+  }
   if (upcomingBaliEvents.length > 0) {
     actionItems.push(
       `Kalender Bali minggu ini mencatat ${upcomingBaliEvents.map((e) => e.name).join(', ')} (+${balineseCalendarExtraLiters} L). ${upcomingBaliEvents[0].preparationTip}`,
@@ -605,7 +638,7 @@ export function computeResidentOptimization(
   }
   if (profile.sortingReadiness !== 'sudah_dipilah') {
     actionItems.push(
-      'Pisahkan sampah mudah terurai (canang, daun, sisa dapur) dari botol plastik agar petugas dapat mengangkut di jadwal organik tanpa tertolak.',
+      'Sesuai Pergub Bali No. 47/2019, pisahkan sampah organik (canang, daun, sisa dapur) dari botol plastik. Sampah tidak terpilah tidak akan diangkut swakelola banjar.',
     )
   }
   if (profile.currentCondition === 'menumpuk' || profile.currentCondition === 'meluber') {
@@ -614,15 +647,20 @@ export function computeResidentOptimization(
     )
   }
   if (actionItems.length === 0) {
-    actionItems.push('Volume dan pemilahan sampah Anda sudah selaras dengan jadwal dan leeway armada kecamatan.')
+    actionItems.push('Volume dan pemilahan sampah Anda sudah selaras dengan jadwal desentralisasi TPS3R dan leeway armada kecamatan.')
   }
 
   const headline =
     overallStatus === 'optimal'
-      ? 'Seluruh timbulan mingguan Anda tertampung nyaman di jadwal rutin petugas.'
+      ? 'Seluruh timbulan mingguan Anda tertampung nyaman di jadwal rutin desentralisasi TPS3R.'
       : overallStatus === 'leeway_used'
-        ? 'Lonjakan hari raya/acara minggu ini tertampung dalam kuota toleransi (leeway) armada petugas.'
-        : 'Lonjakan sampah melampaui batas leeway rutin — disarankan minta penjemputan tambahan.'
+        ? 'Lonjakan hari raya/upacara adat minggu ini tertampung dalam kuota toleransi (leeway) armada TPS3R.'
+        : 'Lonjakan sampah melampaui batas leeway rutin — disarankan minta penjemputan tambahan swakelola.'
+
+  const activeNames = [...activeEvents.map((e) => e.name), ...upcomingBaliEvents.map((e) => e.name)]
+  if (otonan) {
+    activeNames.push(`Otonan: ${otonan.pawukonLabel}`)
+  }
 
   return {
     baseWeeklyLiters,
@@ -631,11 +669,18 @@ export function computeResidentOptimization(
     totalWeeklyLiters,
     equivalentContainers,
     containerLabel: preset.label,
-    activeEventNames: [...activeEvents.map((e) => e.name), ...upcomingBaliEvents.map((e) => e.name)],
+    activeEventNames: activeNames,
     overallStatus,
     headline,
     streams,
     actionItems,
+    otonan,
+    decentralizedNode: {
+      banjar: account.banjarName ?? 'Banjar Lingkungan Setempat',
+      tps3r: account.tps3rNode ?? 'TPS3R Unit Swakelola Desa',
+      ruleText:
+        'Pergub Bali No. 47/2019 & Perda Kota Denpasar No. 8/2023: Pemilahan Wajib Berbasis Sumber. Sampah tanpa pilah ditunda penjemputannya.',
+    },
   }
 }
 
@@ -712,7 +757,12 @@ export function authenticateAccount(email: string, password?: string): UserAccou
 
 export function updateAccountProfile(
   accountId: string,
-  patch: Partial<Pick<UserAccount, 'name' | 'kecamatan' | 'desa' | 'address' | 'lat' | 'lng' | 'accountType'>> & {
+  patch: Partial<
+    Pick<
+      UserAccount,
+      'name' | 'kecamatan' | 'desa' | 'address' | 'lat' | 'lng' | 'accountType' | 'birthDate' | 'banjarName' | 'tps3rNode'
+    >
+  > & {
     wasteProfile?: ResidentWasteProfile
   },
 ): UserAccount | null {
@@ -725,6 +775,9 @@ export function updateAccountProfile(
     name: patch.name !== undefined ? patch.name.trim().slice(0, 120) : current.name,
     kecamatan: patch.kecamatan ?? current.kecamatan,
     desa: patch.desa !== undefined ? patch.desa.trim().slice(0, 120) : current.desa,
+    banjarName: patch.banjarName !== undefined ? patch.banjarName.trim().slice(0, 120) : current.banjarName,
+    tps3rNode: patch.tps3rNode !== undefined ? patch.tps3rNode.trim().slice(0, 120) : current.tps3rNode,
+    birthDate: patch.birthDate !== undefined ? patch.birthDate.trim().slice(0, 20) : current.birthDate,
     address: patch.address !== undefined ? patch.address.trim().slice(0, 240) : current.address,
     lat: patch.lat ?? current.lat,
     lng: patch.lng ?? current.lng,
@@ -742,6 +795,9 @@ export function createAccount(input: {
   role: UserRole
   kecamatan: Kecamatan
   desa: string
+  banjarName?: string
+  tps3rNode?: string
+  birthDate?: string
   address: string
   accountType: AccountType
 }): UserAccount {
@@ -800,6 +856,9 @@ export function createAccount(input: {
     ...(input.role === 'petugas' ? { badgeId: `DLHK-DPS-${Math.floor(100 + Math.random() * 899)}` } : {}),
     kecamatan: input.kecamatan,
     desa: input.desa.trim() || 'Pemecutan',
+    banjarName: input.banjarName?.trim() || `Banjar Lingkungan ${input.desa.trim() || 'Desa'}`,
+    tps3rNode: input.tps3rNode?.trim() || `TPS3R Swakelola ${input.desa.trim() || 'Desa'}`,
+    birthDate: input.birthDate?.trim(),
     address: input.address.trim() || `Wilayah ${input.kecamatan}`,
     lat: -8.6562,
     lng: 115.2124,
