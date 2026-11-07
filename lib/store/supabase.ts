@@ -15,6 +15,7 @@ type ReportRow = {
   description_en: string | null
   photo_url: string | null
   classification: Report['classification']
+  ai_classification: Report['classification'] | null
   edited: boolean
   status: Report['status']
   provenance: string | null
@@ -46,6 +47,7 @@ function toReport(row: ReportRow): Report {
     description: row.description,
     ...(row.photo_url ? { photoUrl: row.photo_url } : {}),
     classification: row.classification,
+    ...(row.ai_classification ? { aiClassification: row.ai_classification } : {}),
     edited: row.edited,
     status: row.status,
     ...(row.provenance ? { provenance: row.provenance } : {}),
@@ -67,6 +69,7 @@ function toReportRow(report: Report): ReportRow {
     description_en: report.descriptionEn ?? null,
     photo_url: report.photoUrl ?? null,
     classification: report.classification,
+    ai_classification: report.aiClassification ?? null,
     edited: report.edited,
     status: report.status,
     provenance: report.provenance ?? null,

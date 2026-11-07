@@ -152,13 +152,17 @@ export const classificationSchema = z
   })
 export type Classification = z.infer<typeof classificationSchema>
 
+/**
+ * Ordinary-route exclusion. True when any hazardous share is above 0, or when
+ * `hazardous_present` was set explicitly. There is no 0.2 cutoff.
+ */
 export function isHazardousClassification(classification: {
-  types: Array<{ type: string; share: number }>
+  types: ReadonlyArray<{ type: string; share: number }>
   flags: readonly string[]
 }): boolean {
   if (classification.flags.includes('hazardous_present')) return true
   const hazardous = classification.types.find((entry) => entry.type === 'hazardous')
-  return (hazardous?.share ?? 0) >= 0.2
+  return (hazardous?.share ?? 0) > 0
 }
 
 export const INSUFFICIENT_MISSING = ['type', 'volume', 'location_context'] as const
@@ -227,6 +231,8 @@ export const reportSchema = z.object({
   description: z.string().min(1),
   photoUrl: z.string().min(1).optional(),
   classification: classificationSchema,
+  /** Original model classification, kept when the resident corrects it. */
+  aiClassification: classificationSchema.optional(),
   edited: z.boolean(),
   status: reportStatusSchema,
   provenance: z.string().min(1).optional(),

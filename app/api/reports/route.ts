@@ -88,6 +88,7 @@ export async function POST(request: Request) {
         ? { photoUrl: `data:${parsed.data.image.mimeType};base64,${parsed.data.image.base64}` }
         : {}),
       classification,
+      ...(parsed.data.aiClassification ? { aiClassification: parsed.data.aiClassification } : {}),
       edited: classificationWasEdited(parsed.data.classification, parsed.data.aiClassification),
       status: 'new',
     }

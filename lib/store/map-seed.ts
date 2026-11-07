@@ -1,6 +1,7 @@
 import { stampClassification } from '@/lib/review'
 import {
   facilitySchema,
+  isHazardousClassification,
   reportSchema,
   trashTypeSchema,
   volumeLabelFor,
@@ -71,7 +72,7 @@ export function mapSeedReport(raw: SeedReport): Report {
   )
   const liters = Math.max(1, Math.round(raw.volumeLiters))
   const flags: ClassificationFlag[] = ['no_image']
-  if (types.some((entry) => entry.type === 'hazardous' && entry.share >= 0.2)) {
+  if (isHazardousClassification({ types, flags: [] })) {
     flags.unshift('hazardous_present')
   }
   const report: Report = {

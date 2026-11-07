@@ -10,7 +10,7 @@ import {
   shiftWindowMinutes,
   solvePlan,
 } from '@/lib/planner/vrp'
-import type { SolvePlanInput, SolveStop } from '@/lib/schemas'
+import { isHazardousClassification, type SolvePlanInput, type SolveStop } from '@/lib/schemas'
 
 const depot = {
   lat: -8.67,
@@ -239,7 +239,7 @@ describe('solvePlan', () => {
       lng: report.lng,
       liters: report.volumeLiters,
       urgency: report.urgency,
-      hazardous: (report.types.find((entry) => entry.type === 'hazardous')?.share ?? 0) >= 0.2,
+      hazardous: isHazardousClassification({ types: report.types, flags: [] }),
     }))
     const scenario = input({
       depot: { lat: suwung.lat, lng: suwung.lng, name: suwung.name, label: DEPOT_LABEL },

@@ -20,9 +20,9 @@
 // sees it. Direct solvePlan calls accept an overnight window.
 //
 // Hazardous stops are those with hazardous === true. The API sets that boolean
-// when the hazardous share is >= 0.2 or the flag hazardous_present is present
-// (isHazardousClassification). stampClassification forces hazardous_present
-// when the hazardous share is above 0, so a trace share is separated too.
+// with isHazardousClassification: any hazardous share above 0, or an explicit
+// hazardous_present flag. stampClassification forces the flag when the share
+// is above 0, and it leaves an explicit flag in place when the share is 0.
 // This solver trusts the confirmed boolean and does not recompute it.
 //
 // Active trucks are the first min(trucks.length, crews) trucks in input order.

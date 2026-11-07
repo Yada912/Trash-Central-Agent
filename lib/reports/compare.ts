@@ -9,6 +9,7 @@ function canonical(classification: Classification): string {
     liters: classification.volume.liters,
     label: classification.volume.label,
     urgency: classification.urgency,
+    flags: [...classification.flags].sort(),
   })
 }
 

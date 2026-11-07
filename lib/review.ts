@@ -2,6 +2,7 @@ import { flagsForSavedReport } from '@/lib/api/image'
 import {
   CLASSIFICATION_FLAGS,
   REVIEW_CONFIDENCE_THRESHOLD,
+  isHazardousClassification,
   type Classification,
   type ClassificationFlag,
   type ClassificationSource,
@@ -19,8 +20,7 @@ export type ReviewInput = {
 export function reviewReasonsFor(input: ReviewInput): ReviewReason[] {
   const reasons: ReviewReason[] = []
   if (input.confidence < REVIEW_CONFIDENCE_THRESHOLD) reasons.push('low_confidence')
-  const hazardousShare = input.types.find((entry) => entry.type === 'hazardous')?.share ?? 0
-  if (hazardousShare > 0 || input.flags.includes('hazardous_present')) reasons.push('hazardous')
+  if (isHazardousClassification({ types: input.types, flags: input.flags })) reasons.push('hazardous')
   if (input.flags.includes('insufficient_text') || (input.text.trim().length < 10 && !input.hasImage)) {
     reasons.push('insufficient_text')
   }
@@ -31,10 +31,12 @@ export function reviewReasonsFor(input: ReviewInput): ReviewReason[] {
 
 export function normalizeClassificationFlags(
   flags: readonly ClassificationFlag[],
-  context: { hasImage: boolean; hazardousShare: number },
+  context: { hasImage: boolean; types: ReadonlyArray<{ type: string; share: number }> },
 ): ClassificationFlag[] {
   const selected = new Set(flagsForSavedReport(flags, context.hasImage))
-  if (context.hazardousShare > 0) selected.add('hazardous_present')
+  // Share above 0 forces the flag. Share 0 keeps an explicit flag and drops it
+  // only when the submitted flags omit it (an explicit uncheck).
+  if (isHazardousClassification({ types: context.types, flags: [] })) selected.add('hazardous_present')
   return CLASSIFICATION_FLAGS.filter((flag) => selected.has(flag))
 }
 
@@ -43,10 +45,9 @@ export function stampClassification(
     Partial<Pick<Classification, 'needsReview' | 'reviewReasons' | 'source'>>,
   context: { text: string; hasImage: boolean; source: ClassificationSource },
 ): Classification {
-  const hazardousShare = classification.types.find((entry) => entry.type === 'hazardous')?.share ?? 0
   const flags = normalizeClassificationFlags(classification.flags, {
     hasImage: context.hasImage,
-    hazardousShare,
+    types: classification.types,
   })
   const reviewReasons = reviewReasonsFor({
     confidence: classification.confidence,

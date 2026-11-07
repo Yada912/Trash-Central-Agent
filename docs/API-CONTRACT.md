@@ -33,7 +33,7 @@ insufficient_text: flag set, or text under 10 characters and no image. contradic
 low_image_quality: flag set. no_image alone does not trigger review.
 POST /api/reports recomputes flags and reviewReasons and ignores a client needsReview value.
 A saved photo drops no_image. A text-only save drops low_image_quality and sets no_image. Those two flags are never stored together.
-A hazardous share above 0 forces hazardous_present.
+A hazardous share above 0 forces hazardous_present. An explicit hazardous_present with share 0 stays. Setting the share to 0 and omitting the flag is an explicit correction and clears the flag. The original aiClassification is stored on the report for audit.
 source is gemini in live mode, mock in demo mode, and manual for manual entry. needsReview never blocks submit.
 REVIEW_CONFIDENCE_THRESHOLD = 0.5.
 Defaults when the resident skips editing: use AI values as-is. Manual entry (no AI) default: types [{residual,1}], volume {50,'medium'}, urgency 'medium', confidence 0, flags ['no_image'] if none.
@@ -50,7 +50,7 @@ POST /api/reports           { text, lat, lng, image?, classification: Classifica
    The same key with a different canonical body is 409 CONFLICT and does not create a second row.
    lat/lng must be inside the Denpasar bbox (-8.75..-8.57, 115.16..115.28) else VALIDATION.
 GET  /api/reports?kecamatan=&status=&since=ISO -> Report[]
-   Report = { id, isDemo, createdAt, lat, lng, kecamatan, desa?, description, photoUrl?, classification, edited: boolean, status }
+   Report = { id, isDemo, createdAt, lat, lng, kecamatan, desa?, description, photoUrl?, classification, aiClassification?, edited: boolean, status }
 GET  /api/dashboard -> { totals: { byType: Record<TrashType, liters>, byKecamatan: Record<Kecamatan,{reports,liters}>, byUrgency: Record<Urgency,number> }, zones: Array<{ id, centroid:[lat,lng], reportIds, liters, dominantType }>, facilities: Facility[] }
 POST /api/plans  { trucks: Array<{ id, capacityLiters }>, crews: number, shift: { start:'HH:MM', end:'HH:MM' }, reportIds?: string[] } -> Plan
 POST /api/plans/:id/decision  { action: 'approve'|'reject'|'edit', note?: string, edits?: { moveStop?: { stopId, toTruckId } } } -> Plan
@@ -72,7 +72,7 @@ Plan = { id, status: PlanStatus, version: number, input, result: { routes: Array
 - Every action is appended to decisions with timestamp (+08:00).
 
 ## Hazardous handling
-Reports whose classification has a hazardous share >= 0.2 or flag 'hazardous_present' are excluded from ordinary truck routes and returned in result.unassigned with reason 'hazardous_separate' (needs specialised pickup). Dashboard shows them separately.
+Any hazardous share above 0, or an explicit flag 'hazardous_present', excludes the report from ordinary truck routes. It is returned in result.unassigned with reason 'hazardous_separate'. Forcing that stop onto a route is infeasible with the same violation. isHazardousClassification in lib/schemas.ts is the only check. The solver trusts stop.hazardous.
 
 ## Seed data
 /workspace/digifest/seed/reports.json (Hormuz, 150 demo records, isDemo:true). Extra fields provenance, descriptionEn, estimatedWeightKg are passed through. Coordinates are approximate demo fixtures, not dispatch-ready; UI must label as demo.
