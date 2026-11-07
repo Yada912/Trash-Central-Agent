@@ -193,10 +193,11 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     async (patch: Parameters<AccountContextValue['updateTimetable']>[0]) => {
       await mutate({
         action: 'update_timetable',
+        accountId: data?.activeAccount?.id,
         timetablePatch: patch,
       })
     },
-    [mutate],
+    [data?.activeAccount?.id, mutate],
   )
 
   return (

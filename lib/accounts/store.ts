@@ -660,17 +660,33 @@ function getAccountState(): AccountMemoryState {
   return globalForAccounts.__ctaAccountState
 }
 
+function sanitizeAccount(account: UserAccount): UserAccount {
+  const { password: _removedPassword, ...safeAccount } = account
+  void _removedPassword
+  return structuredClone(safeAccount)
+}
+
+function constantTimeMatch(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i += 1) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+  return diff === 0
+}
+
 export function listAccounts(): UserAccount[] {
-  return getAccountState().accounts
+  return getAccountState().accounts.map(sanitizeAccount)
 }
 
 export function getActiveAccount(preferredId?: string | null): UserAccount {
   const state = getAccountState()
   if (preferredId) {
     const found = state.accounts.find((acc) => acc.id === preferredId)
-    if (found) return found
+    if (found) return sanitizeAccount(found)
   }
-  return state.accounts.find((acc) => acc.id === state.activeAccountId) ?? state.accounts[0]
+  const active = state.accounts.find((acc) => acc.id === state.activeAccountId) ?? state.accounts[0]
+  return sanitizeAccount(active)
 }
 
 export function setActiveAccountId(accountId: string): UserAccount | null {
@@ -678,19 +694,20 @@ export function setActiveAccountId(accountId: string): UserAccount | null {
   const found = state.accounts.find((acc) => acc.id === accountId)
   if (!found) return null
   state.activeAccountId = found.id
-  return found
+  return sanitizeAccount(found)
 }
 
 export function authenticateAccount(email: string, password?: string): UserAccount | null {
+  if (!email || !password || typeof password !== 'string') return null
   const state = getAccountState()
   const normalizedEmail = email.trim().toLowerCase()
   const found = state.accounts.find((acc) => acc.email.toLowerCase() === normalizedEmail)
-  if (!found) return null
-  if (found.password && password && found.password !== password) {
+  if (!found || !found.password) return null
+  if (!constantTimeMatch(found.password, password)) {
     return null
   }
   state.activeAccountId = found.id
-  return found
+  return sanitizeAccount(found)
 }
 
 export function updateAccountProfile(
@@ -705,11 +722,17 @@ export function updateAccountProfile(
   const current = state.accounts[index]
   const updated: UserAccount = {
     ...current,
-    ...patch,
+    name: patch.name !== undefined ? patch.name.trim().slice(0, 120) : current.name,
+    kecamatan: patch.kecamatan ?? current.kecamatan,
+    desa: patch.desa !== undefined ? patch.desa.trim().slice(0, 120) : current.desa,
+    address: patch.address !== undefined ? patch.address.trim().slice(0, 240) : current.address,
+    lat: patch.lat ?? current.lat,
+    lng: patch.lng ?? current.lng,
+    accountType: patch.accountType ?? current.accountType,
     wasteProfile: patch.wasteProfile ?? current.wasteProfile,
   }
   state.accounts[index] = updated
-  return updated
+  return sanitizeAccount(updated)
 }
 
 export function createAccount(input: {
@@ -785,7 +808,7 @@ export function createAccount(input: {
   }
   state.accounts.push(created)
   state.activeAccountId = created.id
-  return created
+  return sanitizeAccount(created)
 }
 
 export function listTimetableSlots(kecamatan?: Kecamatan): PetugasTimetableSlot[] {

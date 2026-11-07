@@ -12,6 +12,7 @@ import {
   type ResidentWasteProfile,
   type UserRole,
 } from '@/lib/accounts/store'
+import { checkRateLimit, clientIpFromRequest, redactPiiFromText } from '@/lib/security/guard'
 import { KECAMATAN, type AccountType, type Kecamatan } from '@/lib/schemas'
 
 export async function GET(request: Request) {
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const ip = clientIpFromRequest(request)
   const body = (await request.json().catch(() => ({}))) as {
     action?: 'login' | 'switch' | 'update_profile' | 'create_account' | 'update_timetable'
     accountId?: string
@@ -73,6 +75,18 @@ export async function POST(request: Request) {
   }
 
   if (body.action === 'login' && body.login?.email) {
+    const rate = checkRateLimit(`auth_login:${ip}`, 12, 5 * 60_000)
+    if (!rate.allowed) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'RATE_LIMITED',
+            message: `Terlalu banyak percobaan masuk. Coba lagi dalam ${rate.retryAfterSec} detik.`,
+          },
+        },
+        { status: 429 },
+      )
+    }
     const authed = authenticateAccount(body.login.email, body.login.password)
     if (!authed) {
       return NextResponse.json(
@@ -86,17 +100,48 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Akun tidak ditemukan.' } }, { status: 404 })
     }
   } else if (body.action === 'update_profile' && body.accountId && body.profilePatch) {
-    const updated = updateAccountProfile(body.accountId, body.profilePatch)
+    const patch = { ...body.profilePatch }
+    if (patch.wasteProfile?.conditionNote) {
+      patch.wasteProfile = {
+        ...patch.wasteProfile,
+        conditionNote: redactPiiFromText(patch.wasteProfile.conditionNote).slice(0, 500),
+      }
+    }
+    const updated = updateAccountProfile(body.accountId, patch)
     if (!updated) {
       return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Akun tidak ditemukan.' } }, { status: 404 })
     }
   } else if (body.action === 'create_account' && body.newAccount) {
     const { name, email, password, role, kecamatan, desa, address, accountType } = body.newAccount
-    if (!name?.trim() || !email?.trim() || !KECAMATAN.includes(kecamatan)) {
-      return NextResponse.json({ error: { code: 'VALIDATION', message: 'Nama, email, dan kecamatan wajib diisi.' } }, { status: 400 })
+    const trimmedEmail = email?.trim().toLowerCase() ?? ''
+    if (!name?.trim() || !trimmedEmail.includes('@') || !KECAMATAN.includes(kecamatan)) {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION', message: 'Nama, email yang valid, dan kecamatan wajib diisi.' } },
+        { status: 400 },
+      )
     }
-    createAccount({ name, email, password, role, kecamatan, desa, address, accountType })
+    if (password !== undefined && password.trim().length < 6) {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION', message: 'Kata sandi minimal 6 karakter.' } },
+        { status: 400 },
+      )
+    }
+    const duplicate = listAccounts().some((a) => a.email.toLowerCase() === trimmedEmail)
+    if (duplicate) {
+      return NextResponse.json(
+        { error: { code: 'CONFLICT', message: 'Email tersebut sudah terdaftar.' } },
+        { status: 409 },
+      )
+    }
+    createAccount({ name, email: trimmedEmail, password, role, kecamatan, desa, address, accountType })
   } else if (body.action === 'update_timetable' && body.timetablePatch?.slotId) {
+    const currentActor = getActiveAccount(body.accountId)
+    if (currentActor.role !== 'petugas') {
+      return NextResponse.json(
+        { error: { code: 'FORBIDDEN', message: 'Hanya akun Petugas DLHK yang berwenang mengubah jadwal & leeway armada.' } },
+        { status: 403 },
+      )
+    }
     const { slotId, ...rest } = body.timetablePatch
     const updatedSlot = updateTimetableSlot(slotId, rest)
     if (!updatedSlot) {

@@ -16,6 +16,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
 import { EXPLAIN_DEFAULT_MODEL_ID, explainModelId, geminiApiKeys, hasGeminiApiKey } from '@/lib/ai/keys'
 import { shiftWindowMinutes } from '@/lib/planner/vrp'
+import { sanitizeUntrustedForPrompt } from '@/lib/security/guard'
 import type { Explanation, PlanResult, SolvePlanInput, Urgency } from '@/lib/schemas'
 
 export const EXPLAIN_MODEL_ID = EXPLAIN_DEFAULT_MODEL_ID
@@ -401,13 +402,14 @@ async function callModel(plan: PlanResult, input: SolvePlanInput, signal: AbortS
   if (keys.length === 0) throw new ExplainError('UPSTREAM', 'The model request failed.')
   const modelId = explainModelId()
   const shift = readShift(input)
+  const safeTruckId = (id: string) => sanitizeUntrustedForPrompt(id).replace(/[\r\n\t]/g, ' ').slice(0, 64)
   const menu = {
-    depotName: input.depot.name,
-    truckIds: plan.routes.map((route) => route.truckId),
+    depotName: sanitizeUntrustedForPrompt(input.depot.name).slice(0, 120),
+    truckIds: plan.routes.map((route) => safeTruckId(route.truckId)),
     applicableInterpretations: [...applicableInterpretations(plan, input)],
     applicableRiskCodes: [...applicableRisks(plan)],
     routes: plan.routes.map((route) => ({
-      truckId: route.truckId,
+      truckId: safeTruckId(route.truckId),
       empty: route.stopIds.length === 0,
       feasible: route.feasible,
       nearCapacity: noteAllowed('near_capacity', route, plan, shift),

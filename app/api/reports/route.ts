@@ -5,6 +5,7 @@ import { classificationWasEdited } from '@/lib/reports/compare'
 import { savedReportIsDemo } from '@/lib/reports/demo-mode'
 import { canonicalReportBodyHash, idempotencyKeyFrom } from '@/lib/reports/idempotency'
 import { stampClassification } from '@/lib/review'
+import { inspectPromptInput, redactPiiFromText } from '@/lib/security/guard'
 import { createReportSchema, kecamatanSchema, reportStatusSchema, type Kecamatan, type Report } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
 import { nowWita } from '@/lib/time'
@@ -56,10 +57,15 @@ export async function POST(request: Request) {
     if (!parsed.ok) return parsed.response
     const imageError = guardImage(parsed.data.image, requestId)
     if (imageError) return imageError
-    const text = parsed.data.text ?? ''
-    if (!text && !parsed.data.image) {
+    const rawText = parsed.data.text ?? ''
+    if (!rawText && !parsed.data.image) {
       return jsonErr(requestId, 400, 'empty_report', 'Send a photo or a description.')
     }
+    const securityCheck = inspectPromptInput(rawText)
+    if (securityCheck.blocked) {
+      return jsonErr(requestId, 400, 'VALIDATION', securityCheck.reason ?? 'Disallowed input in description.')
+    }
+    const text = redactPiiFromText(rawText)
     const store = getStore()
     const idempotencyKey = idempotencyKeyFrom(request.headers.get('idempotency-key'), parsed.data.clientRequestId)
     const hasImage = Boolean(parsed.data.image)

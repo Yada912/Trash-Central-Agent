@@ -1,5 +1,6 @@
 import type { Kecamatan, WasteStream } from '@/lib/schemas'
 import type { PetugasTimetableSlot } from '@/lib/accounts/store'
+import { sanitizeIcsField } from '@/lib/security/guard'
 
 export type BalineseEventCategory = 'rahinan_besar' | 'rahinan_rutin' | 'adat_keluarga'
 
@@ -351,7 +352,9 @@ export function buildIcsContent(input: ExternalCalendarEventInput): string {
   const startUtc = toCompactUtcStamp(input.date, input.startTime)
   const endUtc = toCompactUtcStamp(input.date, input.endTime)
   const uid = `cta-${input.date}-${input.startTime.replace(':', '')}@denpasar.trash-agent.local`
-  const cleanDesc = input.description.replace(/\r?\n/g, '\\n')
+  const safeTitle = sanitizeIcsField(input.title)
+  const safeLocation = sanitizeIcsField(input.location)
+  const cleanDesc = sanitizeIcsField(input.description)
 
   return [
     'BEGIN:VCALENDAR',
@@ -363,9 +366,9 @@ export function buildIcsContent(input: ExternalCalendarEventInput): string {
     `DTSTAMP:${startUtc}`,
     `DTSTART:${startUtc}`,
     `DTEND:${endUtc}`,
-    `SUMMARY:${input.title}`,
+    `SUMMARY:${safeTitle}`,
     `DESCRIPTION:${cleanDesc}`,
-    `LOCATION:${input.location}`,
+    `LOCATION:${safeLocation}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n')
