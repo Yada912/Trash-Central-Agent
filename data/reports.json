@@ -1,0 +1,3812 @@
+[
+  {
+    "id": "demo-001",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T11:46:00+08:00",
+    "lat": -8.654077,
+    "lng": 115.18395,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Padangsambian; kira-kira 1064.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Padangsambian; about 1064.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1064.3,
+    "estimatedWeightKg": 298.0,
+    "urgency": "medium",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-002",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T10:49:00+08:00",
+    "lat": -8.639306,
+    "lng": 115.18414,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada kemasan plastik di area pemilahan rekaan, sekitar Padangsambian Kaja; kira-kira 71.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging in an invented sorting area, around Padangsambian Kaja; about 71.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 71.7,
+    "estimatedWeightKg": 3.94,
+    "urgency": "low",
+    "confidence": 0.74,
+    "status": "planned"
+  },
+  {
+    "id": "demo-003",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T04:04:00+08:00",
+    "lat": -8.673711,
+    "lng": 115.184557,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Padangsambian Kelod; kira-kira 216.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard beside an invented neighborhood street, around Padangsambian Kelod; about 216.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 216.7,
+    "estimatedWeightKg": 19.5,
+    "urgency": "low",
+    "confidence": 0.79,
+    "status": "new"
+  },
+  {
+    "id": "demo-004",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T22:25:00+08:00",
+    "lat": -8.658273,
+    "lng": 115.207459,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada kaleng logam dekat gang permukiman rekaan, sekitar Pemecutan; kira-kira 3373.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans near an invented residential lane, around Pemecutan; about 3373.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3373.9,
+    "estimatedWeightKg": 607.3,
+    "urgency": "high",
+    "confidence": 0.86,
+    "status": "new"
+  },
+  {
+    "id": "demo-005",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T20:01:00+08:00",
+    "lat": -8.673571,
+    "lng": 115.201644,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada sampah residu di area pemilahan rekaan, sekitar Pemecutan Kelod; kira-kira 3557.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste in an invented sorting area, around Pemecutan Kelod; about 3557.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3557.3,
+    "estimatedWeightKg": 569.17,
+    "urgency": "high",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-006",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T13:34:00+08:00",
+    "lat": -8.679951,
+    "lng": 115.20642,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kauh",
+    "description": "[DEMO] Ada baterai bekas simulasi di sisi jalan lingkungan rekaan, sekitar Dauh Puri Kauh; kira-kira 62 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries beside an invented neighborhood street, around Dauh Puri Kauh; about 62 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 62.0,
+    "estimatedWeightKg": 12.4,
+    "urgency": "high",
+    "confidence": 0.87,
+    "status": "planned"
+  },
+  {
+    "id": "demo-007",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T00:55:00+08:00",
+    "lat": -8.661662,
+    "lng": 115.214118,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kangin",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Dauh Puri Kangin; kira-kira 1011.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste near an invented residential lane, around Dauh Puri Kangin; about 1011.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1011.3,
+    "estimatedWeightKg": 213.38,
+    "urgency": "low",
+    "confidence": 0.85,
+    "status": "new"
+  },
+  {
+    "id": "demo-008",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T07:43:00+08:00",
+    "lat": -8.654352,
+    "lng": 115.185612,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di area pemilahan rekaan, sekitar Padangsambian; kira-kira 54.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans in an invented sorting area, around Padangsambian; about 54.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 54.3,
+    "estimatedWeightKg": 4.67,
+    "urgency": "medium",
+    "confidence": 0.96,
+    "status": "new"
+  },
+  {
+    "id": "demo-009",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-07T10:44:00+08:00",
+    "lat": -8.638753,
+    "lng": 115.185593,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Padangsambian Kaja; kira-kira 228.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard beside an invented neighborhood street, around Padangsambian Kaja; about 228.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 228.5,
+    "estimatedWeightKg": 55.3,
+    "urgency": "low",
+    "confidence": 0.86,
+    "status": "new"
+  },
+  {
+    "id": "demo-010",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T14:17:00+08:00",
+    "lat": -8.673965,
+    "lng": 115.183273,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Padangsambian Kelod; kira-kira 2906.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste near an invented residential lane, around Padangsambian Kelod; about 2906.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 2906.9,
+    "estimatedWeightKg": 343.01,
+    "urgency": "high",
+    "confidence": 0.8,
+    "status": "collected"
+  },
+  {
+    "id": "demo-011",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T02:29:00+08:00",
+    "lat": -8.657591,
+    "lng": 115.208357,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada sisa organik di area pemilahan rekaan, sekitar Pemecutan; kira-kira 63.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps in an invented sorting area, around Pemecutan; about 63.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 63.6,
+    "estimatedWeightKg": 17.81,
+    "urgency": "medium",
+    "confidence": 0.92,
+    "status": "collected"
+  },
+  {
+    "id": "demo-012",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T14:14:00+08:00",
+    "lat": -8.675888,
+    "lng": 115.204339,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada kemasan plastik di sisi jalan lingkungan rekaan, sekitar Pemecutan Kelod; kira-kira 58.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging beside an invented neighborhood street, around Pemecutan Kelod; about 58.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 58.1,
+    "estimatedWeightKg": 3.2,
+    "urgency": "low",
+    "confidence": 0.89,
+    "status": "planned"
+  },
+  {
+    "id": "demo-013",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T09:01:00+08:00",
+    "lat": -8.678621,
+    "lng": 115.205214,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kauh",
+    "description": "[DEMO] Ada kertas dan kardus dekat gang permukiman rekaan, sekitar Dauh Puri Kauh; kira-kira 513.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard near an invented residential lane, around Dauh Puri Kauh; about 513.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 513.3,
+    "estimatedWeightKg": 46.2,
+    "urgency": "low",
+    "confidence": 0.88,
+    "status": "new"
+  },
+  {
+    "id": "demo-014",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T08:19:00+08:00",
+    "lat": -8.660989,
+    "lng": 115.21553,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kangin",
+    "description": "[DEMO] Ada kaleng logam di area pemilahan rekaan, sekitar Dauh Puri Kangin; kira-kira 805.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans in an invented sorting area, around Dauh Puri Kangin; about 805.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 805.4,
+    "estimatedWeightKg": 144.97,
+    "urgency": "low",
+    "confidence": 0.79,
+    "status": "new"
+  },
+  {
+    "id": "demo-015",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T10:51:00+08:00",
+    "lat": -8.656462,
+    "lng": 115.183559,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada sampah residu di sisi jalan lingkungan rekaan, sekitar Padangsambian; kira-kira 3233.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste beside an invented neighborhood street, around Padangsambian; about 3233.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3233.3,
+    "estimatedWeightKg": 517.33,
+    "urgency": "high",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-016",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T08:14:00+08:00",
+    "lat": -8.638363,
+    "lng": 115.186155,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada baterai bekas simulasi dekat gang permukiman rekaan, sekitar Padangsambian Kaja; kira-kira 64.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries near an invented residential lane, around Padangsambian Kaja; about 64.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 64.6,
+    "estimatedWeightKg": 12.92,
+    "urgency": "high",
+    "confidence": 0.8,
+    "status": "new"
+  },
+  {
+    "id": "demo-017",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T00:41:00+08:00",
+    "lat": -8.674476,
+    "lng": 115.185471,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Padangsambian Kelod; kira-kira 99 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste in an invented sorting area, around Padangsambian Kelod; about 99 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 99.0,
+    "estimatedWeightKg": 20.89,
+    "urgency": "medium",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-018",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T19:10:00+08:00",
+    "lat": -8.657036,
+    "lng": 115.205975,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di sisi jalan lingkungan rekaan, sekitar Pemecutan; kira-kira 113 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans beside an invented neighborhood street, around Pemecutan; about 113 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 113.0,
+    "estimatedWeightKg": 9.72,
+    "urgency": "low",
+    "confidence": 0.76,
+    "status": "new"
+  },
+  {
+    "id": "demo-019",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T18:31:00+08:00",
+    "lat": -8.675997,
+    "lng": 115.204201,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus dekat gang permukiman rekaan, sekitar Pemecutan Kelod; kira-kira 1456.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard near an invented residential lane, around Pemecutan Kelod; about 1456.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1456.9,
+    "estimatedWeightKg": 352.57,
+    "urgency": "medium",
+    "confidence": 0.94,
+    "status": "new"
+  },
+  {
+    "id": "demo-020",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T13:14:00+08:00",
+    "lat": -8.680389,
+    "lng": 115.204268,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kauh",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Dauh Puri Kauh; kira-kira 502.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste in an invented sorting area, around Dauh Puri Kauh; about 502.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 502.6,
+    "estimatedWeightKg": 59.31,
+    "urgency": "medium",
+    "confidence": 0.71,
+    "status": "planned"
+  },
+  {
+    "id": "demo-021",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T12:09:00+08:00",
+    "lat": -8.661228,
+    "lng": 115.214786,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kangin",
+    "description": "[DEMO] Ada sisa organik di sisi jalan lingkungan rekaan, sekitar Dauh Puri Kangin; kira-kira 65.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps beside an invented neighborhood street, around Dauh Puri Kangin; about 65.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 65.4,
+    "estimatedWeightKg": 18.31,
+    "urgency": "medium",
+    "confidence": 0.89,
+    "status": "new"
+  },
+  {
+    "id": "demo-022",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T18:14:00+08:00",
+    "lat": -8.654133,
+    "lng": 115.184668,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada kemasan plastik dekat gang permukiman rekaan, sekitar Padangsambian; kira-kira 115.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging near an invented residential lane, around Padangsambian; about 115.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 115.1,
+    "estimatedWeightKg": 6.33,
+    "urgency": "low",
+    "confidence": 0.75,
+    "status": "new"
+  },
+  {
+    "id": "demo-023",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T17:22:00+08:00",
+    "lat": -8.637433,
+    "lng": 115.185398,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada kertas dan kardus di area pemilahan rekaan, sekitar Padangsambian Kaja; kira-kira 106.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard in an invented sorting area, around Padangsambian Kaja; about 106.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 106.9,
+    "estimatedWeightKg": 9.62,
+    "urgency": "medium",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-024",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T19:34:00+08:00",
+    "lat": -8.674178,
+    "lng": 115.184877,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada kaleng logam di sisi jalan lingkungan rekaan, sekitar Padangsambian Kelod; kira-kira 2009.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans beside an invented neighborhood street, around Padangsambian Kelod; about 2009.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2009.8,
+    "estimatedWeightKg": 361.76,
+    "urgency": "high",
+    "confidence": 0.74,
+    "status": "collected"
+  },
+  {
+    "id": "demo-025",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T15:45:00+08:00",
+    "lat": -8.657936,
+    "lng": 115.205709,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada sampah residu dekat gang permukiman rekaan, sekitar Pemecutan; kira-kira 107.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste near an invented residential lane, around Pemecutan; about 107.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 107.5,
+    "estimatedWeightKg": 17.2,
+    "urgency": "medium",
+    "confidence": 0.66,
+    "status": "planned"
+  },
+  {
+    "id": "demo-026",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T07:35:00+08:00",
+    "lat": -8.674697,
+    "lng": 115.204017,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada baterai bekas simulasi di area pemilahan rekaan, sekitar Pemecutan Kelod; kira-kira 17.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries in an invented sorting area, around Pemecutan Kelod; about 17.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 17.7,
+    "estimatedWeightKg": 3.54,
+    "urgency": "high",
+    "confidence": 0.86,
+    "status": "new"
+  },
+  {
+    "id": "demo-027",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T19:42:00+08:00",
+    "lat": -8.678577,
+    "lng": 115.203777,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kauh",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Dauh Puri Kauh; kira-kira 1067.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste beside an invented neighborhood street, around Dauh Puri Kauh; about 1067.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1067.1,
+    "estimatedWeightKg": 225.16,
+    "urgency": "medium",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-028",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T20:17:00+08:00",
+    "lat": -8.661201,
+    "lng": 115.215164,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kangin",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam dekat gang permukiman rekaan, sekitar Dauh Puri Kangin; kira-kira 64.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans near an invented residential lane, around Dauh Puri Kangin; about 64.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 64.5,
+    "estimatedWeightKg": 5.55,
+    "urgency": "low",
+    "confidence": 0.97,
+    "status": "new"
+  },
+  {
+    "id": "demo-029",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T09:26:00+08:00",
+    "lat": -8.655044,
+    "lng": 115.185414,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di area pemilahan rekaan, sekitar Padangsambian; kira-kira 270.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard in an invented sorting area, around Padangsambian; about 270.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 270.1,
+    "estimatedWeightKg": 65.36,
+    "urgency": "medium",
+    "confidence": 0.86,
+    "status": "new"
+  },
+  {
+    "id": "demo-030",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T04:18:00+08:00",
+    "lat": -8.637303,
+    "lng": 115.184602,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Padangsambian Kaja; kira-kira 1182 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste beside an invented neighborhood street, around Padangsambian Kaja; about 1182 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 1182.0,
+    "estimatedWeightKg": 139.48,
+    "urgency": "low",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-031",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T06:15:00+08:00",
+    "lat": -8.674212,
+    "lng": 115.182759,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Padangsambian Kelod; kira-kira 1872.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Padangsambian Kelod; about 1872.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1872.5,
+    "estimatedWeightKg": 524.3,
+    "urgency": "low",
+    "confidence": 0.66,
+    "status": "collected"
+  },
+  {
+    "id": "demo-032",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T07:38:00+08:00",
+    "lat": -8.657464,
+    "lng": 115.206738,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada kemasan plastik di area pemilahan rekaan, sekitar Pemecutan; kira-kira 1870.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging in an invented sorting area, around Pemecutan; about 1870.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1870.9,
+    "estimatedWeightKg": 102.9,
+    "urgency": "low",
+    "confidence": 0.89,
+    "status": "planned"
+  },
+  {
+    "id": "demo-033",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T12:31:00+08:00",
+    "lat": -8.675339,
+    "lng": 115.202648,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Pemecutan Kelod; kira-kira 1161.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard beside an invented neighborhood street, around Pemecutan Kelod; about 1161.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1161.4,
+    "estimatedWeightKg": 104.53,
+    "urgency": "medium",
+    "confidence": 0.93,
+    "status": "new"
+  },
+  {
+    "id": "demo-034",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T15:01:00+08:00",
+    "lat": -8.680723,
+    "lng": 115.204343,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kauh",
+    "description": "[DEMO] Ada kaleng logam dekat gang permukiman rekaan, sekitar Dauh Puri Kauh; kira-kira 54.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans near an invented residential lane, around Dauh Puri Kauh; about 54.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 54.9,
+    "estimatedWeightKg": 9.88,
+    "urgency": "low",
+    "confidence": 0.73,
+    "status": "planned"
+  },
+  {
+    "id": "demo-035",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T10:43:00+08:00",
+    "lat": -8.662122,
+    "lng": 115.214203,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri Kangin",
+    "description": "[DEMO] Ada sampah residu di area pemilahan rekaan, sekitar Dauh Puri Kangin; kira-kira 1185.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste in an invented sorting area, around Dauh Puri Kangin; about 1185.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1185.2,
+    "estimatedWeightKg": 189.63,
+    "urgency": "low",
+    "confidence": 0.72,
+    "status": "new"
+  },
+  {
+    "id": "demo-036",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T14:04:00+08:00",
+    "lat": -8.65602,
+    "lng": 115.185352,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian",
+    "description": "[DEMO] Ada baterai bekas simulasi di sisi jalan lingkungan rekaan, sekitar Padangsambian; kira-kira 42.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries beside an invented neighborhood street, around Padangsambian; about 42.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 42.7,
+    "estimatedWeightKg": 8.54,
+    "urgency": "high",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-037",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T18:15:00+08:00",
+    "lat": -8.636697,
+    "lng": 115.183581,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kaja",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Padangsambian Kaja; kira-kira 103.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste near an invented residential lane, around Padangsambian Kaja; about 103.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 103.8,
+    "estimatedWeightKg": 21.9,
+    "urgency": "medium",
+    "confidence": 0.8,
+    "status": "new"
+  },
+  {
+    "id": "demo-038",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T15:39:00+08:00",
+    "lat": -8.67642,
+    "lng": 115.184075,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Padangsambian Kelod",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di area pemilahan rekaan, sekitar Padangsambian Kelod; kira-kira 476.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans in an invented sorting area, around Padangsambian Kelod; about 476.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 476.8,
+    "estimatedWeightKg": 41.0,
+    "urgency": "medium",
+    "confidence": 0.86,
+    "status": "new"
+  },
+  {
+    "id": "demo-039",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T21:26:00+08:00",
+    "lat": -8.656092,
+    "lng": 115.2059,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Pemecutan; kira-kira 2973.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard beside an invented neighborhood street, around Pemecutan; about 2973.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 2973.5,
+    "estimatedWeightKg": 719.59,
+    "urgency": "high",
+    "confidence": 0.98,
+    "status": "collected"
+  },
+  {
+    "id": "demo-040",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T21:43:00+08:00",
+    "lat": -8.674728,
+    "lng": 115.203111,
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan Kelod",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Pemecutan Kelod; kira-kira 592.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste near an invented residential lane, around Pemecutan Kelod; about 592.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 592.4,
+    "estimatedWeightKg": 69.9,
+    "urgency": "medium",
+    "confidence": 0.95,
+    "status": "new"
+  },
+  {
+    "id": "demo-041",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T08:59:00+08:00",
+    "lat": -8.632634,
+    "lng": 115.203559,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada sisa organik di area pemilahan rekaan, sekitar Ubung; kira-kira 59.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps in an invented sorting area, around Ubung; about 59.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 59.6,
+    "estimatedWeightKg": 16.69,
+    "urgency": "low",
+    "confidence": 0.72,
+    "status": "new"
+  },
+  {
+    "id": "demo-042",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T19:31:00+08:00",
+    "lat": -8.61581,
+    "lng": 115.202654,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada kemasan plastik di sisi jalan lingkungan rekaan, sekitar Ubung Kaja; kira-kira 54.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging beside an invented neighborhood street, around Ubung Kaja; about 54.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 54.8,
+    "estimatedWeightKg": 3.01,
+    "urgency": "low",
+    "confidence": 0.79,
+    "status": "planned"
+  },
+  {
+    "id": "demo-043",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T14:40:00+08:00",
+    "lat": -8.615919,
+    "lng": 115.219822,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada kertas dan kardus dekat gang permukiman rekaan, sekitar Peguyangan; kira-kira 2725.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard near an invented residential lane, around Peguyangan; about 2725.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2725.4,
+    "estimatedWeightKg": 245.29,
+    "urgency": "high",
+    "confidence": 0.8,
+    "status": "new"
+  },
+  {
+    "id": "demo-044",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T16:22:00+08:00",
+    "lat": -8.59592,
+    "lng": 115.225937,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada kaleng logam di area pemilahan rekaan, sekitar Peguyangan Kaja; kira-kira 978.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans in an invented sorting area, around Peguyangan Kaja; about 978.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 978.4,
+    "estimatedWeightKg": 176.11,
+    "urgency": "medium",
+    "confidence": 0.67,
+    "status": "new"
+  },
+  {
+    "id": "demo-045",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T13:39:00+08:00",
+    "lat": -8.613229,
+    "lng": 115.237391,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada sampah residu di sisi jalan lingkungan rekaan, sekitar Peguyangan Kangin; kira-kira 817.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste beside an invented neighborhood street, around Peguyangan Kangin; about 817.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 817.5,
+    "estimatedWeightKg": 130.8,
+    "urgency": "low",
+    "confidence": 0.84,
+    "status": "new"
+  },
+  {
+    "id": "demo-046",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-01T14:28:00+08:00",
+    "lat": -8.63269,
+    "lng": 115.229104,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Tonja",
+    "description": "[DEMO] Ada baterai bekas simulasi dekat gang permukiman rekaan, sekitar Tonja; kira-kira 63.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries near an invented residential lane, around Tonja; about 63.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 63.4,
+    "estimatedWeightKg": 12.68,
+    "urgency": "high",
+    "confidence": 0.7,
+    "status": "new"
+  },
+  {
+    "id": "demo-047",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T02:51:00+08:00",
+    "lat": -8.638996,
+    "lng": 115.219813,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Dangin Puri Kaja",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Dangin Puri Kaja; kira-kira 1751.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste in an invented sorting area, around Dangin Puri Kaja; about 1751.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1751.3,
+    "estimatedWeightKg": 369.52,
+    "urgency": "medium",
+    "confidence": 0.94,
+    "status": "new"
+  },
+  {
+    "id": "demo-048",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T05:04:00+08:00",
+    "lat": -8.631566,
+    "lng": 115.205402,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di sisi jalan lingkungan rekaan, sekitar Ubung; kira-kira 3269 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans beside an invented neighborhood street, around Ubung; about 3269 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 3269.0,
+    "estimatedWeightKg": 281.13,
+    "urgency": "high",
+    "confidence": 0.79,
+    "status": "new"
+  },
+  {
+    "id": "demo-049",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T06:54:00+08:00",
+    "lat": -8.615993,
+    "lng": 115.200597,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus dekat gang permukiman rekaan, sekitar Ubung Kaja; kira-kira 228.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard near an invented residential lane, around Ubung Kaja; about 228.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 228.1,
+    "estimatedWeightKg": 55.2,
+    "urgency": "low",
+    "confidence": 0.8,
+    "status": "new"
+  },
+  {
+    "id": "demo-050",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T18:43:00+08:00",
+    "lat": -8.615678,
+    "lng": 115.220789,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Peguyangan; kira-kira 62 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste in an invented sorting area, around Peguyangan; about 62 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 62.0,
+    "estimatedWeightKg": 7.32,
+    "urgency": "low",
+    "confidence": 0.95,
+    "status": "collected"
+  },
+  {
+    "id": "demo-051",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T23:40:00+08:00",
+    "lat": -8.594196,
+    "lng": 115.223914,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada sisa organik di sisi jalan lingkungan rekaan, sekitar Peguyangan Kaja; kira-kira 2972.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps beside an invented neighborhood street, around Peguyangan Kaja; about 2972.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2972.7,
+    "estimatedWeightKg": 832.36,
+    "urgency": "high",
+    "confidence": 0.9,
+    "status": "collected"
+  },
+  {
+    "id": "demo-052",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T10:12:00+08:00",
+    "lat": -8.613761,
+    "lng": 115.235889,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada kemasan plastik dekat gang permukiman rekaan, sekitar Peguyangan Kangin; kira-kira 512.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging near an invented residential lane, around Peguyangan Kangin; about 512.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 512.6,
+    "estimatedWeightKg": 28.19,
+    "urgency": "low",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-053",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T09:51:00+08:00",
+    "lat": -8.634183,
+    "lng": 115.229813,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Tonja",
+    "description": "[DEMO] Ada kertas dan kardus di area pemilahan rekaan, sekitar Tonja; kira-kira 125.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard in an invented sorting area, around Tonja; about 125.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 125.7,
+    "estimatedWeightKg": 11.31,
+    "urgency": "low",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-054",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T16:18:00+08:00",
+    "lat": -8.63743,
+    "lng": 115.221174,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Dangin Puri Kaja",
+    "description": "[DEMO] Ada kaleng logam di sisi jalan lingkungan rekaan, sekitar Dangin Puri Kaja; kira-kira 123.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans beside an invented neighborhood street, around Dangin Puri Kaja; about 123.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 123.6,
+    "estimatedWeightKg": 22.25,
+    "urgency": "low",
+    "confidence": 0.81,
+    "status": "new"
+  },
+  {
+    "id": "demo-055",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T00:47:00+08:00",
+    "lat": -8.630549,
+    "lng": 115.203691,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada sampah residu dekat gang permukiman rekaan, sekitar Ubung; kira-kira 1827.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste near an invented residential lane, around Ubung; about 1827.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1827.7,
+    "estimatedWeightKg": 292.43,
+    "urgency": "medium",
+    "confidence": 0.65,
+    "status": "collected"
+  },
+  {
+    "id": "demo-056",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T09:36:00+08:00",
+    "lat": -8.616526,
+    "lng": 115.202595,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada baterai bekas simulasi di area pemilahan rekaan, sekitar Ubung Kaja; kira-kira 18.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries in an invented sorting area, around Ubung Kaja; about 18.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 18.9,
+    "estimatedWeightKg": 3.78,
+    "urgency": "high",
+    "confidence": 0.73,
+    "status": "collected"
+  },
+  {
+    "id": "demo-057",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T02:09:00+08:00",
+    "lat": -8.618467,
+    "lng": 115.222234,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Peguyangan; kira-kira 1004.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste beside an invented neighborhood street, around Peguyangan; about 1004.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1004.3,
+    "estimatedWeightKg": 211.91,
+    "urgency": "medium",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-058",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T17:40:00+08:00",
+    "lat": -8.59613,
+    "lng": 115.226246,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam dekat gang permukiman rekaan, sekitar Peguyangan Kaja; kira-kira 55 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans near an invented residential lane, around Peguyangan Kaja; about 55 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 55.0,
+    "estimatedWeightKg": 4.73,
+    "urgency": "low",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-059",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T22:03:00+08:00",
+    "lat": -8.613528,
+    "lng": 115.237309,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di area pemilahan rekaan, sekitar Peguyangan Kangin; kira-kira 1569.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard in an invented sorting area, around Peguyangan Kangin; about 1569.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1569.5,
+    "estimatedWeightKg": 379.82,
+    "urgency": "medium",
+    "confidence": 0.76,
+    "status": "planned"
+  },
+  {
+    "id": "demo-060",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T19:14:00+08:00",
+    "lat": -8.631877,
+    "lng": 115.231094,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Tonja",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Tonja; kira-kira 103.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste beside an invented neighborhood street, around Tonja; about 103.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 103.2,
+    "estimatedWeightKg": 12.18,
+    "urgency": "medium",
+    "confidence": 0.94,
+    "status": "planned"
+  },
+  {
+    "id": "demo-061",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T05:53:00+08:00",
+    "lat": -8.637304,
+    "lng": 115.220782,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Dangin Puri Kaja",
+    "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Dangin Puri Kaja; kira-kira 3508 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Dangin Puri Kaja; about 3508 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3508.0,
+    "estimatedWeightKg": 982.24,
+    "urgency": "high",
+    "confidence": 0.97,
+    "status": "new"
+  },
+  {
+    "id": "demo-062",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-01T21:23:00+08:00",
+    "lat": -8.632828,
+    "lng": 115.20522,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada kemasan plastik di area pemilahan rekaan, sekitar Ubung; kira-kira 291.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging in an invented sorting area, around Ubung; about 291.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 291.6,
+    "estimatedWeightKg": 16.04,
+    "urgency": "low",
+    "confidence": 0.87,
+    "status": "new"
+  },
+  {
+    "id": "demo-063",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-01T03:56:00+08:00",
+    "lat": -8.615801,
+    "lng": 115.202249,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Ubung Kaja; kira-kira 2521.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard beside an invented neighborhood street, around Ubung Kaja; about 2521.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2521.5,
+    "estimatedWeightKg": 226.94,
+    "urgency": "high",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-064",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T14:31:00+08:00",
+    "lat": -8.616128,
+    "lng": 115.221842,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada kaleng logam dekat gang permukiman rekaan, sekitar Peguyangan; kira-kira 556.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans near an invented residential lane, around Peguyangan; about 556.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 556.1,
+    "estimatedWeightKg": 100.1,
+    "urgency": "low",
+    "confidence": 0.7,
+    "status": "new"
+  },
+  {
+    "id": "demo-065",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T14:44:00+08:00",
+    "lat": -8.59422,
+    "lng": 115.224834,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada sampah residu di area pemilahan rekaan, sekitar Peguyangan Kaja; kira-kira 502.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste in an invented sorting area, around Peguyangan Kaja; about 502.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 502.6,
+    "estimatedWeightKg": 80.42,
+    "urgency": "low",
+    "confidence": 0.76,
+    "status": "new"
+  },
+  {
+    "id": "demo-066",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T15:56:00+08:00",
+    "lat": -8.612498,
+    "lng": 115.236524,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada baterai bekas simulasi di sisi jalan lingkungan rekaan, sekitar Peguyangan Kangin; kira-kira 57.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries beside an invented neighborhood street, around Peguyangan Kangin; about 57.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 57.5,
+    "estimatedWeightKg": 11.5,
+    "urgency": "high",
+    "confidence": 0.94,
+    "status": "new"
+  },
+  {
+    "id": "demo-067",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T11:28:00+08:00",
+    "lat": -8.634118,
+    "lng": 115.230861,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Tonja",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Tonja; kira-kira 981.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste near an invented residential lane, around Tonja; about 981.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 981.2,
+    "estimatedWeightKg": 207.03,
+    "urgency": "low",
+    "confidence": 0.75,
+    "status": "new"
+  },
+  {
+    "id": "demo-068",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T07:31:00+08:00",
+    "lat": -8.637216,
+    "lng": 115.219172,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Dangin Puri Kaja",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di area pemilahan rekaan, sekitar Dangin Puri Kaja; kira-kira 98 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans in an invented sorting area, around Dangin Puri Kaja; about 98 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 98.0,
+    "estimatedWeightKg": 8.43,
+    "urgency": "medium",
+    "confidence": 0.96,
+    "status": "new"
+  },
+  {
+    "id": "demo-069",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T12:57:00+08:00",
+    "lat": -8.631118,
+    "lng": 115.205175,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Ubung; kira-kira 237.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard beside an invented neighborhood street, around Ubung; about 237.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 237.3,
+    "estimatedWeightKg": 57.43,
+    "urgency": "medium",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-070",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T09:30:00+08:00",
+    "lat": -8.614791,
+    "lng": 115.201743,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Ubung Kaja; kira-kira 505.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste near an invented residential lane, around Ubung Kaja; about 505.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 505.1,
+    "estimatedWeightKg": 59.6,
+    "urgency": "medium",
+    "confidence": 0.71,
+    "status": "collected"
+  },
+  {
+    "id": "demo-071",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T22:02:00+08:00",
+    "lat": -8.618075,
+    "lng": 115.221719,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada sisa organik di area pemilahan rekaan, sekitar Peguyangan; kira-kira 131.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps in an invented sorting area, around Peguyangan; about 131.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 131.9,
+    "estimatedWeightKg": 36.93,
+    "urgency": "low",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-072",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T03:33:00+08:00",
+    "lat": -8.596122,
+    "lng": 115.2249,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada kemasan plastik di sisi jalan lingkungan rekaan, sekitar Peguyangan Kaja; kira-kira 106.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging beside an invented neighborhood street, around Peguyangan Kaja; about 106.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 106.7,
+    "estimatedWeightKg": 5.87,
+    "urgency": "medium",
+    "confidence": 0.83,
+    "status": "planned"
+  },
+  {
+    "id": "demo-073",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T20:19:00+08:00",
+    "lat": -8.612567,
+    "lng": 115.235941,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada kertas dan kardus dekat gang permukiman rekaan, sekitar Peguyangan Kangin; kira-kira 233.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard near an invented residential lane, around Peguyangan Kangin; about 233.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 233.4,
+    "estimatedWeightKg": 21.01,
+    "urgency": "medium",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-074",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T01:17:00+08:00",
+    "lat": -8.634084,
+    "lng": 115.229346,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Tonja",
+    "description": "[DEMO] Ada kaleng logam di area pemilahan rekaan, sekitar Tonja; kira-kira 141 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans in an invented sorting area, around Tonja; about 141 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 141.0,
+    "estimatedWeightKg": 25.38,
+    "urgency": "medium",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-075",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T18:34:00+08:00",
+    "lat": -8.639312,
+    "lng": 115.21979,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Dangin Puri Kaja",
+    "description": "[DEMO] Ada sampah residu di sisi jalan lingkungan rekaan, sekitar Dangin Puri Kaja; kira-kira 115.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste beside an invented neighborhood street, around Dangin Puri Kaja; about 115.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 115.9,
+    "estimatedWeightKg": 18.54,
+    "urgency": "low",
+    "confidence": 0.92,
+    "status": "new"
+  },
+  {
+    "id": "demo-076",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T05:15:00+08:00",
+    "lat": -8.63181,
+    "lng": 115.205333,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung",
+    "description": "[DEMO] Ada baterai bekas simulasi dekat gang permukiman rekaan, sekitar Ubung; kira-kira 58.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries near an invented residential lane, around Ubung; about 58.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 58.6,
+    "estimatedWeightKg": 11.72,
+    "urgency": "high",
+    "confidence": 0.94,
+    "status": "new"
+  },
+  {
+    "id": "demo-077",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T12:16:00+08:00",
+    "lat": -8.616712,
+    "lng": 115.201056,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Ubung Kaja",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Ubung Kaja; kira-kira 1446.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste in an invented sorting area, around Ubung Kaja; about 1446.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1446.6,
+    "estimatedWeightKg": 305.23,
+    "urgency": "medium",
+    "confidence": 0.76,
+    "status": "new"
+  },
+  {
+    "id": "demo-078",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T09:32:00+08:00",
+    "lat": -8.617113,
+    "lng": 115.220377,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di sisi jalan lingkungan rekaan, sekitar Peguyangan; kira-kira 1048.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans beside an invented neighborhood street, around Peguyangan; about 1048.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 1048.4,
+    "estimatedWeightKg": 90.16,
+    "urgency": "low",
+    "confidence": 0.89,
+    "status": "new"
+  },
+  {
+    "id": "demo-079",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T15:57:00+08:00",
+    "lat": -8.59531,
+    "lng": 115.22539,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kaja",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus dekat gang permukiman rekaan, sekitar Peguyangan Kaja; kira-kira 100.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard near an invented residential lane, around Peguyangan Kaja; about 100.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 100.6,
+    "estimatedWeightKg": 24.35,
+    "urgency": "medium",
+    "confidence": 0.84,
+    "status": "new"
+  },
+  {
+    "id": "demo-080",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T22:04:00+08:00",
+    "lat": -8.611682,
+    "lng": 115.236064,
+    "kecamatan": "Denpasar Utara",
+    "desa": "Peguyangan Kangin",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Peguyangan Kangin; kira-kira 417.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste in an invented sorting area, around Peguyangan Kangin; about 417.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 417.8,
+    "estimatedWeightKg": 49.3,
+    "urgency": "low",
+    "confidence": 0.69,
+    "status": "new"
+  },
+  {
+    "id": "demo-081",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T23:18:00+08:00",
+    "lat": -8.650877,
+    "lng": 115.24334,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman",
+    "description": "[DEMO] Ada sisa organik di sisi jalan lingkungan rekaan, sekitar Kesiman; kira-kira 426.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps beside an invented neighborhood street, around Kesiman; about 426.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 426.8,
+    "estimatedWeightKg": 119.5,
+    "urgency": "medium",
+    "confidence": 0.68,
+    "status": "new"
+  },
+  {
+    "id": "demo-082",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T18:06:00+08:00",
+    "lat": -8.654047,
+    "lng": 115.255038,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Petilan",
+    "description": "[DEMO] Ada kemasan plastik dekat gang permukiman rekaan, sekitar Kesiman Petilan; kira-kira 49.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging near an invented residential lane, around Kesiman Petilan; about 49.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 49.4,
+    "estimatedWeightKg": 2.72,
+    "urgency": "low",
+    "confidence": 0.67,
+    "status": "new"
+  },
+  {
+    "id": "demo-083",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T15:36:00+08:00",
+    "lat": -8.633732,
+    "lng": 115.261896,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Kertalangu",
+    "description": "[DEMO] Ada kertas dan kardus di area pemilahan rekaan, sekitar Kesiman Kertalangu; kira-kira 500 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard in an invented sorting area, around Kesiman Kertalangu; about 500 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 500.0,
+    "estimatedWeightKg": 45.0,
+    "urgency": "medium",
+    "confidence": 0.87,
+    "status": "new"
+  },
+  {
+    "id": "demo-084",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T08:38:00+08:00",
+    "lat": -8.613219,
+    "lng": 115.25291,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih",
+    "description": "[DEMO] Ada kaleng logam di sisi jalan lingkungan rekaan, sekitar Penatih; kira-kira 1105.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans beside an invented neighborhood street, around Penatih; about 1105.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1105.6,
+    "estimatedWeightKg": 199.01,
+    "urgency": "low",
+    "confidence": 0.67,
+    "status": "planned"
+  },
+  {
+    "id": "demo-085",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T07:46:00+08:00",
+    "lat": -8.621399,
+    "lng": 115.260982,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih Dangin Puri",
+    "description": "[DEMO] Ada sampah residu dekat gang permukiman rekaan, sekitar Penatih Dangin Puri; kira-kira 53.3 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste near an invented residential lane, around Penatih Dangin Puri; about 53.3 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 53.3,
+    "estimatedWeightKg": 8.53,
+    "urgency": "low",
+    "confidence": 0.91,
+    "status": "planned"
+  },
+  {
+    "id": "demo-086",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T20:37:00+08:00",
+    "lat": -8.654381,
+    "lng": 115.22974,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta",
+    "description": "[DEMO] Ada baterai bekas simulasi di area pemilahan rekaan, sekitar Sumerta; kira-kira 79.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries in an invented sorting area, around Sumerta; about 79.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 79.8,
+    "estimatedWeightKg": 15.96,
+    "urgency": "high",
+    "confidence": 0.71,
+    "status": "collected"
+  },
+  {
+    "id": "demo-087",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-01T01:13:00+08:00",
+    "lat": -8.66701,
+    "lng": 115.236846,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta Kelod",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Sumerta Kelod; kira-kira 563.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste beside an invented neighborhood street, around Sumerta Kelod; about 563.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 563.8,
+    "estimatedWeightKg": 118.96,
+    "urgency": "medium",
+    "confidence": 0.79,
+    "status": "new"
+  },
+  {
+    "id": "demo-088",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T07:20:00+08:00",
+    "lat": -8.65328,
+    "lng": 115.242231,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam dekat gang permukiman rekaan, sekitar Kesiman; kira-kira 948.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans near an invented residential lane, around Kesiman; about 948.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 948.4,
+    "estimatedWeightKg": 81.56,
+    "urgency": "low",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-089",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T02:14:00+08:00",
+    "lat": -8.653954,
+    "lng": 115.25654,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Petilan",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di area pemilahan rekaan, sekitar Kesiman Petilan; kira-kira 1538.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard in an invented sorting area, around Kesiman Petilan; about 1538.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1538.4,
+    "estimatedWeightKg": 372.29,
+    "urgency": "low",
+    "confidence": 0.84,
+    "status": "collected"
+  },
+  {
+    "id": "demo-090",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-24T16:28:00+08:00",
+    "lat": -8.634608,
+    "lng": 115.260722,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Kertalangu",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Kesiman Kertalangu; kira-kira 1096.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste beside an invented neighborhood street, around Kesiman Kertalangu; about 1096.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 1096.9,
+    "estimatedWeightKg": 129.43,
+    "urgency": "medium",
+    "confidence": 0.68,
+    "status": "new"
+  },
+  {
+    "id": "demo-091",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-24T15:32:00+08:00",
+    "lat": -8.612975,
+    "lng": 115.255116,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih",
+    "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Penatih; kira-kira 64.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Penatih; about 64.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 64.2,
+    "estimatedWeightKg": 17.98,
+    "urgency": "low",
+    "confidence": 0.68,
+    "status": "new"
+  },
+  {
+    "id": "demo-092",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T06:59:00+08:00",
+    "lat": -8.623029,
+    "lng": 115.26325,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih Dangin Puri",
+    "description": "[DEMO] Ada kemasan plastik di area pemilahan rekaan, sekitar Penatih Dangin Puri; kira-kira 2140.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging in an invented sorting area, around Penatih Dangin Puri; about 2140.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2140.9,
+    "estimatedWeightKg": 117.75,
+    "urgency": "high",
+    "confidence": 0.66,
+    "status": "planned"
+  },
+  {
+    "id": "demo-093",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T18:43:00+08:00",
+    "lat": -8.655205,
+    "lng": 115.232013,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta",
+    "description": "[DEMO] Ada kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Sumerta; kira-kira 466.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard beside an invented neighborhood street, around Sumerta; about 466.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 466.8,
+    "estimatedWeightKg": 42.01,
+    "urgency": "low",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-094",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T04:31:00+08:00",
+    "lat": -8.66792,
+    "lng": 115.238057,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta Kelod",
+    "description": "[DEMO] Ada kaleng logam dekat gang permukiman rekaan, sekitar Sumerta Kelod; kira-kira 576.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans near an invented residential lane, around Sumerta Kelod; about 576.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 576.9,
+    "estimatedWeightKg": 103.84,
+    "urgency": "low",
+    "confidence": 0.7,
+    "status": "new"
+  },
+  {
+    "id": "demo-095",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T16:41:00+08:00",
+    "lat": -8.651574,
+    "lng": 115.242546,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman",
+    "description": "[DEMO] Ada sampah residu di area pemilahan rekaan, sekitar Kesiman; kira-kira 56.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste in an invented sorting area, around Kesiman; about 56.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 56.8,
+    "estimatedWeightKg": 9.09,
+    "urgency": "medium",
+    "confidence": 0.85,
+    "status": "planned"
+  },
+  {
+    "id": "demo-096",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T21:49:00+08:00",
+    "lat": -8.654163,
+    "lng": 115.257231,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Petilan",
+    "description": "[DEMO] Ada baterai bekas simulasi di sisi jalan lingkungan rekaan, sekitar Kesiman Petilan; kira-kira 77.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries beside an invented neighborhood street, around Kesiman Petilan; about 77.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 77.6,
+    "estimatedWeightKg": 15.52,
+    "urgency": "high",
+    "confidence": 0.79,
+    "status": "new"
+  },
+  {
+    "id": "demo-097",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T13:43:00+08:00",
+    "lat": -8.635463,
+    "lng": 115.262035,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Kertalangu",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Kesiman Kertalangu; kira-kira 925.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste near an invented residential lane, around Kesiman Kertalangu; about 925.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 925.5,
+    "estimatedWeightKg": 195.28,
+    "urgency": "low",
+    "confidence": 0.91,
+    "status": "new"
+  },
+  {
+    "id": "demo-098",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T11:02:00+08:00",
+    "lat": -8.61257,
+    "lng": 115.253016,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di area pemilahan rekaan, sekitar Penatih; kira-kira 479 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans in an invented sorting area, around Penatih; about 479 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 479.0,
+    "estimatedWeightKg": 41.19,
+    "urgency": "low",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-099",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T23:16:00+08:00",
+    "lat": -8.622473,
+    "lng": 115.261838,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih Dangin Puri",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Penatih Dangin Puri; kira-kira 2129.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard beside an invented neighborhood street, around Penatih Dangin Puri; about 2129.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 2129.9,
+    "estimatedWeightKg": 515.44,
+    "urgency": "high",
+    "confidence": 0.67,
+    "status": "new"
+  },
+  {
+    "id": "demo-100",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T13:54:00+08:00",
+    "lat": -8.652805,
+    "lng": 115.231782,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Sumerta; kira-kira 107.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste near an invented residential lane, around Sumerta; about 107.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 107.5,
+    "estimatedWeightKg": 12.69,
+    "urgency": "low",
+    "confidence": 0.86,
+    "status": "planned"
+  },
+  {
+    "id": "demo-101",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T22:37:00+08:00",
+    "lat": -8.666645,
+    "lng": 115.237006,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta Kelod",
+    "description": "[DEMO] Ada sisa organik di area pemilahan rekaan, sekitar Sumerta Kelod; kira-kira 231.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps in an invented sorting area, around Sumerta Kelod; about 231.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 231.6,
+    "estimatedWeightKg": 64.85,
+    "urgency": "medium",
+    "confidence": 0.79,
+    "status": "planned"
+  },
+  {
+    "id": "demo-102",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T17:32:00+08:00",
+    "lat": -8.652591,
+    "lng": 115.24407,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman",
+    "description": "[DEMO] Ada kemasan plastik di sisi jalan lingkungan rekaan, sekitar Kesiman; kira-kira 473.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging beside an invented neighborhood street, around Kesiman; about 473.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 473.8,
+    "estimatedWeightKg": 26.06,
+    "urgency": "low",
+    "confidence": 0.72,
+    "status": "planned"
+  },
+  {
+    "id": "demo-103",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T01:36:00+08:00",
+    "lat": -8.652759,
+    "lng": 115.257374,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Petilan",
+    "description": "[DEMO] Ada kertas dan kardus dekat gang permukiman rekaan, sekitar Kesiman Petilan; kira-kira 50.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard near an invented residential lane, around Kesiman Petilan; about 50.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 50.8,
+    "estimatedWeightKg": 4.57,
+    "urgency": "low",
+    "confidence": 0.78,
+    "status": "new"
+  },
+  {
+    "id": "demo-104",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T22:24:00+08:00",
+    "lat": -8.634351,
+    "lng": 115.262497,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Kertalangu",
+    "description": "[DEMO] Ada kaleng logam di area pemilahan rekaan, sekitar Kesiman Kertalangu; kira-kira 279 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans in an invented sorting area, around Kesiman Kertalangu; about 279 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 279.0,
+    "estimatedWeightKg": 50.22,
+    "urgency": "medium",
+    "confidence": 0.68,
+    "status": "collected"
+  },
+  {
+    "id": "demo-105",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T06:19:00+08:00",
+    "lat": -8.614326,
+    "lng": 115.254654,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih",
+    "description": "[DEMO] Ada sampah residu di sisi jalan lingkungan rekaan, sekitar Penatih; kira-kira 1803.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste beside an invented neighborhood street, around Penatih; about 1803.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1803.7,
+    "estimatedWeightKg": 288.59,
+    "urgency": "medium",
+    "confidence": 0.76,
+    "status": "planned"
+  },
+  {
+    "id": "demo-106",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T08:47:00+08:00",
+    "lat": -8.620821,
+    "lng": 115.262147,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih Dangin Puri",
+    "description": "[DEMO] Ada baterai bekas simulasi dekat gang permukiman rekaan, sekitar Penatih Dangin Puri; kira-kira 31 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries near an invented residential lane, around Penatih Dangin Puri; about 31 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 31.0,
+    "estimatedWeightKg": 6.2,
+    "urgency": "high",
+    "confidence": 0.84,
+    "status": "new"
+  },
+  {
+    "id": "demo-107",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-06T08:51:00+08:00",
+    "lat": -8.653113,
+    "lng": 115.229627,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Sumerta; kira-kira 1524.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste in an invented sorting area, around Sumerta; about 1524.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1524.1,
+    "estimatedWeightKg": 321.59,
+    "urgency": "low",
+    "confidence": 0.8,
+    "status": "planned"
+  },
+  {
+    "id": "demo-108",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T15:14:00+08:00",
+    "lat": -8.666945,
+    "lng": 115.23619,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta Kelod",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di sisi jalan lingkungan rekaan, sekitar Sumerta Kelod; kira-kira 423.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans beside an invented neighborhood street, around Sumerta Kelod; about 423.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 423.5,
+    "estimatedWeightKg": 36.42,
+    "urgency": "low",
+    "confidence": 0.69,
+    "status": "planned"
+  },
+  {
+    "id": "demo-109",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T14:54:00+08:00",
+    "lat": -8.650725,
+    "lng": 115.243134,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus dekat gang permukiman rekaan, sekitar Kesiman; kira-kira 403.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard near an invented residential lane, around Kesiman; about 403.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 403.8,
+    "estimatedWeightKg": 97.72,
+    "urgency": "medium",
+    "confidence": 0.93,
+    "status": "new"
+  },
+  {
+    "id": "demo-110",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T07:49:00+08:00",
+    "lat": -8.651818,
+    "lng": 115.255178,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Petilan",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Kesiman Petilan; kira-kira 64.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste in an invented sorting area, around Kesiman Petilan; about 64.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 64.9,
+    "estimatedWeightKg": 7.66,
+    "urgency": "medium",
+    "confidence": 0.76,
+    "status": "new"
+  },
+  {
+    "id": "demo-111",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T04:14:00+08:00",
+    "lat": -8.633814,
+    "lng": 115.259887,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Kesiman Kertalangu",
+    "description": "[DEMO] Ada sisa organik di sisi jalan lingkungan rekaan, sekitar Kesiman Kertalangu; kira-kira 1154.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps beside an invented neighborhood street, around Kesiman Kertalangu; about 1154.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1154.4,
+    "estimatedWeightKg": 323.23,
+    "urgency": "medium",
+    "confidence": 0.77,
+    "status": "new"
+  },
+  {
+    "id": "demo-112",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T15:34:00+08:00",
+    "lat": -8.614014,
+    "lng": 115.255205,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih",
+    "description": "[DEMO] Ada kemasan plastik dekat gang permukiman rekaan, sekitar Penatih; kira-kira 232.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging near an invented residential lane, around Penatih; about 232.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 232.5,
+    "estimatedWeightKg": 12.79,
+    "urgency": "low",
+    "confidence": 0.76,
+    "status": "collected"
+  },
+  {
+    "id": "demo-113",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-24T20:55:00+08:00",
+    "lat": -8.62346,
+    "lng": 115.262751,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Penatih Dangin Puri",
+    "description": "[DEMO] Ada kertas dan kardus di area pemilahan rekaan, sekitar Penatih Dangin Puri; kira-kira 61.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard in an invented sorting area, around Penatih Dangin Puri; about 61.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 61.1,
+    "estimatedWeightKg": 5.5,
+    "urgency": "medium",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-114",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T20:52:00+08:00",
+    "lat": -8.654527,
+    "lng": 115.231082,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta",
+    "description": "[DEMO] Ada kaleng logam di sisi jalan lingkungan rekaan, sekitar Sumerta; kira-kira 476.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans beside an invented neighborhood street, around Sumerta; about 476.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 476.8,
+    "estimatedWeightKg": 85.82,
+    "urgency": "medium",
+    "confidence": 0.94,
+    "status": "new"
+  },
+  {
+    "id": "demo-115",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T18:04:00+08:00",
+    "lat": -8.667127,
+    "lng": 115.238433,
+    "kecamatan": "Denpasar Timur",
+    "desa": "Sumerta Kelod",
+    "description": "[DEMO] Ada sampah residu dekat gang permukiman rekaan, sekitar Sumerta Kelod; kira-kira 2841.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste near an invented residential lane, around Sumerta Kelod; about 2841.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2841.6,
+    "estimatedWeightKg": 454.66,
+    "urgency": "high",
+    "confidence": 0.75,
+    "status": "new"
+  },
+  {
+    "id": "demo-116",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T13:33:00+08:00",
+    "lat": -8.704671,
+    "lng": 115.220502,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sesetan",
+    "description": "[DEMO] Ada baterai bekas simulasi di area pemilahan rekaan, sekitar Sesetan; kira-kira 39.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries in an invented sorting area, around Sesetan; about 39.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 39.9,
+    "estimatedWeightKg": 7.98,
+    "urgency": "high",
+    "confidence": 0.75,
+    "status": "new"
+  },
+  {
+    "id": "demo-117",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T11:15:00+08:00",
+    "lat": -8.7112,
+    "lng": 115.207822,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Pedungan",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Pedungan; kira-kira 1050.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste beside an invented neighborhood street, around Pedungan; about 1050.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1050.7,
+    "estimatedWeightKg": 221.7,
+    "urgency": "low",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-118",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T21:27:00+08:00",
+    "lat": -8.688233,
+    "lng": 115.231686,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Panjer",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam dekat gang permukiman rekaan, sekitar Panjer; kira-kira 1195.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans near an invented residential lane, around Panjer; about 1195.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 1195.6,
+    "estimatedWeightKg": 102.82,
+    "urgency": "medium",
+    "confidence": 0.74,
+    "status": "new"
+  },
+  {
+    "id": "demo-119",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T21:24:00+08:00",
+    "lat": -8.680081,
+    "lng": 115.242803,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Renon",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di area pemilahan rekaan, sekitar Renon; kira-kira 2433.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard in an invented sorting area, around Renon; about 2433.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 2433.2,
+    "estimatedWeightKg": 588.83,
+    "urgency": "high",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-120",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T07:17:00+08:00",
+    "lat": -8.711684,
+    "lng": 115.231971,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sidakarya",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Sidakarya; kira-kira 118.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste beside an invented neighborhood street, around Sidakarya; about 118.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 118.8,
+    "estimatedWeightKg": 14.02,
+    "urgency": "low",
+    "confidence": 0.91,
+    "status": "planned"
+  },
+  {
+    "id": "demo-121",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T18:56:00+08:00",
+    "lat": -8.699242,
+    "lng": 115.247087,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kauh",
+    "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Sanur Kauh; kira-kira 3168.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Sanur Kauh; about 3168.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3168.1,
+    "estimatedWeightKg": 887.07,
+    "urgency": "high",
+    "confidence": 0.89,
+    "status": "planned"
+  },
+  {
+    "id": "demo-122",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T15:28:00+08:00",
+    "lat": -8.676565,
+    "lng": 115.259793,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kaja",
+    "description": "[DEMO] Ada kemasan plastik di area pemilahan rekaan, sekitar Sanur Kaja; kira-kira 3211.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging in an invented sorting area, around Sanur Kaja; about 3211.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3211.8,
+    "estimatedWeightKg": 176.65,
+    "urgency": "high",
+    "confidence": 0.69,
+    "status": "collected"
+  },
+  {
+    "id": "demo-123",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-07T12:14:00+08:00",
+    "lat": -8.705005,
+    "lng": 115.22016,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sesetan",
+    "description": "[DEMO] Ada kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Sesetan; kira-kira 1115.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard beside an invented neighborhood street, around Sesetan; about 1115.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1115.9,
+    "estimatedWeightKg": 100.43,
+    "urgency": "medium",
+    "confidence": 0.75,
+    "status": "new"
+  },
+  {
+    "id": "demo-124",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T13:04:00+08:00",
+    "lat": -8.709577,
+    "lng": 115.206123,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Pedungan",
+    "description": "[DEMO] Ada kaleng logam dekat gang permukiman rekaan, sekitar Pedungan; kira-kira 1027.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans near an invented residential lane, around Pedungan; about 1027.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1027.8,
+    "estimatedWeightKg": 185.0,
+    "urgency": "low",
+    "confidence": 0.95,
+    "status": "new"
+  },
+  {
+    "id": "demo-125",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T17:45:00+08:00",
+    "lat": -8.685803,
+    "lng": 115.229841,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Panjer",
+    "description": "[DEMO] Ada sampah residu di area pemilahan rekaan, sekitar Panjer; kira-kira 2760.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste in an invented sorting area, around Panjer; about 2760.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 2760.5,
+    "estimatedWeightKg": 441.68,
+    "urgency": "high",
+    "confidence": 0.71,
+    "status": "new"
+  },
+  {
+    "id": "demo-126",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-07T06:14:00+08:00",
+    "lat": -8.680181,
+    "lng": 115.240759,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Renon",
+    "description": "[DEMO] Ada baterai bekas simulasi di sisi jalan lingkungan rekaan, sekitar Renon; kira-kira 62.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries beside an invented neighborhood street, around Renon; about 62.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 62.8,
+    "estimatedWeightKg": 12.56,
+    "urgency": "high",
+    "confidence": 0.67,
+    "status": "new"
+  },
+  {
+    "id": "demo-127",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-26T10:22:00+08:00",
+    "lat": -8.709919,
+    "lng": 115.232564,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sidakarya",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Sidakarya; kira-kira 128.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste near an invented residential lane, around Sidakarya; about 128.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 128.4,
+    "estimatedWeightKg": 27.09,
+    "urgency": "low",
+    "confidence": 0.8,
+    "status": "new"
+  },
+  {
+    "id": "demo-128",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T08:52:00+08:00",
+    "lat": -8.700748,
+    "lng": 115.248335,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kauh",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di area pemilahan rekaan, sekitar Sanur Kauh; kira-kira 3462.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans in an invented sorting area, around Sanur Kauh; about 3462.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 3462.2,
+    "estimatedWeightKg": 297.75,
+    "urgency": "high",
+    "confidence": 0.91,
+    "status": "new"
+  },
+  {
+    "id": "demo-129",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T21:39:00+08:00",
+    "lat": -8.675408,
+    "lng": 115.258988,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kaja",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di sisi jalan lingkungan rekaan, sekitar Sanur Kaja; kira-kira 52.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard beside an invented neighborhood street, around Sanur Kaja; about 52.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 52.6,
+    "estimatedWeightKg": 12.73,
+    "urgency": "low",
+    "confidence": 0.88,
+    "status": "new"
+  },
+  {
+    "id": "demo-130",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-24T23:53:00+08:00",
+    "lat": -8.704216,
+    "lng": 115.218513,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sesetan",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu dekat gang permukiman rekaan, sekitar Sesetan; kira-kira 1888.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste near an invented residential lane, around Sesetan; about 1888.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 1888.6,
+    "estimatedWeightKg": 222.85,
+    "urgency": "low",
+    "confidence": 0.92,
+    "status": "new"
+  },
+  {
+    "id": "demo-131",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T14:53:00+08:00",
+    "lat": -8.709794,
+    "lng": 115.208481,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Pedungan",
+    "description": "[DEMO] Ada sisa organik di area pemilahan rekaan, sekitar Pedungan; kira-kira 1142.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps in an invented sorting area, around Pedungan; about 1142.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1142.2,
+    "estimatedWeightKg": 319.82,
+    "urgency": "medium",
+    "confidence": 0.9,
+    "status": "new"
+  },
+  {
+    "id": "demo-132",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T12:52:00+08:00",
+    "lat": -8.686492,
+    "lng": 115.230455,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Panjer",
+    "description": "[DEMO] Ada kemasan plastik di sisi jalan lingkungan rekaan, sekitar Panjer; kira-kira 479.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging beside an invented neighborhood street, around Panjer; about 479.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 479.4,
+    "estimatedWeightKg": 26.37,
+    "urgency": "low",
+    "confidence": 0.92,
+    "status": "new"
+  },
+  {
+    "id": "demo-133",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-28T01:24:00+08:00",
+    "lat": -8.678621,
+    "lng": 115.243431,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Renon",
+    "description": "[DEMO] Ada kertas dan kardus dekat gang permukiman rekaan, sekitar Renon; kira-kira 54.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard near an invented residential lane, around Renon; about 54.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 54.9,
+    "estimatedWeightKg": 4.94,
+    "urgency": "low",
+    "confidence": 0.67,
+    "status": "new"
+  },
+  {
+    "id": "demo-134",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-03T16:05:00+08:00",
+    "lat": -8.709881,
+    "lng": 115.234494,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sidakarya",
+    "description": "[DEMO] Ada kaleng logam di area pemilahan rekaan, sekitar Sidakarya; kira-kira 117.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans in an invented sorting area, around Sidakarya; about 117.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 117.6,
+    "estimatedWeightKg": 21.17,
+    "urgency": "medium",
+    "confidence": 0.71,
+    "status": "planned"
+  },
+  {
+    "id": "demo-135",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T11:54:00+08:00",
+    "lat": -8.700979,
+    "lng": 115.248319,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kauh",
+    "description": "[DEMO] Ada sampah residu di sisi jalan lingkungan rekaan, sekitar Sanur Kauh; kira-kira 224.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste beside an invented neighborhood street, around Sanur Kauh; about 224.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 224.1,
+    "estimatedWeightKg": 35.86,
+    "urgency": "low",
+    "confidence": 0.85,
+    "status": "new"
+  },
+  {
+    "id": "demo-136",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T11:28:00+08:00",
+    "lat": -8.676121,
+    "lng": 115.257865,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kaja",
+    "description": "[DEMO] Ada baterai bekas simulasi dekat gang permukiman rekaan, sekitar Sanur Kaja; kira-kira 59.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries near an invented residential lane, around Sanur Kaja; about 59.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 59.9,
+    "estimatedWeightKg": 11.98,
+    "urgency": "high",
+    "confidence": 0.77,
+    "status": "new"
+  },
+  {
+    "id": "demo-137",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-24T17:26:00+08:00",
+    "lat": -8.70618,
+    "lng": 115.220102,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sesetan",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Sesetan; kira-kira 259.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste in an invented sorting area, around Sesetan; about 259.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 259.5,
+    "estimatedWeightKg": 54.75,
+    "urgency": "medium",
+    "confidence": 0.72,
+    "status": "collected"
+  },
+  {
+    "id": "demo-138",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-25T22:52:00+08:00",
+    "lat": -8.711819,
+    "lng": 115.206365,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Pedungan",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam di sisi jalan lingkungan rekaan, sekitar Pedungan; kira-kira 3116.2 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans beside an invented neighborhood street, around Pedungan; about 3116.2 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 3116.2,
+    "estimatedWeightKg": 267.99,
+    "urgency": "high",
+    "confidence": 0.86,
+    "status": "planned"
+  },
+  {
+    "id": "demo-139",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-01T12:32:00+08:00",
+    "lat": -8.688459,
+    "lng": 115.230746,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Panjer",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus dekat gang permukiman rekaan, sekitar Panjer; kira-kira 406.5 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard near an invented residential lane, around Panjer; about 406.5 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 406.5,
+    "estimatedWeightKg": 98.37,
+    "urgency": "low",
+    "confidence": 0.92,
+    "status": "new"
+  },
+  {
+    "id": "demo-140",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T12:18:00+08:00",
+    "lat": -8.680311,
+    "lng": 115.241525,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Renon",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di area pemilahan rekaan, sekitar Renon; kira-kira 1885.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste in an invented sorting area, around Renon; about 1885.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 1885.6,
+    "estimatedWeightKg": 222.5,
+    "urgency": "medium",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-141",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-04T13:39:00+08:00",
+    "lat": -8.709723,
+    "lng": 115.231875,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sidakarya",
+    "description": "[DEMO] Ada sisa organik di sisi jalan lingkungan rekaan, sekitar Sidakarya; kira-kira 1598.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps beside an invented neighborhood street, around Sidakarya; about 1598.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 1598.8,
+    "estimatedWeightKg": 447.66,
+    "urgency": "low",
+    "confidence": 0.7,
+    "status": "planned"
+  },
+  {
+    "id": "demo-142",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-27T06:11:00+08:00",
+    "lat": -8.699187,
+    "lng": 115.248037,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kauh",
+    "description": "[DEMO] Ada kemasan plastik dekat gang permukiman rekaan, sekitar Sanur Kauh; kira-kira 51.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging near an invented residential lane, around Sanur Kauh; about 51.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 51.6,
+    "estimatedWeightKg": 2.84,
+    "urgency": "medium",
+    "confidence": 0.8,
+    "status": "collected"
+  },
+  {
+    "id": "demo-143",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T04:23:00+08:00",
+    "lat": -8.675761,
+    "lng": 115.259121,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kaja",
+    "description": "[DEMO] Ada kertas dan kardus di area pemilahan rekaan, sekitar Sanur Kaja; kira-kira 454.1 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is paper and cardboard in an invented sorting area, around Sanur Kaja; about 454.1 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "paper",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 454.1,
+    "estimatedWeightKg": 40.87,
+    "urgency": "medium",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-144",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-07T10:29:00+08:00",
+    "lat": -8.704643,
+    "lng": 115.221276,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sesetan",
+    "description": "[DEMO] Ada kaleng logam di sisi jalan lingkungan rekaan, sekitar Sesetan; kira-kira 71.7 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is metal cans beside an invented neighborhood street, around Sesetan; about 71.7 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "metal",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 71.7,
+    "estimatedWeightKg": 12.91,
+    "urgency": "medium",
+    "confidence": 0.9,
+    "status": "planned"
+  },
+  {
+    "id": "demo-145",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-30T05:15:00+08:00",
+    "lat": -8.709926,
+    "lng": 115.206211,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Pedungan",
+    "description": "[DEMO] Ada sampah residu dekat gang permukiman rekaan, sekitar Pedungan; kira-kira 3490.9 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is residual waste near an invented residential lane, around Pedungan; about 3490.9 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "residual",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 3490.9,
+    "estimatedWeightKg": 558.54,
+    "urgency": "high",
+    "confidence": 0.76,
+    "status": "new"
+  },
+  {
+    "id": "demo-146",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T10:03:00+08:00",
+    "lat": -8.686529,
+    "lng": 115.229861,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Panjer",
+    "description": "[DEMO] Ada baterai bekas simulasi di area pemilahan rekaan, sekitar Panjer; kira-kira 79.6 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is simulated used batteries in an invented sorting area, around Panjer; about 79.6 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "hazardous",
+        "share": 1
+      }
+    ],
+    "volumeLiters": 79.6,
+    "estimatedWeightKg": 15.92,
+    "urgency": "high",
+    "confidence": 0.66,
+    "status": "new"
+  },
+  {
+    "id": "demo-147",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-02T00:28:00+08:00",
+    "lat": -8.679648,
+    "lng": 115.241024,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Renon",
+    "description": "[DEMO] Ada sisa organik, kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Renon; kira-kira 598.8 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, plastic packaging, residual waste beside an invented neighborhood street, around Renon; about 598.8 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.6
+      },
+      {
+        "type": "plastic",
+        "share": 0.2
+      },
+      {
+        "type": "residual",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 598.8,
+    "estimatedWeightKg": 126.35,
+    "urgency": "medium",
+    "confidence": 0.92,
+    "status": "planned"
+  },
+  {
+    "id": "demo-148",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-29T07:40:00+08:00",
+    "lat": -8.710544,
+    "lng": 115.234115,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sidakarya",
+    "description": "[DEMO] Ada kemasan plastik, kertas dan kardus, kaleng logam dekat gang permukiman rekaan, sekitar Sidakarya; kira-kira 122.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, paper and cardboard, metal cans near an invented residential lane, around Sidakarya; about 122.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.5
+      },
+      {
+        "type": "paper",
+        "share": 0.35
+      },
+      {
+        "type": "metal",
+        "share": 0.15
+      }
+    ],
+    "volumeLiters": 122.4,
+    "estimatedWeightKg": 10.53,
+    "urgency": "medium",
+    "confidence": 0.82,
+    "status": "new"
+  },
+  {
+    "id": "demo-149",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-10-31T20:43:00+08:00",
+    "lat": -8.701209,
+    "lng": 115.246589,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kauh",
+    "description": "[DEMO] Ada sisa organik, kertas dan kardus di area pemilahan rekaan, sekitar Sanur Kauh; kira-kira 1858 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is organic scraps, paper and cardboard in an invented sorting area, around Sanur Kauh; about 1858 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "organic",
+        "share": 0.8
+      },
+      {
+        "type": "paper",
+        "share": 0.2
+      }
+    ],
+    "volumeLiters": 1858.0,
+    "estimatedWeightKg": 449.64,
+    "urgency": "medium",
+    "confidence": 0.73,
+    "status": "new"
+  },
+  {
+    "id": "demo-150",
+    "isDemo": true,
+    "provenance": "synthetic",
+    "createdAt": "2026-11-05T06:12:00+08:00",
+    "lat": -8.676993,
+    "lng": 115.260418,
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur Kaja",
+    "description": "[DEMO] Ada kemasan plastik, sampah residu di sisi jalan lingkungan rekaan, sekitar Sanur Kaja; kira-kira 1517.4 liter. Bukan kejadian nyata.",
+    "descriptionEn": "[DEMO] There is plastic packaging, residual waste beside an invented neighborhood street, around Sanur Kaja; about 1517.4 liters. Not a real incident.",
+    "types": [
+      {
+        "type": "plastic",
+        "share": 0.4
+      },
+      {
+        "type": "residual",
+        "share": 0.6
+      }
+    ],
+    "volumeLiters": 1517.4,
+    "estimatedWeightKg": 179.05,
+    "urgency": "medium",
+    "confidence": 0.87,
+    "status": "new"
+  }
+]

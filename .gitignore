@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+dist
+coverage
+.vercel
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+e2e/artifacts
+test-results
+playwright-report
+blob-report
+.DS_Store

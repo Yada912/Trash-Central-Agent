@@ -1,0 +1,32 @@
+[
+  {
+    "id": "dps-tpa-suwung",
+    "name": "TPA Suwung",
+    "kind": "TPA",
+    "lat": -8.7193435,
+    "lng": 115.2205973,
+    "address": "Jl. TPA Suwung No.200, Sesetan, Denpasar Selatan",
+    "sourceUrl": "https://id.maptons.com/p/5282207436",
+    "verified": true
+  },
+  {
+    "id": "dps-facility-001",
+    "name": "TPS3R Cemara",
+    "kind": "TPS3R",
+    "lat": -8.674578,
+    "lng": 115.251768,
+    "address": "Jalan Tukad Nyali No. 1, Desa Sanur Kaja, Denpasar",
+    "sourceUrl": "https://exa.ai/library/place/yc4mf6qkjlh",
+    "verified": true
+  },
+  {
+    "id": "dps-facility-002",
+    "name": "TPS3R Sesetan",
+    "kind": "TPS3R",
+    "lat": -8.701733,
+    "lng": 115.217534,
+    "address": "Jalan Gurita, Sesetan, Denpasar Selatan",
+    "sourceUrl": "https://exa.ai/library/place/wl22tkly45g",
+    "verified": true
+  }
+]
