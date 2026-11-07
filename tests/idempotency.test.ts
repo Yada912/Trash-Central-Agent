@@ -28,6 +28,7 @@ function report(id: string): Report {
       source: 'mock',
     },
     edited: false,
+    accountType: 'household',
     status: 'new',
   }
 }

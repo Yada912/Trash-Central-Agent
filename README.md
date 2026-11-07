@@ -18,6 +18,7 @@ Two people use it:
 - Report: text, an optional photo compressed in the browser, then a classification the resident can edit, then a location, then submit.
 - Dashboard: a Denpasar map with pickup zones, totals, an accessible report list, and hazardous reports kept separate.
 - Planner: truck, crew, and shift inputs; a deterministic route proposal; an explanation; approve, edit, or reject, with an audit log.
+- Schedule: `GET /api/schedule` is a simulated demo schedule derived from reports. It is not the official DLH Denpasar schedule.
 - Demo mode when `GEMINI_API_KEY` is unset. Seeded reports are marked synthetic.
 
 Roadmap items that are not in this build: recycling points, an MSME marketplace, and bank sampah integration.
@@ -180,6 +181,7 @@ No account. The app has no login.
 - Routes use straight-line distance, not the road network. Shift time is a simple speed and service-time model.
 - Kecamatan for a new report is the nearest seeded demo point, not an official boundary.
 - There is no authentication, no rate limit, and no real message to DLH. Hazardous copy says the report is flagged for special handling and that demo routing was not sent.
+- The pickup schedule is simulated. Capacity feasibility is not checked. It is not the official DLH Denpasar schedule.
 - Photos are stored on the report as a data URL.
 - After an edit, the explanation stays stale until someone calls re-explain.
 - Recycling points, a marketplace, and bank sampah integration are not built.

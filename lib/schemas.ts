@@ -24,6 +24,26 @@ export const KECAMATAN = ['Denpasar Barat', 'Denpasar Timur', 'Denpasar Selatan'
 export const kecamatanSchema = z.enum(KECAMATAN)
 export type Kecamatan = z.infer<typeof kecamatanSchema>
 
+export const ACCOUNT_TYPES = ['household', 'company'] as const
+export const accountTypeSchema = z.enum(ACCOUNT_TYPES)
+export type AccountType = z.infer<typeof accountTypeSchema>
+
+export const WASTE_STREAMS = ['organik', 'anorganik', 'residu', 'B3'] as const
+export const wasteStreamSchema = z.enum(WASTE_STREAMS)
+export type WasteStream = z.infer<typeof wasteStreamSchema>
+
+export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
+export const weekdaySchema = z.enum(WEEKDAYS)
+export type Weekday = z.infer<typeof weekdaySchema>
+
+/** Trash type to pickup stream. Hazardous litres are B3. */
+export function streamOf(type: TrashType): WasteStream {
+  if (type === 'organic') return 'organik'
+  if (type === 'plastic' || type === 'paper' || type === 'metal') return 'anorganik'
+  if (type === 'residual') return 'residu'
+  return 'B3'
+}
+
 export const CLASSIFICATION_FLAGS = [
   'hazardous_present',
   'low_image_quality',
@@ -223,6 +243,7 @@ export const createReportSchema = z
     classification: classificationSchema,
     aiClassification: classificationSchema.optional(),
     clientRequestId: z.string().trim().min(8).max(200).optional(),
+    accountType: accountTypeSchema.optional(),
   })
   .strict()
 export type CreateReportInput = z.infer<typeof createReportSchema>
@@ -241,6 +262,7 @@ export const reportSchema = z.object({
   /** Original model classification, kept when the resident corrects it. */
   aiClassification: classificationSchema.optional(),
   edited: z.boolean(),
+  accountType: accountTypeSchema.default('household'),
   status: reportStatusSchema,
   provenance: z.string().min(1).optional(),
   descriptionEn: z.string().min(1).optional(),
@@ -297,6 +319,50 @@ export const dashboardSchema = z.object({
 export type Dashboard = z.infer<typeof dashboardSchema>
 
 const clockSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+
+export const scheduleEntrySchema = z
+  .object({
+    kecamatan: kecamatanSchema,
+    stream: wasteStreamSchema,
+    accountType: accountTypeSchema,
+    days: z.array(weekdaySchema),
+    window: z
+      .object({
+        start: clockSchema,
+        end: clockSchema,
+      })
+      .strict()
+      .nullable(),
+    mode: z.enum(['routine', 'on_request']),
+    basis: z
+      .object({
+        reports: z.number(),
+        liters: z.number(),
+      })
+      .strict(),
+    source: z.literal('simulated'),
+    note: z.string().optional(),
+    nextPickup: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    feasibility: z.enum(['unverified_template', 'solver_checked']),
+    unassigned: z
+      .object({
+        liters: z.number(),
+        reason: z.string(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict()
+export type ScheduleEntry = z.infer<typeof scheduleEntrySchema>
+
+export const scheduleResponseSchema = z
+  .object({
+    entries: z.array(scheduleEntrySchema),
+    generatedFrom: z.literal('seed+reports'),
+    disclaimer: z.string(),
+  })
+  .strict()
+export type ScheduleResponse = z.infer<typeof scheduleResponseSchema>
 
 export const planRequestSchema = z
   .object({

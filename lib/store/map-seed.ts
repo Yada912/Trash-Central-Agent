@@ -5,6 +5,7 @@ import {
   reportSchema,
   trashTypeSchema,
   volumeLabelFor,
+  type AccountType,
   type ClassificationFlag,
   type Facility,
   type Report,
@@ -63,6 +64,16 @@ function normalizeShares(types: Array<{ type: TrashType; share: number }>): Arra
     .sort((a, b) => b.share - a.share || a.type.localeCompare(b.type))
 }
 
+/** Stable mix: about one id in five is a company, the rest are households. */
+export function accountTypeForSeed(id: string): AccountType {
+  let hash = 2166136261
+  for (let index = 0; index < id.length; index += 1) {
+    hash ^= id.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+  return (hash >>> 0) % 5 === 0 ? 'company' : 'household'
+}
+
 export function mapSeedReport(raw: SeedReport): Report {
   const types = normalizeShares(
     raw.types.map((entry) => {
@@ -96,6 +107,7 @@ export function mapSeedReport(raw: SeedReport): Report {
       { text: raw.description, hasImage: false, source: 'mock' },
     ),
     edited: false,
+    accountType: accountTypeForSeed(raw.id),
     status: raw.status as Report['status'],
     ...(raw.provenance ? { provenance: raw.provenance } : {}),
     ...(raw.descriptionEn ? { descriptionEn: raw.descriptionEn } : {}),

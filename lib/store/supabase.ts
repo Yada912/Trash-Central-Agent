@@ -17,6 +17,7 @@ type ReportRow = {
   classification: Report['classification']
   ai_classification: Report['classification'] | null
   edited: boolean
+  account_type: Report['accountType'] | null
   status: Report['status']
   provenance: string | null
   estimated_weight_kg: number | null
@@ -49,6 +50,7 @@ function toReport(row: ReportRow): Report {
     classification: row.classification,
     ...(row.ai_classification ? { aiClassification: row.ai_classification } : {}),
     edited: row.edited,
+    ...(row.account_type ? { accountType: row.account_type } : {}),
     status: row.status,
     ...(row.provenance ? { provenance: row.provenance } : {}),
     ...(row.description_en ? { descriptionEn: row.description_en } : {}),
@@ -71,6 +73,7 @@ function toReportRow(report: Report): ReportRow {
     classification: report.classification,
     ai_classification: report.aiClassification ?? null,
     edited: report.edited,
+    account_type: report.accountType,
     status: report.status,
     provenance: report.provenance ?? null,
     estimated_weight_kg: report.estimatedWeightKg ?? null,

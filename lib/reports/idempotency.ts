@@ -14,6 +14,7 @@ export function canonicalReportBodyHash(body: {
   lat: number
   lng: number
   image?: { base64: string; mimeType: string }
+  accountType?: string
   classification: {
     types: Array<{ type: string; share: number }>
     volume: { liters: number; label: string }
@@ -34,6 +35,7 @@ export function canonicalReportBodyHash(body: {
       urgency: body.classification.urgency,
       volume: body.classification.volume,
     },
+    accountType: body.accountType ?? 'household',
     image: body.image ? { base64: body.image.base64, mimeType: body.image.mimeType } : null,
     lat: body.lat,
     lng: body.lng,

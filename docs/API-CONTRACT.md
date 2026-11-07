@@ -77,5 +77,14 @@ Any hazardous share above 0, or an explicit flag 'hazardous_present', excludes t
 ## Seed data
 /workspace/digifest/seed/reports.json (Hormuz, 150 demo records, isDemo:true). Extra fields provenance, descriptionEn, estimatedWeightKg are passed through. Coordinates are approximate demo fixtures, not dispatch-ready; UI must label as demo.
 
+## Schedule
+AccountType = household | company. WasteStream = organik | anorganik | residu | B3. Weekday = mon | tue | wed | thu | fri | sat | sun.
+streamOf: organic→organik; plastic, paper, metal→anorganik; residual→residu; hazardous→B3.
+POST /api/reports accepts optional accountType. Omitted means household. Report.accountType defaults to household.
+A hazardous report (isHazardousClassification) contributes all of its litres to B3. Any other report splits litres by share across organik, anorganik, and residu.
+GET /api/schedule?kecamatan=&stream=&accountType= -> { entries, generatedFrom: 'seed+reports', disclaimer }
+Disclaimer: "Simulated demo schedule derived from reports; not an official DLH Denpasar schedule."
+An unknown filter is 400 VALIDATION. The placeholder sets feasibility to unverified_template and notes that capacity feasibility was not checked. B3 is on_request with empty days and a null window. Household window 06:00–09:00. Company entries use one group window per kecamatan and stream, 14:00–17:00. nextPickup is optional and unset until a dated solver fills it.
+
 ## Facilities
 /workspace/digifest/seed/facilities.json (Hormuz): TPA Suwung, TPS3R Cemara, TPS3R Sesetan. verified:true = source-published point only, not operations/entrance. TPA Suwung is the planner depot and must be labelled "simulated depot (operational status unverified)" in UI and explanation. Bank sampah records with null coordinates are never routed or mapped.

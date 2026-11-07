@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       lng: parsed.data.lng,
       image: parsed.data.image,
       classification: parsed.data.classification,
+      accountType: parsed.data.accountType ?? 'household',
     })
     const existing = await store.listReports()
     const kecamatan = nearestKecamatan(parsed.data.lat, parsed.data.lng, existing)
@@ -91,6 +92,7 @@ export async function POST(request: Request) {
       classification,
       ...(parsed.data.aiClassification ? { aiClassification: parsed.data.aiClassification } : {}),
       edited: classificationWasEdited(parsed.data.classification, parsed.data.aiClassification),
+      accountType: parsed.data.accountType ?? 'household',
       status: 'new',
     }
     const saved = await store.createReport(report, idempotencyKey ? { key: idempotencyKey, bodyHash } : undefined)
