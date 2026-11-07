@@ -1,6 +1,6 @@
 import { generateObject } from 'ai'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { EXPLAIN_PROMPT, EXPLAIN_REPAIR_PROMPT, explainPlan } from '@/lib/planner/explain'
+import { EXPLAIN_MODEL_ID, EXPLAIN_PROMPT, EXPLAIN_REPAIR_PROMPT, explainPlan } from '@/lib/planner/explain'
 import type { PlanResult, SolvePlanInput } from '@/lib/schemas'
 
 vi.mock('ai', () => ({
@@ -13,10 +13,19 @@ vi.mock('ai', () => ({
 
 const generate = vi.mocked(generateObject)
 const previousKey = process.env.GEMINI_API_KEY
+const previousKey2 = process.env.GEMINI_API_KEY_2
+const previousKey3 = process.env.GEMINI_API_KEY_3
+const previousKey4 = process.env.GEMINI_API_KEY_4
 
 afterEach(() => {
   if (previousKey === undefined) delete process.env.GEMINI_API_KEY
   else process.env.GEMINI_API_KEY = previousKey
+  if (previousKey2 === undefined) delete process.env.GEMINI_API_KEY_2
+  else process.env.GEMINI_API_KEY_2 = previousKey2
+  if (previousKey3 === undefined) delete process.env.GEMINI_API_KEY_3
+  else process.env.GEMINI_API_KEY_3 = previousKey3
+  if (previousKey4 === undefined) delete process.env.GEMINI_API_KEY_4
+  else process.env.GEMINI_API_KEY_4 = previousKey4
   vi.clearAllMocks()
 })
 
@@ -86,6 +95,9 @@ describe('explain prompts', () => {
 describe('explainPlan', () => {
   it('uses a labelled demo whose cited numbers already appear in the plan', async () => {
     delete process.env.GEMINI_API_KEY
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     const single: PlanResult = { ...plan, unassigned: [] }
     const explanation = await explainPlan(single, input)
     const text = [explanation.summary, ...explanation.perRoute, ...explanation.risks].join('\n')
@@ -103,8 +115,11 @@ describe('explainPlan', () => {
     }
   })
 
-  it('renders the model interpretation from plan facts and rejects a fabricated truck', async () => {
+  it('renders the model interpretation from plan facts using the dedicated explain model and rejects a fabricated truck', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     generate.mockResolvedValue({
       object: {
         interpretation: 'high_urgency_order',
@@ -113,12 +128,13 @@ describe('explainPlan', () => {
       },
     } as never)
     const explained = await explainPlan(plan, input)
+    expect(EXPLAIN_MODEL_ID).toBe('gemini-2.5-flash-lite')
     expect(explained.summary).toContain('higher-urgency')
     expect(explained.summary).toContain('simulated depot (operational status unverified)')
     expect(explained.summary).toContain(String(plan.totals.distanceKm))
     expect(explained.summary).toContain('demo-002')
     expect(explained.perRoute).toHaveLength(plan.routes.length)
-    expect(explained.provenance).toEqual({ source: 'gemini', model: 'gemini-2.5-flash' })
+    expect(explained.provenance).toEqual({ source: 'gemini', model: 'gemini-2.5-flash-lite' })
     expect(explained.perRoute[0]).toContain('truck-1')
     expect(explained.perRoute[0]).toContain(String(plan.routes[0]?.loadLiters))
     expect(explained.risks.join(' ')).toContain('straight-line')
@@ -139,6 +155,9 @@ describe('explainPlan', () => {
 
   it('rejects an inapplicable risk and a provider error without switching to demo', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     generate.mockResolvedValue({
       object: {
         interpretation: 'infeasible_routes',
@@ -155,8 +174,28 @@ describe('explainPlan', () => {
     expect(generate).toHaveBeenCalledTimes(1)
   })
 
+  it('fails over across multiple API keys when the primary key hits a 429 rate limit', async () => {
+    process.env.GEMINI_API_KEY = 'key-1'
+    process.env.GEMINI_API_KEY_2 = 'key-2'
+    generate
+      .mockRejectedValueOnce(Object.assign(new Error('rate limited'), { statusCode: 429 }))
+      .mockResolvedValueOnce({
+        object: {
+          interpretation: 'high_urgency_order',
+          riskCodes: ['stops_unassigned'],
+          routeNotes: [{ truckId: 'truck-1', note: 'on_plan' }],
+        },
+      } as never)
+    const explained = await explainPlan(plan, input)
+    expect(explained.provenance).toEqual({ source: 'gemini', model: 'gemini-2.5-flash-lite' })
+    expect(generate).toHaveBeenCalledTimes(2)
+  })
+
   it('describes an empty plan without inventing collections', async () => {
     delete process.env.GEMINI_API_KEY
+    delete process.env.GEMINI_API_KEY_2
+    delete process.env.GEMINI_API_KEY_3
+    delete process.env.GEMINI_API_KEY_4
     const emptyPlan: PlanResult = {
       routes: [],
       unassigned: [],

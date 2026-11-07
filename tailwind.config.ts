@@ -11,9 +11,16 @@ const config: Config = {
         gold: '#C8A24A',
         alert: '#B4532A',
         card: '#FFFFFF',
+        accent: '#1D4E89',
+        mint: '#D1FAE5',
+        amber: '#FEF3C7',
+        sky: '#E0F2FE',
+        coral: '#FFEDD5',
+        lavender: '#EDE9FE',
       },
       borderRadius: {
-        lg: '16px',
+        xl: '20px',
+        lg: '14px',
         md: '10px',
       },
       fontFamily: {

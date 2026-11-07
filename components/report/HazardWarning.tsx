@@ -15,15 +15,18 @@ export function HazardWarning({
   const warningOn = checked || positiveShare
   return (
     <fieldset className="grid gap-3 rounded-lg border border-alert/30 bg-alert/10 p-4">
-      <legend className="px-1 text-base font-semibold text-alert">Hazardous-material warning</legend>
+      <legend className="px-1 text-base font-semibold text-alert">
+        Peringatan limbah berbahaya (B3)
+      </legend>
       <p className="text-sm">
-        Any hazardous share above 0 is kept off ordinary routes. The warning cannot turn that share into an ordinary stop. At 0%,
-        an unchecked warning leaves hazardous_present off the confirmed classification.
+        Proporsi limbah berbahaya di atas 0% selalu dipisahkan dari rute truk biasa. Pada
+        proporsi 0%, kotak peringatan yang tidak dicentang akan menghapus tanda
+        hazardous_present dari klasifikasi terkonfirmasi.
       </p>
       {classifierFlag && hazardousPercent === 0 && !checked ? (
         <p className="text-sm">
-          The classifier set hazardous_present. The confirmed hazardous share is 0%, so that flag is left off unless you check
-          the warning.
+          Pengklasifikasi menyetel hazardous_present. Proporsi B3 terkonfirmasi saat ini 0%,
+          sehingga tanda tersebut dihapus kecuali Anda mencentang kotak peringatan di bawah.
         </p>
       ) : null}
       <label className="flex items-start gap-3 text-base">
@@ -34,7 +37,7 @@ export function HazardWarning({
           disabled={positiveShare}
           onChange={(event) => onChange(event.target.checked)}
         />
-        <span>Include hazardous_present on the confirmed classification</span>
+        <span>Sertakan hazardous_present pada klasifikasi terkonfirmasi</span>
       </label>
       {warningOn ? <p className="text-sm">{HAZARDOUS_LABEL}</p> : null}
     </fieldset>

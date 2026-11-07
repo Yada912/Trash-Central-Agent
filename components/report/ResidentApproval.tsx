@@ -1,4 +1,12 @@
-export function ResidentApproval({ checked, onChange, disabled }: { checked: boolean; onChange: (checked: boolean) => void; disabled?: boolean }) {
+export function ResidentApproval({
+  checked,
+  onChange,
+  disabled,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+}) {
   return (
     <label className="flex items-start gap-2 text-base">
       <input
@@ -8,7 +16,7 @@ export function ResidentApproval({ checked, onChange, disabled }: { checked: boo
         disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span>I&apos;ve reviewed this</span>
+      <span>Saya telah meninjau hasil ini</span>
     </label>
   )
 }
