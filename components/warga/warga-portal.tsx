@@ -18,7 +18,7 @@ import { computeResidentOptimization } from '@/lib/accounts/store'
 import { WargaAgentChat } from '@/components/warga/warga-agent-chat'
 
 export function WargaPortal() {
-  const { activeAccount, isSignedIn, timetable, updateProfile, login } = useAccount()
+  const { activeAccount, isSignedIn, timetable, updateProfile } = useAccount()
   const weeklyLiters = activeAccount?.wasteProfile?.weeklyRegularLiters ?? 105
   const [bagCount, setBagCount] = useState<number>(() => Math.max(1, Math.round(weeklyLiters / 15)))
   const [savingProfile, setSavingProfile] = useState(false)
@@ -67,29 +67,22 @@ export function WargaPortal() {
               : 'Silakan masuk menggunakan akun Warga untuk melihat kalender jemputan rumah Anda, riwayat pengangkutan, dan prediksi Hari Raya Bali.'}
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              onClick={() => void login('made.adi@warga.denpasar.id', 'warga123')}
-              data-testid="switch-to-warga-btn"
+            <Link
+              href="/masuk"
+              className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-[2px_2px_0_#1F2933]"
             >
-              <MaterialIcon name="person" size="sm" />
-              Masuk Cepat sebagai Warga (I Made Adi)
-            </Button>
+              <MaterialIcon name="login" size="sm" />
+              Masuk dengan Akun Warga
+            </Link>
             {activeAccount?.role === 'petugas' ? (
               <Link
                 href="/petugas"
-                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-lavender px-4 py-2.5 text-sm font-bold text-ink"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-lavender px-4 py-2.5 text-sm font-bold text-ink shadow-[2px_2px_0_#1F2933]"
               >
                 <MaterialIcon name="space_dashboard" size="sm" />
                 Kembali ke Portal Petugas
               </Link>
             ) : null}
-            <Link
-              href="/masuk"
-              className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-card px-4 py-2.5 text-sm font-bold text-ink"
-            >
-              <MaterialIcon name="login" size="sm" />
-              Halaman Masuk / Daftar
-            </Link>
           </div>
         </section>
       </main>
@@ -311,7 +304,7 @@ export function WargaPortal() {
             <MaterialIcon name="calendar_month" className="text-primary" />
             Kalender Jemputan & Rahinan Bali Saya
           </h2>
-          <span className="text-xs font-bold text-ink/75">
+          <span className="text-xs font-black text-ink">
             Klik sel tanggal untuk melihat jadwal & menyimpan ke Google Calendar / Kalender HP (.ics)
           </span>
         </div>
@@ -402,12 +395,12 @@ export function WargaPortal() {
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
                     <h3 className="text-lg font-black text-ink">{computedOtonan.pawukonLabel}</h3>
-                    <span className="text-xs text-ink/75">· Siklus 210 Hari</span>
+                    <span className="text-xs font-bold text-ink">· Siklus 210 Hari</span>
                   </div>
-                  <p className="mt-1 text-xs text-ink/80 leading-relaxed">
+                  <p className="mt-1 text-xs text-ink font-medium leading-relaxed">
                     {computedOtonan.EventItem.preparationTip}
                   </p>
-                  <p className="mt-1 text-xs font-bold text-primary">
+                  <p className="mt-1 text-xs font-black text-primary">
                     Estimasi lonjakan sampah: +{computedOtonan.extraLitersHousehold} L (Organik banten otonan +{computedOtonan.organicSurgePct}%)
                   </p>
                 </div>
@@ -432,7 +425,7 @@ export function WargaPortal() {
                           <span className="rounded border border-ink bg-mint px-2 py-0.5 text-xs font-black text-ink">
                             {ev.date}
                           </span>
-                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-ink select-none">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-xs font-black text-ink select-none">
                             <input
                               type="checkbox"
                               className="h-4 w-4 accent-primary cursor-pointer"
@@ -443,15 +436,15 @@ export function WargaPortal() {
                           </label>
                         </div>
                         <h4 className="font-black text-base text-ink mt-0.5">{ev.name}</h4>
-                        <p className="text-xs font-semibold text-ink/70">{ev.balineseName}</p>
+                        <p className="text-xs font-bold text-ink">{ev.balineseName}</p>
                       </div>
 
                       <div className="border-t border-ink/20 pt-2 text-xs grid gap-1">
-                        <div className="flex items-center justify-between font-extrabold text-ink">
+                        <div className="flex items-center justify-between font-black text-ink">
                           <span>Lonjakan Timbulan:</span>
                           <span className="text-primary font-black">+{ev.extraLitersHousehold} L</span>
                         </div>
-                        <p className="text-[11px] text-ink/75 truncate">
+                        <p className="text-[11px] font-bold text-ink truncate">
                           Komposisi: {ev.typicalWasteItems.join(', ')}
                         </p>
 
@@ -530,24 +523,24 @@ export function WargaPortal() {
               {upcomingPickups.length} Terjadwal
             </span>
           </div>
-          <p className="text-xs text-ink/75">
+          <p className="text-xs font-bold text-ink">
             Perkiraan waktu kedatangan armada di {activeAccount.address} beserta toleransi leeway petugas.
           </p>
           <ul className="grid gap-2.5">
             {upcomingPickups.map((item) => (
-              <li key={item.id} className="vector-card-soft bg-bg p-3.5 grid gap-1">
+              <li key={item.id} className="vector-card-soft bg-bg p-3.5 grid gap-1 border-2 border-ink">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-extrabold text-sm">
+                  <span className="font-extrabold text-sm text-ink">
                     {item.date} · Armada {item.stream.toUpperCase()}
                   </span>
-                  <span className="rounded border border-ink bg-mint px-2 py-0.5 text-[11px] font-extrabold">
+                  <span className="rounded border border-ink bg-mint px-2 py-0.5 text-[11px] font-extrabold text-ink">
                     ~{item.liters} Liter ({item.containersLabel})
                   </span>
                 </div>
-                <p className="text-xs font-bold text-primary">
+                <p className="text-xs font-black text-primary">
                   Pukul {item.window}
                 </p>
-                <p className="text-xs text-ink/80">{item.notes}</p>
+                <p className="text-xs font-medium text-ink">{item.notes}</p>
               </li>
             ))}
           </ul>
@@ -556,33 +549,33 @@ export function WargaPortal() {
         {/* Past Pickups */}
         <div className="vector-card bg-card p-5 grid content-start gap-3" data-testid="past-pickups-card">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-extrabold flex items-center gap-2">
+            <h2 className="text-xl font-extrabold flex items-center gap-2 text-ink">
               <MaterialIcon name="history" className="text-primary" />
               Riwayat Pengangkutan Sebelumnya
             </h2>
-            <span className="vector-pill bg-sky text-ink text-xs">
+            <span className="vector-pill bg-sky text-ink text-xs font-black">
               {pastPickups.length} Selesai
             </span>
           </div>
-          <p className="text-xs text-ink/75">
+          <p className="text-xs font-bold text-ink">
             Catatan penjemputan sampah yang telah diselesaikan oleh kru DLHK di rumah/usaha Anda.
           </p>
           <ul className="grid gap-2.5">
             {pastPickups.map((item) => (
-              <li key={item.id} className="vector-card-soft bg-bg p-3.5 grid gap-1">
+              <li key={item.id} className="vector-card-soft bg-bg p-3.5 grid gap-1 border-2 border-ink">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-extrabold text-sm flex items-center gap-1">
+                  <span className="font-extrabold text-sm flex items-center gap-1 text-ink">
                     <MaterialIcon name="check_circle" size="sm" className="text-success" />
                     {item.date} · {item.stream.toUpperCase()}
                   </span>
-                  <span className="rounded border border-ink bg-card px-2 py-0.5 text-[11px] font-extrabold">
+                  <span className="rounded border border-ink bg-card px-2 py-0.5 text-[11px] font-extrabold text-ink">
                     {item.liters} Liter ({item.containersLabel})
                   </span>
                 </div>
-                <p className="text-xs font-semibold text-ink/75">
+                <p className="text-xs font-bold text-ink">
                   Jam Angkut: {item.window}
                 </p>
-                <p className="text-xs text-ink/80">{item.notes}</p>
+                <p className="text-xs font-medium text-ink">{item.notes}</p>
               </li>
             ))}
           </ul>

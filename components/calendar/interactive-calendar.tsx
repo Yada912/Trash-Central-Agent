@@ -87,7 +87,7 @@ export function InteractiveCalendar({
             <h3 className="mt-1.5 text-xl font-extrabold">
               Kalender Angkut & Hari Raya Bali ({kecamatan})
             </h3>
-            <p className="text-xs text-ink/75">
+            <p className="text-xs font-bold text-ink">
               Klik tanggal mana pun untuk melihat detail jenis sampah yang diangkut, lonjakan Rahinan Bali, dan menyimpannya ke kalender HP/Google Anda.
             </p>
           </div>
@@ -99,7 +99,7 @@ export function InteractiveCalendar({
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-extrabold uppercase text-ink/75">
+        <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-black uppercase text-ink">
           {WEEKDAY_HEADERS.map((day) => (
             <div key={day} className="py-1">
               {day}
@@ -170,7 +170,7 @@ export function InteractiveCalendar({
                     <span
                       className={[
                         'truncate rounded border border-ink px-1 py-0.2 text-[9px] font-extrabold leading-tight',
-                        hasSelectedBaliEvent ? 'bg-lavender text-ink' : 'bg-card text-ink/70',
+                        hasSelectedBaliEvent ? 'bg-lavender text-ink' : 'bg-card text-ink font-bold',
                       ].join(' ')}
                     >
                       {cell.balineseEvents[0].name}
@@ -277,7 +277,7 @@ export function InteractiveCalendar({
           {activeCell.pickups.length === 0 ? (
             <div className="vector-card-soft bg-bg p-4 text-sm">
               <p className="font-bold">Tidak ada jadwal angkut reguler pada hari ini.</p>
-              <p className="mt-1 text-xs text-ink/75">
+              <p className="mt-1 text-xs font-bold text-ink">
                 Simpan sampah terpilah di wadah tertutup hingga jadwal pengangkutan berikutnya.
               </p>
             </div>

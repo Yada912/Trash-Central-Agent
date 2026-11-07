@@ -19,8 +19,11 @@ export function WargaAgentChat() {
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
   const [lastUpdateNotice, setLastUpdateNotice] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null)
 
   // Initialize chat messages from activeAccount profile or welcoming message
   useEffect(() => {
@@ -132,8 +135,16 @@ export function WargaAgentChat() {
       return
     }
 
-    if (isListening) {
+    if (isListening || isTranscribing) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop()
+        } catch {
+          // ignore
+        }
+      }
       setIsListening(false)
+      setIsTranscribing(false)
       return
     }
 
@@ -142,13 +153,26 @@ export function WargaAgentChat() {
       recognition.lang = 'id-ID'
       recognition.continuous = false
       recognition.interimResults = false
+      recognitionRef.current = recognition
 
       recognition.onstart = () => {
         setIsListening(true)
+        setIsTranscribing(false)
+      }
+
+      recognition.onspeechstart = () => {
+        setIsListening(true)
+      }
+
+      recognition.onspeechend = () => {
+        setIsListening(false)
+        setIsTranscribing(true)
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = (event: any) => {
+        setIsTranscribing(false)
+        setIsListening(false)
         const transcript = event.results?.[0]?.[0]?.transcript
         if (transcript) {
           setInput((prev) => (prev ? `${prev} ${transcript}` : transcript))
@@ -157,15 +181,18 @@ export function WargaAgentChat() {
 
       recognition.onerror = () => {
         setIsListening(false)
+        setIsTranscribing(false)
       }
 
       recognition.onend = () => {
         setIsListening(false)
+        setIsTranscribing(false)
       }
 
       recognition.start()
     } catch {
       setIsListening(false)
+      setIsTranscribing(false)
     }
   }
 
@@ -202,7 +229,7 @@ export function WargaAgentChat() {
                 Demand-Based AI
               </span>
             </div>
-            <p className="text-xs text-ink/75 font-medium">
+            <p className="text-xs text-ink font-semibold">
               Menyelaraskan timbulan sampah Anda langsung dengan kuota armada TPS3R{' '}
               {activeAccount?.tps3rNode ?? activeAccount?.kecamatan}
             </p>
@@ -267,12 +294,12 @@ export function WargaAgentChat() {
               key={msg.id}
               className={`flex flex-col gap-1 ${isAgent ? 'items-start mr-6 sm:mr-12' : 'items-end ml-6 sm:ml-12'}`}
             >
-              <div className="flex items-center gap-1 text-[11px] font-bold text-ink/70">
+              <div className="flex items-center gap-1 text-[11px] font-black text-ink">
                 <MaterialIcon name={isAgent ? 'smart_toy' : 'person'} size="sm" />
                 <span>{isAgent ? 'Kresna (Asisten DLHK)' : 'Anda (Warga)'}</span>
               </div>
               <div
-                className={`rounded-2xl border-2 border-ink p-3 text-sm font-medium leading-relaxed ${
+                className={`rounded-2xl border-2 border-ink p-3 text-sm font-semibold leading-relaxed ${
                   isAgent
                     ? 'bg-card text-ink shadow-[3px_3px_0_#1F2933]'
                     : 'bg-mint text-ink shadow-[3px_3px_0_#1F2933]'
@@ -280,7 +307,7 @@ export function WargaAgentChat() {
               >
                 <p className="whitespace-pre-line">{msg.text}</p>
                 {msg.modelUpdateSummary ? (
-                  <div className="mt-2.5 rounded-lg border border-ink bg-sky/35 p-2 text-xs font-black text-ink flex items-center gap-1.5">
+                  <div className="mt-2.5 rounded-lg border-2 border-ink bg-sky/35 p-2 text-xs font-black text-ink flex items-center gap-1.5">
                     <MaterialIcon name="published_with_changes" size="sm" className="text-primary" />
                     <span>{msg.modelUpdateSummary}</span>
                   </div>
@@ -291,7 +318,7 @@ export function WargaAgentChat() {
         })}
 
         {isSending ? (
-          <div className="flex items-center gap-2 text-xs font-bold text-ink/75 p-2">
+          <div className="flex items-center gap-2 text-xs font-black text-ink p-2">
             <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-ink border-t-transparent" />
             <span>Kresna sedang menganalisis timbulan & jadwal armada...</span>
           </div>
@@ -300,7 +327,7 @@ export function WargaAgentChat() {
 
       {/* 5. Quick Prompt Chips */}
       <div className="grid gap-1.5">
-        <span className="text-[11px] font-extrabold uppercase text-ink/70">
+        <span className="text-[11px] font-black uppercase text-ink">
           💡 Rekomendasi Pertanyaan & Situasi Cepat:
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -317,6 +344,35 @@ export function WargaAgentChat() {
           ))}
         </div>
       </div>
+
+      {/* 5.5 Real-Time Speech Processing Indicator */}
+      {isListening || isTranscribing ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center justify-between gap-3 rounded-xl border-2 border-ink bg-coral/20 px-3.5 py-2.5 text-xs font-black text-ink shadow-[2px_2px_0_#1F2933]"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-3 w-3 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-coral"></span>
+            </span>
+            <MaterialIcon name={isListening ? 'mic' : 'sync'} size="sm" className="text-coral animate-pulse" />
+            <span>
+              {isListening
+                ? 'Mendengarkan suara Anda... Silakan berbicara (Bahasa Indonesia / Bali)'
+                : 'Sedang memproses suara ke teks...'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleToggleVoiceRecognition}
+            className="rounded border border-ink bg-card px-2 py-0.5 text-[11px] font-black text-ink hover:bg-coral hover:text-white transition-colors"
+          >
+            Selesai / Berhenti
+          </button>
+        </div>
+      ) : null}
 
       {/* 6. Message Input & Voice Assistant Trigger */}
       <form

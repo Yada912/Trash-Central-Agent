@@ -13,7 +13,7 @@ export function SiteFooter() {
             </div>
             <div>
               <span className="font-black text-base tracking-tight text-ink">Central Trash Agent Bali</span>
-              <p className="text-[11px] font-bold text-ink/75">
+              <p className="text-[11px] font-black text-ink">
                 Pemerintah Provinsi Bali &amp; Kota Denpasar · Dinas Lingkungan Hidup dan Kebersihan
               </p>
             </div>
@@ -100,7 +100,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t-2 border-ink/20 bg-bg px-4 py-3 text-center text-xs font-semibold text-ink/75">
+      <div className="border-t-2 border-ink/20 bg-bg px-4 py-3 text-center text-xs font-black text-ink">
         <p>© 2026 Central Trash Agent Bali — Dinas Lingkungan Hidup dan Kebersihan Provinsi Bali &amp; Kota Denpasar. Seluruh hak cipta dilindungi undang-undang.</p>
       </div>
     </footer>

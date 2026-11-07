@@ -41,7 +41,7 @@ function ReportList({ reports, onSelect, selectedId }: { reports: Report[]; onSe
                 {report.desa ? ` · ${report.desa}` : ''} · {report.status} · {report.classification.urgency} · {report.classification.volume.liters} L
               </span>
               <span className="block text-sm">{report.classification.types.map((entry) => entry.type).join(', ')}</span>
-              <span className="block text-xs text-ink/75">{storedRecordLabel({ isDemo: report.isDemo, source: report.classification.source })}</span>
+              <span className="block text-xs font-bold text-ink">{storedRecordLabel({ isDemo: report.isDemo, source: report.classification.source })}</span>
               {report.classification.needsReview ? <span className="block text-xs font-extrabold text-alert mt-0.5">Perlu tinjauan</span> : null}
             </button>
           </li>
@@ -133,8 +133,8 @@ export function DashboardView() {
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight">Dasbor</h1>
         <p className="max-w-3xl text-lg font-medium">Pantau laporan warga. Tentukan prioritas pengangkutan.</p>
-        {meta ? <p className="text-xs text-ink/75">Mode API: {meta.mode}. Ini adalah mode pada respons dasbor, bukan label untuk tiap rekaman tersimpan.</p> : null}
-        <p className="text-xs text-ink/75">Koordinat pada laporan awal adalah titik perkiraan, bukan titik penjemputan pasti. TPA Suwung adalah {DEPOT_LABEL}.</p>
+        {meta ? <p className="text-xs font-bold text-ink">Mode API: {meta.mode}. Ini adalah mode pada respons dasbor, bukan label untuk tiap rekaman tersimpan.</p> : null}
+        <p className="text-xs font-bold text-ink">Koordinat pada laporan awal adalah titik perkiraan, bukan titik penjemputan pasti. TPA Suwung adalah {DEPOT_LABEL}.</p>
       </div>
 
       <ErrorNotice message={error} />

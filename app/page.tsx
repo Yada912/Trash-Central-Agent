@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Textarea } from '@/components/ui/textarea'
-import { BaliVectorMap } from '@/components/home/bali-vector-map'
+import { SupportedAreasList } from '@/components/home/supported-areas-list'
 import type { ClassifyOutcome } from '@/lib/schemas'
 
 const GUEST_LIMIT = 5
@@ -191,23 +191,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Interactive 3D Vector Map: Bali Decentralized Waste Coverage */}
-      <section aria-labelledby="bali-map-heading" className="grid gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <span className="vector-pill bg-mint text-ink tilt-left">
-              <MaterialIcon name="explore" size="sm" />
-              Sistem Desentralisasi Berbasis Sumber
-            </span>
-            <h2 id="bali-map-heading" className="mt-1 text-2xl font-extrabold tracking-tight">
-              Peta Operasional & Cakupan Wilayah Bali
-            </h2>
-          </div>
-          <p className="text-xs font-bold text-ink/75">
-            Sesuai Pergub Bali No. 47 Tahun 2019 & Perda Kota Denpasar No. 8 Tahun 2023
-          </p>
-        </div>
-        <BaliVectorMap />
+      {/* 2. Supported Areas Section: Bali Decentralized Waste Coverage */}
+      <section aria-label="Wilayah Cakupan Operasional Bali" className="grid gap-3">
+        <SupportedAreasList />
       </section>
 
       {/* 3. About Section (Tentang Central Trash Agent) */}
@@ -346,7 +332,7 @@ export default function HomePage() {
             </div>
 
             {!result ? (
-              <p className="text-xs text-ink/70">
+              <p className="text-xs font-bold text-ink">
                 Klik tombol <strong>Uji Klasifikasi Sekarang</strong> untuk melihat hasil estimasi jenis sampah, persentase komposisi, dan perkiraan jumlah kantong/liter.
               </p>
             ) : result.kind === 'trash' ? (

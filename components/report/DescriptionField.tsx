@@ -60,6 +60,7 @@ export function DescriptionField({
   onChange: (value: string) => void
 }) {
   const [listening, setListening] = useState(false)
+  const [transcribing, setTranscribing] = useState(false)
   const [speechNotice, setSpeechNotice] = useState<string | null>(null)
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
@@ -71,9 +72,14 @@ export function DescriptionField({
 
   function toggleSpeechToText() {
     setSpeechNotice(null)
-    if (listening && recognitionRef.current) {
-      recognitionRef.current.stop()
+    if ((listening || transcribing) && recognitionRef.current) {
+      try {
+        recognitionRef.current.stop()
+      } catch {
+        // ignore
+      }
       setListening(false)
+      setTranscribing(false)
       return
     }
 
@@ -93,6 +99,8 @@ export function DescriptionField({
       rec.continuous = false
       rec.interimResults = false
       rec.onresult = (event) => {
+        setTranscribing(false)
+        setListening(false)
         const transcript = Array.from(event.results)
           .map((res) => res[0]?.transcript ?? '')
           .join(' ')
@@ -105,16 +113,20 @@ export function DescriptionField({
       rec.onerror = () => {
         setSpeechNotice('Gagal menangkap suara. Pastikan izin mikrofon peramban diaktifkan.')
         setListening(false)
+        setTranscribing(false)
       }
       rec.onend = () => {
         setListening(false)
+        setTranscribing(false)
       }
       recognitionRef.current = rec
       setListening(true)
+      setTranscribing(false)
       rec.start()
     } catch {
       setSpeechNotice('Tidak dapat memulai perekaman suara pada perangkat ini.')
       setListening(false)
+      setTranscribing(false)
     }
   }
 
@@ -126,20 +138,48 @@ export function DescriptionField({
           Apa yang Anda lihat?
         </Label>
         <Button
-          variant={listening ? 'alert' : 'secondary'}
+          variant={listening || transcribing ? 'alert' : 'secondary'}
           onClick={toggleSpeechToText}
-          aria-pressed={listening}
+          aria-pressed={listening || transcribing}
         >
           <MaterialIcon name={listening ? 'stop_circle' : 'mic'} />
-          {listening ? 'Berhenti Rekam Suara…' : 'Isi dengan Suara (Bahasa Indonesia)'}
+          {listening ? 'Berhenti Rekam Suara…' : transcribing ? 'Memproses Teks…' : 'Isi dengan Suara (Bahasa Indonesia)'}
         </Button>
       </div>
+
+      {listening || transcribing ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center justify-between gap-3 rounded-xl border-2 border-ink bg-coral/20 px-3.5 py-2.5 text-xs font-black text-ink shadow-[2px_2px_0_#1F2933] animate-pulse"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-3 w-3 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-coral"></span>
+            </span>
+            <MaterialIcon name={listening ? 'mic' : 'sync'} size="sm" className="text-coral" />
+            <span>
+              {listening
+                ? 'Mendengarkan suara Anda... Silakan berbicara (Bahasa Indonesia)'
+                : 'Sedang memproses suara ke teks...'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={toggleSpeechToText}
+            className="rounded border border-ink bg-card px-2 py-0.5 text-[11px] font-black text-ink hover:bg-coral hover:text-white transition-colors"
+          >
+            Selesai
+          </button>
+        </div>
+      ) : null}
 
       {speechNotice ? <p className="text-xs font-bold text-alert">{speechNotice}</p> : null}
 
       {/* Guided Curated Prompts: "Bagaimana kondisi sampah yang sekarang?" */}
-      <div className="vector-card-soft bg-bg p-3.5 grid gap-2.5">
-        <p className="text-xs font-extrabold uppercase tracking-wide text-primary flex items-center gap-1">
+      <div className="vector-card-soft bg-bg p-3.5 grid gap-2.5 border-2 border-ink">
+        <p className="text-xs font-black uppercase tracking-wide text-primary flex items-center gap-1">
           <MaterialIcon name="touch_app" size="sm" />
           Pilih cepat kondisi sampah sekarang (klik untuk mengisi otomatis):
         </p>
@@ -149,21 +189,21 @@ export function DescriptionField({
               key={item.label}
               type="button"
               onClick={() => appendSnippet(item.snippet)}
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-card px-2.5 py-1.5 text-xs font-bold hover:bg-amber/50 active:translate-y-0.5"
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-ink bg-card px-2.5 py-1.5 text-xs font-black text-ink hover:bg-amber/50 active:translate-y-0.5 shadow-[1px_1px_0_#1F2933]"
             >
               <MaterialIcon name={item.icon} size="sm" className="text-primary" />
               <span>{item.label}</span>
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-ink/10">
-          <span className="text-[11px] font-bold text-ink/70 mr-1">Perkiraan wadah:</span>
+        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t-2 border-ink/20">
+          <span className="text-[11px] font-black text-ink mr-1">Perkiraan wadah:</span>
           {CONTAINER_CHIPS.map((chip) => (
             <button
               key={chip.label}
               type="button"
               onClick={() => appendSnippet(chip.text)}
-              className="rounded border border-ink bg-mint/60 px-2 py-1 text-[11px] font-bold hover:bg-mint"
+              className="rounded border-2 border-ink bg-mint px-2 py-1 text-[11px] font-black text-ink hover:bg-mint/80 shadow-[1px_1px_0_#1F2933]"
             >
               + {chip.label}
             </button>
@@ -179,7 +219,7 @@ export function DescriptionField({
         onChange={(event) => onChange(event.target.value)}
         placeholder="Ceritakan kondisi sampah sekarang, jenis dominan (organik/plastik/residu), dan apakah ini sampah rutin mingguan atau sisa acara..."
       />
-      <div className="flex items-center justify-between text-xs font-semibold text-ink/75">
+      <div className="flex items-center justify-between text-xs font-bold text-ink">
         <span>Tips: Pilih tombol di atas atau tekan tombol mikrofon untuk berbicara langsung.</span>
         <span>{value.trim().length} / 1000</span>
       </div>

@@ -165,7 +165,7 @@ function buildGoogleMapsDirectionsUrl(stops: Array<{ lat: number; lng: number }>
 }
 
 export function PetugasPortal() {
-  const { activeAccount, accounts, isSignedIn, timetable, updateTimetable, login } = useAccount()
+  const { activeAccount, accounts, isSignedIn, timetable, updateTimetable } = useAccount()
   const { reports, loading: loadingReports, reload } = useDashboard()
 
   const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan>('Denpasar Barat')
@@ -209,29 +209,22 @@ export function PetugasPortal() {
               : 'Silakan masuk menggunakan akun Petugas DLHK untuk mengakses pusat kendali operasional, manajemen jadwal, dan evaluasi sistem AI.'}
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              onClick={() => void login('surya.wirawan@dlhk.denpasar.id', 'petugas123')}
-              data-testid="switch-to-petugas-btn"
+            <Link
+              href="/masuk/petugas"
+              className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-[2px_2px_0_#1F2933]"
             >
               <MaterialIcon name="badge" size="sm" />
-              Masuk Cepat sebagai Petugas (I Ketut Surya)
-            </Button>
+              Masuk dengan Akun Petugas DLHK
+            </Link>
             {activeAccount?.role === 'warga' ? (
               <Link
                 href="/warga"
-                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-mint px-4 py-2.5 text-sm font-bold text-ink"
+                className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-mint px-4 py-2.5 text-sm font-bold text-ink shadow-[2px_2px_0_#1F2933]"
               >
                 <MaterialIcon name="home" size="sm" />
                 Buka Portal Warga Saya
               </Link>
             ) : null}
-            <Link
-              href="/masuk"
-              className="vector-btn inline-flex items-center gap-2 rounded-md border-2 border-ink bg-card px-4 py-2.5 text-sm font-bold text-ink"
-            >
-              <MaterialIcon name="login" size="sm" />
-              Halaman Masuk / Daftar
-            </Link>
           </div>
         </section>
       </main>
@@ -425,10 +418,10 @@ export function PetugasPortal() {
               <MaterialIcon name="verified" size="sm" />
               Panel Evaluasi & Pengujian Sistem Terpadu
             </span>
-            <h2 id="eval-heading" className="mt-1 text-2xl font-extrabold">
+            <h2 id="eval-heading" className="mt-1 text-2xl font-extrabold text-ink">
               Uji Efektivitas AI, Keamanan B3, VRP Solver & Prediksi Kalender Bali
             </h2>
-            <p className="text-xs text-ink/75">
+            <p className="text-xs font-bold text-ink">
               Menguji seluruh komponen kritis secara otomatis untuk memastikan AI dan solver bekerja akurat sesuai standar operasional.
             </p>
           </div>
@@ -510,7 +503,7 @@ export function PetugasPortal() {
                       </span>
                       <span className="font-extrabold text-sm">{check.name}</span>
                     </div>
-                    <p className="text-xs text-ink/75 mt-1">
+                    <p className="text-xs font-bold text-ink mt-1">
                       <strong>Target:</strong> {check.expected} · <strong>Hasil Aktual:</strong> {check.actual}
                     </p>
                   </div>
@@ -652,10 +645,10 @@ export function PetugasPortal() {
                   <MaterialIcon name="alt_route" size="sm" />
                   Rute Operasional Armada DLHK
                 </span>
-                <h2 id="petugas-route-heading" className="mt-1 text-2xl font-extrabold">
+                <h2 id="petugas-route-heading" className="mt-1 text-2xl font-extrabold text-ink">
                   Peta Rute Harian & Rute Penjemputan Mendatang
                 </h2>
-                <p className="text-xs text-ink/75">
+                <p className="text-xs font-bold text-ink">
                   Visualisasi sekuens titik henti armada, estimasi beban muatan per rute, dan tujuan akhir pengolahan (TPS3R/TPST).
                 </p>
               </div>
@@ -689,12 +682,12 @@ export function PetugasPortal() {
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
               {/* Map Canvas with CityMap */}
               <div className="grid gap-2">
-                <div className="flex items-center justify-between text-xs font-bold">
+                <div className="flex items-center justify-between text-xs font-black">
                   <span className="flex items-center gap-1 text-ink">
                     <MaterialIcon name="map" size="sm" className="text-primary" />
                     Peta Lintasan Truk ({activeRoute.stops.length} Titik Henti Terurut)
                   </span>
-                  <span className="text-ink/75 font-mono">
+                  <span className="text-ink font-mono font-bold">
                     Depot: Posko DLHK/TPS3R → Akhir: TPST
                   </span>
                 </div>
@@ -706,31 +699,31 @@ export function PetugasPortal() {
               </div>
 
               {/* Route Details & Stop Sequence */}
-              <div className="vector-card-soft bg-bg p-4 grid content-start gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ink/20 pb-2">
+              <div className="vector-card-soft bg-bg p-4 grid content-start gap-3 border-2 border-ink">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink pb-2">
                   <div>
                     <span
                       className={[
-                        'vector-pill text-xs',
+                        'vector-pill text-xs font-black',
                         activeRoute.isToday ? 'bg-mint text-ink' : 'bg-sky text-ink',
                       ].join(' ')}
                     >
                       {activeRoute.isToday ? 'Rute Berjalan Hari Ini' : 'Rute Terencana Mendatang'}
                     </span>
-                    <h3 className="mt-1 font-black text-lg">{activeRoute.title}</h3>
-                    <p className="text-xs font-bold text-ink/75">{activeRoute.armadaName}</p>
+                    <h3 className="mt-1 font-black text-lg text-ink">{activeRoute.title}</h3>
+                    <p className="text-xs font-black text-ink">{activeRoute.armadaName}</p>
                   </div>
                 </div>
 
                 {/* Capacity & Load Bar */}
                 <div className="rounded-lg border-2 border-ink bg-card p-3 grid gap-1.5">
-                  <div className="flex items-center justify-between text-xs font-extrabold">
+                  <div className="flex items-center justify-between text-xs font-black">
                     <span>Estimasi Beban Muatan:</span>
                     <span className="text-primary font-black">
                       {activeRoute.loadLiters} L / {activeRoute.maxCapacityLiters} L ({pctUsed}%)
                     </span>
                   </div>
-                  <div className="h-3 w-full overflow-hidden rounded-full border border-ink bg-ink/10">
+                  <div className="h-3 w-full overflow-hidden rounded-full border-2 border-ink bg-ink/10">
                     <div
                       className={[
                         'h-full transition-all',
@@ -739,7 +732,7 @@ export function PetugasPortal() {
                       style={{ width: `${Math.min(100, pctUsed)}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-ink/70">
+                  <p className="text-[11px] font-bold text-ink">
                     {pctUsed <= 95
                       ? '✓ Muatan dalam batas aman kapasitas armada dan toleransi leeway kecamatan.'
                       : '⚠ Mendekati batas maksimum — siapkan armada cadangan jika ada tambahan permintaan warga.'}
@@ -748,25 +741,25 @@ export function PetugasPortal() {
 
                 {/* Ordered Stop Sequence */}
                 <div className="grid gap-1.5">
-                  <span className="text-xs font-extrabold uppercase text-primary">
+                  <span className="text-xs font-black uppercase text-primary">
                     Sekuens Perjalanan Armada:
                   </span>
                   <ol className="grid gap-2 text-xs">
                     {activeRoute.stops.map((stop) => (
                       <li
                         key={stop.seq}
-                        className="rounded-lg border border-ink/40 bg-card p-2.5 flex items-start justify-between gap-2"
+                        className="rounded-lg border-2 border-ink bg-card p-2.5 flex items-start justify-between gap-2 shadow-[1px_1px_0_#1F2933]"
                       >
                         <div className="flex items-start gap-2">
-                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink text-white font-bold text-[10px]">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink text-white font-black text-[10px]">
                             {stop.seq}
                           </span>
                           <div>
-                            <p className="font-extrabold text-ink">{stop.name}</p>
-                            <p className="text-[11px] text-ink/75">{stop.action}</p>
+                            <p className="font-black text-ink">{stop.name}</p>
+                            <p className="text-[11px] font-bold text-ink">{stop.action}</p>
                           </div>
                         </div>
-                        <span className="rounded border border-ink/30 bg-bg px-1.5 py-0.5 text-[10px] font-bold shrink-0">
+                        <span className="rounded border-2 border-ink bg-bg px-1.5 py-0.5 text-[10px] font-black text-ink shrink-0">
                           {stop.volumeText}
                         </span>
                       </li>

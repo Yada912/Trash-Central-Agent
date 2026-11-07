@@ -97,7 +97,7 @@ export function PlannerView() {
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight">Perencana</h1>
         <p className="max-w-3xl text-lg font-medium">Atur kapasitas armada. Perhitungan rute terpisah dari penjelasan naratif.</p>
-        {planner.mode ? <p className="text-xs text-ink/75">Mode API: {planner.mode}. Angka rute berasal dari solver deterministik. Label penjelasan di bawah mengikuti kolom model pada respons.</p> : null}
+        {planner.mode ? <p className="text-xs font-bold text-ink">Mode API: {planner.mode}. Angka rute berasal dari solver deterministik. Label penjelasan di bawah mengikuti kolom model pada respons.</p> : null}
         <ol className="grid gap-2 sm:grid-cols-3">
           {STEPS.map((label, index) => (
             <li
@@ -106,14 +106,14 @@ export function PlannerView() {
               className={
                 index === stepIndex
                   ? 'vector-card bg-primary text-white px-3 py-2 text-sm font-extrabold'
-                  : 'vector-card-soft bg-bg px-3 py-2 text-sm font-bold text-ink/75'
+                  : 'vector-card-soft bg-bg px-3 py-2 text-sm font-black text-ink'
               }
             >
               0{index + 1} · {label}
             </li>
           ))}
         </ol>
-        <p className="text-xs text-ink/75">Rute dimulai dari TPA Suwung, yaitu {DEPOT_LABEL}. Jarak garis lurus bukan rute jalan raya sebenarnya.</p>
+        <p className="text-xs font-bold text-ink">Rute dimulai dari TPA Suwung, yaitu {DEPOT_LABEL}. Jarak garis lurus bukan rute jalan raya sebenarnya.</p>
         <ErrorNotice message={planner.requestError} />
       </div>
 
@@ -213,7 +213,7 @@ export function PlannerView() {
                 <h3 id="route-facts" className="text-lg font-extrabold">
                   Fakta rute
                 </h3>
-                <p className="text-xs text-ink/75">Angka-angka ini berasal dari perencana deterministik. Warna dipasangkan dengan nomor kru dan pola garis.</p>
+                <p className="text-xs font-bold text-ink">Angka-angka ini berasal dari perencana deterministik. Warna dipasangkan dengan nomor kru dan pola garis.</p>
                 <ul className="grid gap-3">
                   {plan.result.routes.map((route, index) => {
                     const style = routeStyle(index)
@@ -395,7 +395,7 @@ export function PlannerView() {
                     <p className="font-bold">
                       {decision.action} · versi {decision.toVersion} · {decision.actor}
                     </p>
-                    <time dateTime={decision.at} className="text-xs text-ink/75">{formatWita(decision.at)}</time>
+                    <time dateTime={decision.at} className="text-xs font-bold text-ink">{formatWita(decision.at)}</time>
                     {decision.note ? <p className="mt-1">{decision.note}</p> : null}
                   </li>
                 ))}
