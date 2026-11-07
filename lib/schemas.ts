@@ -362,7 +362,7 @@ export type ScheduleEntry = z.infer<typeof scheduleEntrySchema>
 export const scheduleResponseSchema = z
   .object({
     entries: z.array(scheduleEntrySchema),
-    generatedFrom: z.literal('seed+reports'),
+    generatedFrom: z.string().min(1),
     disclaimer: z.string(),
   })
   .strict()

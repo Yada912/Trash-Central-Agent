@@ -4,7 +4,7 @@ vi.mock('server-only', () => ({}))
 
 import { GET as getSchedule } from '@/app/api/schedule/route'
 import { POST as createReport } from '@/app/api/reports/route'
-import { SCHEDULE_DISCLAIMER } from '@/lib/schedule'
+import { SCHEDULE_DISCLAIMER, SCHEDULE_GENERATED_FROM } from '@/lib/schedule'
 import type { Report, ScheduleResponse } from '@/lib/schemas'
 import { resetMemoryStoreForTests } from '@/lib/store/memory'
 
@@ -32,7 +32,8 @@ describe('GET /api/schedule', () => {
     const body = (await response.json()) as { data: ScheduleResponse; meta: { mode: string; requestId: string } }
     expect(body.meta.mode).toBe('demo')
     expect(body.meta.requestId).toBeTruthy()
-    expect(body.data.generatedFrom).toBe('seed+reports')
+    expect(body.data.generatedFrom).toBe(SCHEDULE_GENERATED_FROM)
+    expect(body.data.generatedFrom).toContain('not a forecast')
     expect(body.data.disclaimer).toBe(SCHEDULE_DISCLAIMER)
     expect(body.data.disclaimer).toBe('Simulated demo schedule derived from reports; not an official DLH Denpasar schedule.')
     expect(body.data.entries.length).toBeGreaterThan(0)

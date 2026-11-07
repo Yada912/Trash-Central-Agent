@@ -172,11 +172,84 @@ describe('buildSchedule placeholder', () => {
       mode: 'routine',
       source: 'simulated',
       feasibility: 'unverified_template',
-      note: 'Capacity feasibility was not checked.',
+      note: 'policy days, capacity not verified',
     })
     expect(firm?.window).toEqual({ start: '14:00', end: '17:00' })
     expect(special).toMatchObject({ days: [], window: null, mode: 'on_request', feasibility: 'unverified_template' })
     expect(entries.every((entry) => entry.nextPickup === undefined && entry.unassigned === undefined)).toBe(true)
     expect(buildSchedule([report({ id: 'home' })], { stream: 'organik' })).toEqual([])
+  })
+
+  it('keeps the policy template when no availability is supplied', () => {
+    const entries = buildSchedule([report({ id: 'home' })])
+    expect(entries).toHaveLength(1)
+    expect(entries[0]?.feasibility).toBe('unverified_template')
+    expect(entries[0]?.days).toEqual(['tue', 'sat'])
+    expect(entries[0]?.nextPickup).toBeUndefined()
+    expect(entries[0]?.note).toBe('policy days, capacity not verified')
+    expect(entries[0]?.window).toEqual({ start: '06:00', end: '09:00' })
+  })
+
+  it('uses dated solver runs only when availability is supplied', () => {
+    const weekStart = '2026-11-02'
+    const ordinary = report({
+      id: 'organik',
+      kecamatan: 'Denpasar Barat',
+      classification: {
+        types: [{ type: 'organic', share: 1 }],
+        volume: { liters: 90, label: 'medium' },
+        urgency: 'low',
+        confidence: 0.8,
+        rationale: 'Food scraps.',
+        flags: [],
+        needsReview: false,
+        reviewReasons: [],
+        source: 'manual',
+      },
+    })
+    const hazardous = report({
+      id: 'b3',
+      kecamatan: 'Denpasar Barat',
+      classification: {
+        types: [{ type: 'hazardous', share: 1 }],
+        volume: { liters: 10, label: 'small' },
+        urgency: 'high',
+        confidence: 0.9,
+        rationale: 'Batteries.',
+        flags: ['hazardous_present'],
+        needsReview: true,
+        reviewReasons: ['hazardous'],
+        source: 'manual',
+      },
+    })
+    const slots = [0, 1, 2, 3, 4, 5].map((day) => {
+      const date = new Date(Date.UTC(2026, 10, 2 + day)).toISOString().slice(0, 10)
+      return { truckId: 't1', date, dayIndex: day, start: '06:00', end: '09:00', accountType: 'household' as const }
+    })
+    const entries = buildSchedule([ordinary, hazardous], {
+      availability: { trucks: [{ id: 't1', capacityLiters: 1000 }], slots },
+      weekStart,
+      asOf: '2026-11-05T12:00+08:00',
+    })
+    const organik = entries.find((entry) => entry.stream === 'organik')
+    const special = entries.find((entry) => entry.stream === 'B3')
+    expect(organik).toMatchObject({
+      feasibility: 'solver_checked',
+      mode: 'routine',
+      days: ['mon', 'wed', 'fri'],
+      window: { start: '06:00', end: '09:00' },
+      nextPickup: '2026-11-06',
+      basis: { reports: 1, liters: 90 },
+    })
+    expect(organik?.unassigned).toBeUndefined()
+    expect(special).toMatchObject({
+      feasibility: 'solver_checked',
+      mode: 'on_request',
+      days: [],
+      window: null,
+      unassigned: { liters: 10, reason: 'b3_separate_dlh_demo' },
+    })
+    expect(special?.nextPickup).toBeUndefined()
+    expect(entries.reduce((sum, entry) => sum + entry.basis.liters, 0)).toBe(100)
   })
 })

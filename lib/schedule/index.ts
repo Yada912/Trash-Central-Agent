@@ -10,14 +10,17 @@
 // report cannot occur, because any hazardous share makes the report hazardous.
 // Each report's allocated litres sum to its volume.
 //
-// The weekday template below is an internal placeholder. Hummer's
-// lib/planner/weekly.ts will later supply dated runs. This file stays.
-// nextPickup and unassigned are left unset until that solver fills them.
+// solveWeekly places the confirmed litres. This file does not forecast demand
+// and does not pass backlogLiters. With no availability, the visible days are
+// the policy template and nextPickup is omitted. Dated runs appear only when
+// the caller supplies availability.
 // A company entry is one group window for that kecamatan and stream.
 
+import { solveWeekly, type WeeklyAvailability, type WeeklyPlanInput, type WeeklyScheduleResult } from '@/lib/planner/weekly'
 import {
   ACCOUNT_TYPES,
   KECAMATAN,
+  WEEKDAYS,
   WASTE_STREAMS,
   isHazardousClassification,
   streamOf,
@@ -30,12 +33,24 @@ import {
 } from '@/lib/schemas'
 
 export const SCHEDULE_DISCLAIMER = 'Simulated demo schedule derived from reports; not an official DLH Denpasar schedule.'
-const PLACEHOLDER_NOTE = 'Capacity feasibility was not checked.'
+export const SCHEDULE_GENERATED_FROM =
+  'seed+reports; demand equals the currently confirmed reports and is not a forecast'
+const POLICY_NOTE = 'policy days, capacity not verified'
+const COMPANY_NOTE = 'Company-group window for this kecamatan and stream. Not a booking for a named company.'
+const POLICY_DAYS: Record<Exclude<WasteStream, 'B3'>, Weekday[]> = {
+  organik: ['mon', 'wed', 'fri'],
+  anorganik: ['tue', 'sat'],
+  residu: ['thu'],
+}
 
 export type ScheduleBuildOptions = {
   kecamatan?: Kecamatan
   stream?: WasteStream
   accountType?: AccountType
+  /** Omit for the policy template. Present, even with empty arrays, checks the solver. */
+  availability?: WeeklyAvailability
+  weekStart?: string
+  asOf?: string
 }
 
 export type ScheduleDemand = {
@@ -118,38 +133,117 @@ export function scheduleDemand(reports: readonly Report[]): ScheduleDemand[] {
     }))
 }
 
-function placeholderRule(stream: WasteStream, accountType: AccountType): {
-  days: Weekday[]
-  window: { start: string; end: string } | null
-  mode: 'routine' | 'on_request'
-} {
-  if (stream === 'B3') return { days: [], window: null, mode: 'on_request' }
-  const days: Weekday[] =
-    stream === 'organik' ? ['mon', 'wed', 'fri'] : stream === 'anorganik' ? ['tue', 'sat'] : ['thu']
-  const window =
-    accountType === 'company' ? { start: '14:00', end: '17:00' } : { start: '06:00', end: '09:00' }
-  return { days, window, mode: 'routine' }
+function policyWindow(accountType: AccountType): { start: string; end: string } {
+  return accountType === 'company' ? { start: '14:00', end: '17:00' } : { start: '06:00', end: '09:00' }
+}
+
+function addDays(iso: string, days: number): string {
+  const [year, month, day] = iso.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10)
+}
+
+function weekdayOf(iso: string): Weekday {
+  const [year, month, day] = iso.split('-').map(Number)
+  const sunday = new Date(Date.UTC(year, month - 1, day)).getUTCDay()
+  return WEEKDAYS[(sunday + 6) % 7]
+}
+
+/** One demo truck and the household and company windows, Monday through Saturday. */
+export function demoCheckedAvailability(weekStart: string): WeeklyAvailability {
+  const slots: WeeklyAvailability['slots'] = []
+  for (let day = 0; day < 6; day += 1) {
+    const date = addDays(weekStart, day)
+    slots.push({ truckId: 'demo-truck', date, dayIndex: day, start: '06:00', end: '09:00', accountType: 'household' })
+    slots.push({ truckId: 'demo-truck', date, dayIndex: day, start: '14:00', end: '17:00', accountType: 'company' })
+  }
+  return { trucks: [{ id: 'demo-truck', capacityLiters: 100_000 }], slots }
+}
+
+function sameGroup(row: { kecamatan: string; stream: string; accountType: string }, cell: ScheduleDemand): boolean {
+  return row.kecamatan === cell.kecamatan && row.stream === cell.stream && row.accountType === cell.accountType
+}
+
+function entryFor(cell: ScheduleDemand, result: WeeklyScheduleResult): ScheduleEntry {
+  const group = result.groups.find((row) => sameGroup(row, cell))
+  const basis = {
+    reports: group?.reportCount ?? cell.reports,
+    liters: round2(group?.weeklyLiters ?? cell.liters),
+  }
+  const shared = {
+    kecamatan: cell.kecamatan,
+    stream: cell.stream,
+    accountType: cell.accountType,
+    basis,
+    source: 'simulated' as const,
+    feasibility: result.feasibility,
+  }
+  if (result.feasibility === 'unverified_template') {
+    if (cell.stream === 'B3') {
+      return { ...shared, days: [], window: null, mode: 'on_request', note: POLICY_NOTE }
+    }
+    return {
+      ...shared,
+      days: POLICY_DAYS[cell.stream],
+      window: policyWindow(cell.accountType),
+      mode: 'routine',
+      note: POLICY_NOTE,
+    }
+  }
+  if (cell.stream === 'B3') {
+    const row = result.unassigned.find((item) => sameGroup(item, cell))
+    return {
+      ...shared,
+      days: [],
+      window: null,
+      mode: 'on_request',
+      note: row?.note ?? 'Simulated request for separate DLH handling. No date, truck, or booking is assigned.',
+      unassigned: { liters: basis.liters, reason: row?.reason ?? 'b3_separate_dlh_demo' },
+    }
+  }
+  const runs = result.runs.filter((run) => sameGroup(run, cell))
+  const leftover = result.unassigned.find((item) => sameGroup(item, cell))
+  if (runs.length === 0) {
+    return {
+      ...shared,
+      days: [],
+      window: null,
+      mode: 'on_request',
+      note: leftover?.note,
+      unassigned: { liters: leftover?.liters ?? basis.liters, reason: leftover?.reason ?? 'no_slot' },
+    }
+  }
+  const days = WEEKDAYS.filter((day) => runs.some((run) => weekdayOf(run.date) === day))
+  const next = result.nextPickups.find((item) => sameGroup(item, cell) && item.date)
+  const entry: ScheduleEntry = {
+    ...shared,
+    days,
+    window: { start: runs[0].start, end: runs[0].end },
+    mode: 'routine',
+    ...(group?.dedicated ? { note: COMPANY_NOTE } : {}),
+    ...(next?.date ? { nextPickup: next.date } : {}),
+    ...(leftover && leftover.liters > 0 ? { unassigned: { liters: leftover.liters, reason: leftover.reason } } : {}),
+  }
+  return entry
 }
 
 export function buildSchedule(reports: readonly Report[], opts: ScheduleBuildOptions = {}): ScheduleEntry[] {
-  return scheduleDemand(reports)
+  const cells = scheduleDemand(reports)
     .filter((cell) => !opts.kecamatan || cell.kecamatan === opts.kecamatan)
     .filter((cell) => !opts.stream || cell.stream === opts.stream)
     .filter((cell) => !opts.accountType || cell.accountType === opts.accountType)
-    .map((cell) => {
-      const rule = placeholderRule(cell.stream, cell.accountType)
-      const entry: ScheduleEntry = {
-        kecamatan: cell.kecamatan,
-        stream: cell.stream,
-        accountType: cell.accountType,
-        days: rule.days,
-        window: rule.window,
-        mode: rule.mode,
-        basis: { reports: cell.reports, liters: round2(cell.liters) },
-        source: 'simulated',
-        note: PLACEHOLDER_NOTE,
-        feasibility: 'unverified_template',
-      }
-      return entry
-    })
+  const weekStart = opts.weekStart ?? '2026-11-02'
+  const input: WeeklyPlanInput = {
+    weekStart,
+    asOf: opts.asOf ?? `${weekStart}T08:00+08:00`,
+    demand: cells.map((cell) => ({
+      kecamatan: cell.kecamatan,
+      stream: cell.stream,
+      accountType: cell.accountType,
+      weeklyLiters: cell.liters,
+      reportCount: cell.reports,
+    })),
+    ...(opts.availability ? { availability: opts.availability } : {}),
+  }
+  const result = solveWeekly(input)
+  return cells.map((cell) => entryFor(cell, result))
 }
