@@ -55,26 +55,25 @@ export function ClassificationStatus({
         </div>
       ) : null}
       {classification ? (
-        <div className="grid gap-1 text-sm">
+        <div className="grid gap-1.5 text-sm">
           <p
             className={
               classification.confidence < 0.5
-                ? 'font-semibold text-alert'
-                : 'font-semibold'
+                ? 'font-bold text-alert'
+                : 'font-bold text-ink'
             }
           >
-            Keyakinan: {Math.round(classification.confidence * 100)}% (
-            {classification.confidence.toFixed(2)})
-            {classification.confidence < 0.5 ? ' — rendah' : ''}
+            Tingkat Keyakinan AI: {Math.round(classification.confidence * 100)}%
+            {classification.confidence < 0.5 ? ' — Perlu tinjauan tambahan' : ' — Akurat'}
           </p>
-          <p>Alasan: {classification.rationale}</p>
-          <p>
-            Classifier flags:{' '}
-            {classification.flags.length > 0 ? classification.flags.join(', ') : 'none'}
-          </p>
-          <p>
-            Hasil awal ini tetap disimpan apa adanya. Perubahan di bawah akan memperbarui
-            proporsi, volume, urgensi, dan flag terkonfirmasi.
+          <p className="text-xs font-medium text-ink/85">Catatan Analisis: {classification.rationale}</p>
+          {classification.flags.includes('hazardous_present') ? (
+            <p className="text-xs font-bold text-alert">
+              Perhatian: Terdeteksi potensi sampah berbahaya (B3). Pastikan tidak dicampur dengan sampah organik.
+            </p>
+          ) : null}
+          <p className="text-[11px] text-ink/70">
+            Anda dapat menyesuaikan takaran persentase dan volume secara bebas pada bagian di bawah ini.
           </p>
         </div>
       ) : null}

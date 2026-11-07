@@ -128,11 +128,20 @@ export default function MasukPage() {
         <p className="text-base font-medium text-ink/85">
           Kelola ritme pemilahan sampah berbasis sumber di lingkungan rumah tangga atau usaha Anda sesuai <strong>Pergub Bali No. 47 Tahun 2019</strong>.
         </p>
-        <div className="rounded-lg border-2 border-ink bg-sky/20 p-3 text-xs text-ink/85 flex items-start gap-2">
-          <MaterialIcon name="info" size="sm" className="text-primary mt-0.5 shrink-0" />
-          <span>
-            <strong>Bagi Petugas Armada DLHK / TPS3R:</strong> Semua pengguna masuk melalui portal Warga terlebih dahulu. Untuk membuka akses pengelolaan jadwal dan rute operasional, masuk ke menu <strong>Pengaturan Akun (/akun)</strong> dan lakukan otentikasi petugas di bagian paling bawah halaman.
-          </span>
+        <div className="rounded-xl border-2 border-ink bg-sky/25 p-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <MaterialIcon name="badge" size="sm" className="text-primary shrink-0" />
+            <span className="text-xs font-bold text-ink">
+              Apakah Anda petugas armada kebersihan DLHK atau TPS3R?
+            </span>
+          </div>
+          <Link
+            href="/masuk/petugas"
+            className="btn-tactile bg-sky text-ink px-3.5 py-1.5 text-xs font-black inline-flex items-center gap-1.5 border-2 border-ink shadow-[2px_2px_0_#1F2933]"
+          >
+            <MaterialIcon name="lock_person" size="sm" />
+            <span>Masuk sebagai Petugas</span>
+          </Link>
         </div>
 
         <div className="flex flex-wrap gap-2 pt-2">

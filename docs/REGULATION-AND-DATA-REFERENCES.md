@@ -1,6 +1,6 @@
 # Referensi Regulasi & Provenans Data Pengelolaan Sampah Bali / Denpasar
 
-Dokumen ini merangkum landasan regulasi daerah Provinsi Bali, statistik publik timbulan sampah Kota Denpasar, serta aturan provenans data yang digunakan dalam **Central Trash Agent**.
+Dokumen ini merangkum landasan regulasi daerah Provinsi Bali, statistik publik timbulan sampah Kota Denpasar, serta aturan provenans data yang digunakan dalam **Central Trash Agent Bali**.
 
 ---
 

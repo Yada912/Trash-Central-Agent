@@ -1,4 +1,4 @@
-# Central Trash Agent — Sistem Pengelolaan & Pengangkutan Sampah Terpadu Kota Denpasar
+# Central Trash Agent Bali — Sistem Pengelolaan & Pengangkutan Sampah Terpadu Provinsi Bali
 
 Platform web adaptif (*desktop & mobile*) yang menghubungkan **Warga** dan **Petugas DLHK Kota Denpasar** dalam satu alur kerja terpadu: mulai dari pencatatan profil timbulan sampah mingguan & lonjakan acara adat, pelaporan kondisi sampah melalui kamera/suara/takaran mudah, penyesuaian jadwal & toleransi (*leeway*) armada per kecamatan, hingga perencanaan rute pengangkutan deterministik (*Capacitated Vehicle Routing Problem*) dengan prinsip **manusia dalam kendali** (*human-in-the-loop*).
 

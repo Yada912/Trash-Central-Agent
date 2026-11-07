@@ -15,6 +15,7 @@ import {
   type BalineseEventCategory,
 } from '@/lib/calendar/balinese-calendar'
 import { computeResidentOptimization } from '@/lib/accounts/store'
+import { WargaAgentChat } from '@/components/warga/warga-agent-chat'
 
 export function WargaPortal() {
   const { activeAccount, isSignedIn, timetable, updateProfile, login } = useAccount()
@@ -249,7 +250,10 @@ export function WargaPortal() {
         ) : null}
       </section>
 
-      {/* 2. Personal Status Cards (Only what matters to this resident) */}
+      {/* 2. Interactive AI Agent Chat: Demand-Based Waste Reasoning */}
+      <WargaAgentChat />
+
+      {/* 3. Personal Status Cards (Only what matters to this resident) */}
       {optimization ? (
         <section className="grid gap-4 md:grid-cols-3" aria-label="Ringkasan Status Sampah Anda">
           <div className="vector-card bg-mint/45 p-4 grid gap-1">

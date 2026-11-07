@@ -1,4 +1,4 @@
-# Central Trash Agent — Spesifikasi Kontrak API & Domain (v1)
+# Central Trash Agent Bali — Spesifikasi Kontrak API & Domain (v1)
 
 Sumber kebenaran skema validasi berada di [`lib/schemas.ts`](../lib/schemas.ts) (Zod) dan jadwal mingguan di [`lib/schedule/index.ts`](../lib/schedule/index.ts). Seluruh endpoint REST API berada di bawah `app/api/` serta menerima dan mengembalikan format amplop JSON standar.
 

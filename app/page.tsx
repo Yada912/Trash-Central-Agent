@@ -117,10 +117,10 @@ export default function HomePage() {
         <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-center">
           <div className="grid gap-3">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              Central Trash Agent
+              Central Trash Agent Bali
             </h1>
             <p className="text-lg font-medium text-ink/85">
-              Platform pengelolaan sampah cerdas yang menghubungkan <strong>Warga & UMKM Kota Denpasar</strong> dengan <strong>Armada Petugas DLHK</strong>. Dilengkapi kalender jemputan interaktif, prediksi lonjakan sampah Hari Raya Bali, dan optimasi rute pengangkutan.
+              Platform pengelolaan sampah cerdas yang menghubungkan <strong>Warga &amp; UMKM Provinsi Bali</strong> dengan <strong>Armada Petugas DLHK &amp; TPS3R Desa</strong>. Dilengkapi asisten AI Kresna berbasis permintaan, kalender rahinan interaktif, dan optimasi rute pengangkutan desentralisasi.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link

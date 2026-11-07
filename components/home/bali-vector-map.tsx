@@ -44,7 +44,7 @@ export const BALI_REGIONS: BaliRegionData[] = [
     ruleNotice:
       'Pergub Bali No. 47/2019 & Perda Denpasar No. 8/2023: Pemilahan Wajib Berbasis Sumber. Sampah tanpa pilah ditunda penjemputannya oleh Swakelola Banjar.',
     description:
-      'Wilayah operasional utama Central Trash Agent. Terhubung langsung dengan 4 armada kecamatan, 26 TPS3R mandiri, dan 3 TPST sentral untuk pemrosesan kompos, RDF, dan daur ulang plastik.',
+      'Wilayah operasional utama Central Trash Agent Bali. Terhubung langsung dengan 4 armada kecamatan, 26 TPS3R mandiri, dan 3 TPST sentral untuk pemrosesan kompos, RDF, dan daur ulang plastik.',
     // Denpasar coastal polygon
     pathD: 'M 445 425 L 485 415 L 495 445 L 480 470 L 440 465 L 435 440 Z',
     center: [462, 442],

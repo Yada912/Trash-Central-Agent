@@ -6,7 +6,6 @@ import { ActionBar } from '@/components/report/ActionBar'
 import { ClassificationEditor } from '@/components/report/ClassificationEditor'
 import { ClassificationStatus } from '@/components/report/ClassificationStatus'
 import { ConfidenceAlert } from '@/components/report/ConfidenceAlert'
-import { DemoBadge } from '@/components/report/DemoBadge'
 import { DescriptionField } from '@/components/report/DescriptionField'
 import { ErrorNotice } from '@/components/report/ErrorNotice'
 import { HazardWarning } from '@/components/report/HazardWarning'
@@ -15,7 +14,6 @@ import { PhotoUploader } from '@/components/report/PhotoUploader'
 import { ResidentApproval } from '@/components/report/ResidentApproval'
 import {
   classifierHeading,
-  demoMockLabel,
   storedRecordLabel,
 } from '@/components/report/report-labels'
 import { HAZARDOUS_LABEL, isSeparateHazard } from '@/components/report/hazard-policy'
@@ -44,7 +42,6 @@ export function ReportFlow() {
     const hazardous = isSeparateHazard(flow.success.classification)
     return (
       <main id="main" className="grid gap-4">
-        <DemoBadge mode={flow.mode} />
         <section
           role="status"
           className="vector-card bg-mint/35 p-6 grid gap-3"
@@ -86,8 +83,6 @@ export function ReportFlow() {
       : flow.shown
         ? classifierHeading(flow.mode, flow.model)
         : 'Klasifikasi'
-  const qualityFlagWithoutPhoto =
-    flow.classifierFlags.includes('low_image_quality') && !flow.photo
 
   return (
     <main id="main" className="grid gap-6">
@@ -98,7 +93,6 @@ export function ReportFlow() {
               <MaterialIcon name="add_a_photo" size="sm" />
               Laporan warga
             </span>
-            <DemoBadge mode={flow.mode} />
           </div>
           {activeAccount ? (
             <Button variant="secondary" className="min-h-9 py-1 text-xs" onClick={applyProfileDefaults}>
@@ -193,7 +187,6 @@ export function ReportFlow() {
           <ClassificationStatus
             busy={flow.busy === 'classify'}
             heading={heading}
-            demoLabel={demoMockLabel(flow.mode)}
             notTrashReason={flow.notTrashReason}
             insufficient={flow.insufficient}
             classification={flow.shown}
@@ -204,20 +197,11 @@ export function ReportFlow() {
             textLength={flow.text.trim().length}
             hasImage={Boolean(flow.photo)}
           />
-          {qualityFlagWithoutPhoto ? (
-            <p className="text-sm">
-              Pengklasifikasi menyetel low_image_quality. Tidak ada foto yang dilampirkan,
-              sehingga tanda tersebut tidak dimasukkan ke klasifikasi terkonfirmasi.
-            </p>
-          ) : null}
         </>
       ) : null}
 
       {flow.hasDraft ? (
         <>
-          {demoMockLabel(flow.mode) ? (
-            <p className="text-sm font-semibold">{demoMockLabel(flow.mode)}</p>
-          ) : null}
           <ClassificationEditor
             percents={flow.percents}
             liters={flow.liters}
@@ -233,14 +217,15 @@ export function ReportFlow() {
             onChange={flow.setHazardChecked}
           />
           {flow.draft ? (
-            <p className="text-sm font-semibold">
-              Bendera terkonfirmasi:{' '}
-              {flow.draft.flags.length > 0 ? flow.draft.flags.join(', ') : 'none'}
-            </p>
+            <div className="rounded-xl border-2 border-ink bg-mint/40 px-3.5 py-2 text-xs font-black text-ink flex items-center gap-2 shadow-[2px_2px_0_#1F2933]">
+              <MaterialIcon name="check_circle" size="sm" className="text-primary" />
+              <span>Komposisi 100% tervalidasi dan siap untuk disetujui.</span>
+            </div>
           ) : (
-            <p className="text-sm font-semibold text-alert">
-              Keenam persentase harus berjumlah 100 sebelum flag terkonfirmasi dapat disimpan.
-            </p>
+            <div className="rounded-xl border-2 border-ink bg-coral/20 px-3.5 py-2 text-xs font-black text-alert flex items-center gap-2">
+              <MaterialIcon name="info" size="sm" />
+              <span>Jumlah seluruh persentase harus tepat 100% sebelum dapat disimpan.</span>
+            </div>
           )}
           <div className="vector-card bg-mint/40 p-5 grid gap-2">
             <h2 className="text-xl font-extrabold flex items-center gap-1.5">

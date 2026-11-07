@@ -1,4 +1,4 @@
-// Classification for Central Trash Agent.
+// Classification for Central Trash Agent Bali.
 //
 // Public contract expected by the scaffold:
 //   CLASSIFY_PROMPT

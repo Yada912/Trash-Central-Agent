@@ -5,11 +5,12 @@ import '@fontsource/inter/700.css'
 import './globals.css'
 import { AccountProvider } from '@/components/account/use-account'
 import { SiteHeader } from '@/components/site-header'
+import { SiteFooter } from '@/components/site-footer'
 
 export const metadata: Metadata = {
-  title: 'Central Trash Agent — Pengelolaan & Penjemputan Sampah Kota Denpasar',
+  title: 'Central Trash Agent Bali — Pengelolaan & Penjemputan Sampah Cerdas',
   description:
-    'Platform terpadu pelaporan kondisi sampah warga, profil timbulan rumah tangga/usaha, jadwal armada kecamatan, dan perencanaan rute pengangkutan Kota Denpasar.',
+    'Platform terpadu agen cerdas pelaporan sampah warga, profil timbulan rumah tangga/usaha, jadwal armada desentralisasi TPS3R, dan rute VRP di Provinsi Bali.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </a>
           <SiteHeader />
           <div className="mx-auto max-w-6xl px-4 py-6">{children}</div>
+          <SiteFooter />
         </AccountProvider>
       </body>
     </html>

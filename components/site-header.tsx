@@ -15,7 +15,6 @@ const WARGA_NAV_ITEMS: NavItem[] = [
   { href: '/warga', label: 'Dasbor Warga', icon: 'home' },
   { href: '/report', label: 'Lapor', icon: 'add_a_photo' },
   { href: '/schedule', label: 'Jadwal', icon: 'calendar_month' },
-  { href: '/akun', label: 'Profil & Akun', icon: 'account_circle' },
 ]
 
 const PETUGAS_NAV_ITEMS: NavItem[] = [
@@ -23,7 +22,6 @@ const PETUGAS_NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', label: 'Dasbor', icon: 'space_dashboard' },
   { href: '/planner', label: 'Perencana', icon: 'route' },
   { href: '/schedule', label: 'Jadwal', icon: 'calendar_month' },
-  { href: '/akun', label: 'Akun', icon: 'account_circle' },
 ]
 
 const GUEST_NAV_ITEMS: NavItem[] = [
@@ -51,7 +49,7 @@ export function SiteHeader() {
             <Link
               href="/"
               className="group flex items-center gap-3 rounded-md focus:outline-none"
-              aria-label="Central Trash Agent Beranda"
+              aria-label="Central Trash Agent Bali Beranda"
             >
               <div
                 data-testid="brand-logo-slot"
@@ -65,10 +63,10 @@ export function SiteHeader() {
               </div>
               <div>
                 <span className="block text-lg font-extrabold tracking-tight text-white">
-                  Central Trash Agent
+                  Central Trash Agent Bali
                 </span>
                 <span className="block text-xs font-medium text-white/75">
-                  Warga & Armada DLHK Kota Denpasar
+                  Warga &amp; Armada DLHK Provinsi Bali
                 </span>
               </div>
             </Link>
@@ -95,34 +93,25 @@ export function SiteHeader() {
             })}
           </nav>
 
-          {/* User Profile Pill & Account Settings (Single Account Context) */}
+          {/* User Profile Pill & Account Settings (Single Clear Destination) */}
           <div className="flex items-center gap-2 text-xs">
             {isSignedIn && activeAccount ? (
-              <>
-                <Link
-                  href="/akun"
-                  data-testid="header-user-profile-pill"
-                  className="flex items-center gap-1.5 rounded-lg border-2 border-white/60 bg-white/10 px-2.5 py-1.5 font-bold text-white hover:bg-white/20 transition-all"
-                  title="Lihat Profil & Pengaturan Akun"
-                >
-                  <MaterialIcon
-                    name={activeAccount.role === 'petugas' ? 'badge' : 'person'}
-                    size="sm"
-                    className={activeAccount.role === 'petugas' ? 'text-gold' : 'text-mint'}
-                  />
-                  <span className="max-w-[130px] truncate font-extrabold">{activeAccount.name}</span>
-                  <span className="rounded border border-white/40 bg-white/20 px-1 py-0.2 text-[10px] uppercase font-extrabold tracking-wider">
-                    {activeAccount.role === 'petugas' ? 'Petugas' : 'Warga'}
-                  </span>
-                </Link>
-                <Link
-                  href="/akun"
-                  className="inline-flex items-center gap-1 rounded-lg border-2 border-white bg-gold px-2.5 py-1.5 font-extrabold text-ink hover:bg-amber"
-                >
-                  <MaterialIcon name="settings" size="sm" />
-                  <span>Akun</span>
-                </Link>
-              </>
+              <Link
+                href="/akun"
+                data-testid="header-user-profile-pill"
+                className="flex items-center gap-1.5 rounded-lg border-2 border-white/60 bg-white/10 px-3 py-1.5 font-bold text-white hover:bg-white/20 transition-all shadow-[2px_2px_0_#000]"
+                title="Lihat Profil & Pengaturan Akun"
+              >
+                <MaterialIcon
+                  name={activeAccount.role === 'petugas' ? 'badge' : 'person'}
+                  size="sm"
+                  className={activeAccount.role === 'petugas' ? 'text-gold' : 'text-mint'}
+                />
+                <span className="max-w-[140px] truncate font-extrabold">{activeAccount.name}</span>
+                <span className="rounded border border-white/40 bg-white/20 px-1.5 py-0.5 text-[10px] uppercase font-extrabold tracking-wider">
+                  {activeAccount.role === 'petugas' ? 'Petugas' : 'Warga'}
+                </span>
+              </Link>
             ) : (
               <Link
                 href="/masuk"
@@ -141,7 +130,12 @@ export function SiteHeader() {
         aria-label="Navigasi Seluler"
         className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t-4 border-ink bg-card px-1 py-1.5 md:hidden"
       >
-        {navItems.map((item) => {
+        {[
+          ...navItems,
+          ...(isSignedIn && activeAccount
+            ? [{ href: '/akun', label: 'Profil', icon: 'account_circle' }]
+            : []),
+        ].map((item) => {
           const active = pathname === item.href
           return (
             <Link
