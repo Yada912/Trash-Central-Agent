@@ -23,6 +23,23 @@ describe('placeholder classifier', () => {
     expect(CLASSIFY_PROMPT.length).toBeGreaterThan(20)
   })
 
+  it('returns insufficient instead of inventing numbers for a short note without a photo', async () => {
+    delete process.env.GEMINI_API_KEY
+    const outcome = await classifyReport({ text: 'plastik' })
+    expect(outcome.kind).toBe('insufficient')
+    if (outcome.kind !== 'insufficient') return
+    expect(outcome.reason.length).toBeLessThanOrEqual(280)
+    expect(outcome.reason.toLowerCase()).toContain('demo output')
+    expect(outcome.missing).toEqual(['type', 'volume'])
+    const withPhoto = await classifyReport({
+      text: 'plastik',
+      image: { base64: 'YQ==', mimeType: 'image/jpeg' },
+    })
+    expect(withPhoto.kind).toBe('trash')
+    const tenChars = await classifyReport({ text: '0123456789' })
+    expect(tenChars.kind).not.toBe('insufficient')
+  })
+
   it('returns not_trash instead of inventing a waste type', async () => {
     delete process.env.GEMINI_API_KEY
     const outcome = await classifyReport({ text: 'Ini kucing peliharaan, bukan sampah' })

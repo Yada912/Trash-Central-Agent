@@ -10,6 +10,7 @@ import {
   TRASH_TYPES,
   volumeLabelFor,
   type Classification,
+  type InsufficientMissing,
   type ClassifyOutcome,
   type Report,
   type TrashType,
@@ -50,6 +51,7 @@ export function useReportFlow() {
   const [aiClassification, setAiClassification] = useState<Classification | null>(null)
   const [shown, setShown] = useState<Classification | null>(null)
   const [notTrashReason, setNotTrashReason] = useState<string | null>(null)
+  const [insufficient, setInsufficient] = useState<{ reason: string; missing: InsufficientMissing[] } | null>(null)
   const [percents, setPercents] = useState(EMPTY_PERCENTS)
   const [liters, setLiters] = useState('50')
   const [urgency, setUrgency] = useState<Urgency>('medium')
@@ -124,6 +126,8 @@ export function useReportFlow() {
   }
 
   function applyAi(classification: Classification) {
+    setNotTrashReason(null)
+    setInsufficient(null)
     setSource('ai')
     setAiClassification(classification)
     setShown(classification)
@@ -172,6 +176,14 @@ export function useReportFlow() {
       setMode(response.meta.mode)
       if (response.data.kind === 'not_trash') {
         setNotTrashReason(response.data.reason)
+        setInsufficient(null)
+        setSource(null)
+        setShown(null)
+        return
+      }
+      if (response.data.kind === 'insufficient') {
+        setInsufficient({ reason: response.data.reason, missing: response.data.missing })
+        setNotTrashReason(null)
         setSource(null)
         setShown(null)
         return
@@ -239,6 +251,7 @@ export function useReportFlow() {
     setAiClassification(null)
     setShown(null)
     setNotTrashReason(null)
+    setInsufficient(null)
     setPercents(EMPTY_PERCENTS())
     setLiters('50')
     setUrgency('medium')
@@ -259,6 +272,7 @@ export function useReportFlow() {
     clearPhoto,
     shown,
     notTrashReason,
+    insufficient,
     percents,
     liters,
     urgency,

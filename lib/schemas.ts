@@ -161,6 +161,10 @@ export function isHazardousClassification(classification: {
   return (hazardous?.share ?? 0) >= 0.2
 }
 
+export const INSUFFICIENT_MISSING = ['type', 'volume', 'location_context'] as const
+export const insufficientMissingSchema = z.enum(INSUFFICIENT_MISSING)
+export type InsufficientMissing = z.infer<typeof insufficientMissingSchema>
+
 export const classifyOutcomeSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('trash'),
@@ -170,6 +174,11 @@ export const classifyOutcomeSchema = z.discriminatedUnion('kind', [
     kind: z.literal('not_trash'),
     reason: z.string().min(1).max(280),
     confidence: z.number().min(0).max(1),
+  }),
+  z.object({
+    kind: z.literal('insufficient'),
+    reason: z.string().min(1).max(280),
+    missing: z.array(insufficientMissingSchema).min(1),
   }),
 ])
 export type ClassifyOutcome = z.infer<typeof classifyOutcomeSchema>

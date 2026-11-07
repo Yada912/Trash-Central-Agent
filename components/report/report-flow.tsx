@@ -64,9 +64,14 @@ export function ReportFlow() {
           ...(flow.error ? [{ label: 'Retry', onClick: flow.classify, disabled: !flow.canClassify, variant: 'secondary' as const }] : []),
         ]}
       />
-      {flow.notTrashReason || flow.shown ? (
+      {flow.notTrashReason || flow.insufficient || flow.shown ? (
         <>
-          <ClassificationStatus busy={flow.busy === 'classify'} notTrashReason={flow.notTrashReason} classification={flow.shown} />
+          <ClassificationStatus
+            busy={flow.busy === 'classify'}
+            notTrashReason={flow.notTrashReason}
+            insufficient={flow.insufficient}
+            classification={flow.shown}
+          />
           <ConfidenceAlert needsReview={Boolean(flow.draft?.needsReview)} reasons={flow.draft?.reviewReasons ?? []} />
         </>
       ) : null}

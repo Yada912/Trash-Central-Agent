@@ -14,6 +14,7 @@ import { z } from 'zod'
 import {
   classificationFlagSchema,
   classificationSchema,
+  insufficientMissingSchema,
   trashTypeSchema,
   urgencySchema,
   volumeLabelFor,
@@ -40,11 +41,18 @@ const modelOutcomeSchema = z.discriminatedUnion('kind', [
     reason: z.string().min(1).max(280),
     confidence: z.number().min(0).max(1),
   }),
+  z.object({
+    kind: z.literal('insufficient'),
+    reason: z.string().min(1).max(280),
+    missing: z.array(insufficientMissingSchema).min(1),
+  }),
 ])
 
 export const CLASSIFY_PROMPT = `You classify a resident's waste report in Denpasar.
-Return either kind "trash" with a classification, or kind "not_trash" when the text and photo are not waste.
-Do not invent a trash type for something that is not waste.
+Return kind "trash" with a classification when you can estimate the waste.
+Return kind "not_trash" only when the text and photo are not waste. Put the reason in your own words.
+Return kind "insufficient" when the input is too vague to estimate type or volume without inventing numbers. That is not a claim that there is no trash. List what is missing: type, volume, and/or location_context.
+Do not invent a trash type, a litre count, or a location.
 Shares are volume fractions from 0 to 1, at most 2 decimal places, sorted descending, summing to 1 within 0.01.
 Volume litres is an integer of at least 1. Label is small below 50 L, medium from 50 to 300 L, and large above 300 L.
 Set flag hazardous_present when hazardous material is visible or described.
@@ -68,7 +76,14 @@ function fail(code: 'TIMEOUT' | 'UPSTREAM' | 'RATE_LIMIT', message: string): Err
 }
 
 function mockClassify(input: ClassifyInput): ClassifyOutcome {
-  const text = input.text.toLowerCase()
+  const text = input.text.trim().toLowerCase()
+  if (text.length < 10 && !input.image) {
+    return {
+      kind: 'insufficient',
+      reason: 'Demo output: this note is too short to estimate the waste type or volume without guessing.',
+      missing: ['type', 'volume'],
+    }
+  }
   const wasteWord =
     /\b(sampah|limbah|trash|waste|plastik|plastic|organik|organic|kertas|paper|kardus|logam|metal|kaleng|baterai|battery|oli|medis|hazardous)\b/
   if (/\b(bukan sampah|bukan limbah|not trash|not waste)\b/.test(text) || (!wasteWord.test(text) && /\b(kucing|anjing|sepeda|cat|dog|bicycle)\b/.test(text))) {
@@ -151,7 +166,7 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutc
         repairNote = parsed.error.issues.map((issue) => issue.message).join('; ').slice(0, 500)
         continue
       }
-      if (parsed.data.kind === 'not_trash') return parsed.data
+      if (parsed.data.kind !== 'trash') return parsed.data
       const full = classificationSchema.safeParse({
         ...parsed.data.classification,
         source: 'gemini',

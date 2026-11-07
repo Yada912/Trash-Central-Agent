@@ -38,8 +38,9 @@ UI must show confidence; < 0.5 => prompt resident to check.
 
 ## Endpoints
 POST /api/reports/classify  { text: string(1–1000), image?: { base64, mimeType } } -> ClassifyOutcome   (budget 15 s)
-   ClassifyOutcome = { kind: 'trash', classification: Classification } | { kind: 'not_trash', reason: string /*≤280*/, confidence: number }
-   not_trash is a normal 200 result (no fabricated trash). UI tells the resident and offers manual entry; POST /api/reports always requires a full Classification.
+   ClassifyOutcome = { kind: 'trash', classification: Classification } | { kind: 'not_trash', reason: string /*≤280*/, confidence: number } | { kind: 'insufficient', reason: string /*≤280*/, missing: Array<'type'|'volume'|'location_context'> }
+   not_trash is a normal 200 result (no fabricated trash). insufficient means the input is too vague to estimate without inventing numbers; it is not a claim that there is no trash.
+   UI shows the returned reason for both, keeps the resident's text and photo, and offers manual entry. POST /api/reports always requires a full Classification.
    Module: classifyReport() returns ClassifyOutcome; it throws only for real failures (timeout/upstream/invalid model output).
 POST /api/reports           { text, lat, lng, image?, classification: Classification, aiClassification?: Classification } -> Report
    lat/lng must be inside the Denpasar bbox (-8.75..-8.57, 115.16..115.28) else VALIDATION.
