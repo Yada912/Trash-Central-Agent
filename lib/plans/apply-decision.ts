@@ -16,6 +16,36 @@ export type DecisionOutcome =
       fields?: Record<string, string[]>
     }
 
+function assignmentSummary(routes: Array<{ truckId: string; stopIds: string[] }>, unassigned: Array<{ id: string }>): string {
+  const routed = routes.map((route) => `${route.truckId}: ${route.stopIds.length > 0 ? route.stopIds.join(', ') : '(none)'}`).join('; ')
+  const waiting = unassigned.length > 0 ? `; unassigned: ${unassigned.map((item) => item.id).join(', ')}` : ''
+  return `${routed}${waiting}`
+}
+
+function logDecision(
+  plan: Plan,
+  body: DecisionRequest,
+  toStatus: Plan['status'],
+  extra?: { beforeAssignments?: string; afterAssignments?: string },
+  now?: string,
+): Plan['decisions'][number] {
+  const toVersion = plan.version + 1
+  const note = 'note' in body ? body.note : undefined
+  return {
+    action: body.action,
+    ...(note ? { note } : {}),
+    at: now ?? '',
+    version: toVersion,
+    actor: body.actor?.trim() || 'demo-officer',
+    fromStatus: plan.status,
+    toStatus,
+    fromVersion: plan.version,
+    toVersion,
+    ...(extra?.beforeAssignments ? { beforeAssignments: extra.beforeAssignments } : {}),
+    ...(extra?.afterAssignments ? { afterAssignments: extra.afterAssignments } : {}),
+  }
+}
+
 function violationLines(routes: Plan['result']['routes']): string[] {
   return routes.flatMap((route) =>
     route.feasible ? [] : route.violations.length > 0 ? route.violations.map((violation) => `${route.truckId}: ${violation}`) : [`${route.truckId}: infeasible`],
@@ -23,6 +53,14 @@ function violationLines(routes: Plan['result']['routes']): string[] {
 }
 
 export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionContext): DecisionOutcome {
+  if (body.expectedVersion !== plan.version) {
+    return {
+      ok: false,
+      httpStatus: 409,
+      code: 'CONFLICT',
+      message: 'Plan version does not match expectedVersion.',
+    }
+  }
   if (body.action === 'approve' || body.action === 'reject') {
     if (plan.status !== 'proposed' && plan.status !== 'edited_pending') {
       return {
@@ -44,7 +82,7 @@ export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionCo
         ...plan,
         status: 'rejected',
         version: nextVersion,
-        decisions: [...plan.decisions, { action: 'reject', note: body.note, at: ctx.now, version: nextVersion }],
+        decisions: [...plan.decisions, logDecision(plan, body, 'rejected', undefined, ctx.now)],
       },
     }
   }
@@ -60,6 +98,14 @@ export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionCo
         fields: { violations: lines.length > 0 ? lines : ['A route is infeasible.'] },
       }
     }
+    if (plan.explanation.stale) {
+      return {
+        ok: false,
+        httpStatus: 409,
+        code: 'CONFLICT',
+        message: 'explanation stale; re-explain first',
+      }
+    }
     const nextVersion = plan.version + 1
     const plannedReportIds = [...new Set(plan.result.routes.flatMap((route) => route.stopIds))]
     return {
@@ -70,10 +116,7 @@ export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionCo
         ...plan,
         status: 'approved',
         version: nextVersion,
-        decisions: [
-          ...plan.decisions,
-          { action: 'approve', ...(body.note ? { note: body.note } : {}), at: ctx.now, version: nextVersion },
-        ],
+        decisions: [...plan.decisions, logDecision(plan, body, 'approved', undefined, ctx.now)],
       },
     }
   }
@@ -141,6 +184,9 @@ export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionCo
   const nextVersion = plan.version + 1
   const releasedReportIds =
     plan.status === 'approved' ? [...new Set(plan.result.routes.flatMap((route) => route.stopIds))] : []
+  const beforeAssignments = assignmentSummary(plan.result.routes, plan.result.unassigned)
+  const afterUnassigned = plan.result.unassigned.filter((item) => item.id !== stopId)
+  const afterAssignments = assignmentSummary(routes, afterUnassigned)
   return {
     ok: true,
     plannedReportIds: [],
@@ -161,7 +207,7 @@ export function applyDecision(plan: Plan, body: DecisionRequest, ctx: DecisionCo
       explanation: { ...plan.explanation, stale: true },
       decisions: [
         ...plan.decisions,
-        { action: 'edit', ...(body.note ? { note: body.note } : {}), at: ctx.now, version: nextVersion },
+        logDecision(plan, body, 'edited_pending', { beforeAssignments, afterAssignments }, ctx.now),
       ],
     },
   }

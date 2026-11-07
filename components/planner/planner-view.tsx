@@ -269,7 +269,7 @@ export function PlannerView() {
                 {plan.decisions.map((decision, index) => (
                   <li key={`${decision.at}-${index}`} className="rounded-md border border-ink/10 bg-card px-3 py-2 text-sm">
                     <p>
-                      {decision.action} · version {decision.version}
+                      {decision.action} · version {decision.toVersion} · {decision.actor}
                     </p>
                     <time dateTime={decision.at}>{formatWita(decision.at)}</time>
                     {decision.note ? <p>{decision.note}</p> : null}

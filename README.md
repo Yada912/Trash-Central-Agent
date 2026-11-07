@@ -112,7 +112,7 @@ See `.env.example`. Do not commit real values.
 
 Apply `supabase/migrations/0001_init.sql`, then `pnpm seed:supabase`, if you use Supabase. Without both variables the app uses memory and needs no keys.
 
-In-memory data resets between serverless instances.
+In-memory data is not shared across processes or serverless instances. A report or plan saved on one instance is a 404 on another. Use Supabase when it must survive.
 
 ## API summary
 
@@ -170,7 +170,7 @@ No account. The app has no login.
 
 ## Known Limitations
 
-- The in-memory store resets between serverless instances, so a report saved on one instance can be missing on the next.
+- The default store is in memory and is not shared across processes or serverless instances. A report or plan created on one instance is a 404 on another, including `GET /api/plans/:id`. Reloading the planner works only on the same server process. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` when the data has to survive a new instance.
 - `lib/ai/*` and `lib/planner/*` are placeholders and will be replaced.
 - Routes use straight-line distance, not the road network. Shift time is a simple speed and service-time model.
 - Kecamatan for a new report is the nearest seeded demo point, not an official boundary.

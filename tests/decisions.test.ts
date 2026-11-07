@@ -74,7 +74,7 @@ describe('plan decisions', () => {
     const current = plan()
     current.result.routes[0].feasible = false
     current.result.routes[0].violations = ['over_capacity']
-    const outcome = applyDecision(current, { action: 'approve' }, { now: NOW, solveInput: input })
+    const outcome = applyDecision(current, { action: 'approve', expectedVersion: current.version }, { now: NOW, solveInput: input })
     expect(outcome.ok).toBe(false)
     if (!outcome.ok) {
       expect(outcome.httpStatus).toBe(409)
@@ -84,11 +84,25 @@ describe('plan decisions', () => {
   })
 
   it('requires a note to reject and logs the decision in WITA', () => {
-    const rejected = applyDecision(plan(), { action: 'reject', note: 'Crew is unavailable.' }, { now: NOW, solveInput: input })
+    const rejected = applyDecision(
+      plan(),
+      { action: 'reject', note: 'Crew is unavailable.', expectedVersion: 1, actor: 'officer-adi' },
+      { now: NOW, solveInput: input },
+    )
     expect(rejected.ok).toBe(true)
     if (rejected.ok) {
       expect(rejected.plan.status).toBe('rejected')
-      expect(rejected.plan.decisions[0]).toMatchObject({ action: 'reject', note: 'Crew is unavailable.', at: NOW, version: 2 })
+      expect(rejected.plan.decisions[0]).toMatchObject({
+        action: 'reject',
+        note: 'Crew is unavailable.',
+        at: NOW,
+        version: 2,
+        actor: 'officer-adi',
+        fromStatus: 'proposed',
+        toStatus: 'rejected',
+        fromVersion: 1,
+        toVersion: 2,
+      })
       expect(rejected.plan.decisions[0].at.endsWith('+08:00')).toBe(true)
     }
   })
@@ -97,7 +111,7 @@ describe('plan decisions', () => {
     const approved = plan({ status: 'approved', version: 2 })
     const edited = applyDecision(
       approved,
-      { action: 'edit', edits: { moveStop: { stopId: 'b', toTruckId: 't2' } } },
+      { action: 'edit', expectedVersion: 2, edits: { moveStop: { stopId: 'b', toTruckId: 't2' } } },
       { now: NOW, solveInput: input },
     )
     expect(edited.ok).toBe(true)
@@ -108,8 +122,31 @@ describe('plan decisions', () => {
     expect(edited.plan.result.routes.find((route) => route.truckId === 't1')?.stopIds).not.toContain('b')
     expect(edited.plan.result.routes.find((route) => route.truckId === 't2')?.stopIds).toContain('b')
     expect(edited.releasedReportIds).toEqual(['a', 'b'])
-    expect(edited.plan.decisions.at(-1)).toMatchObject({ action: 'edit', at: NOW, version: 3 })
-    const approvedAgain = applyDecision(edited.plan, { action: 'approve' }, { now: NOW, solveInput: input })
+    expect(edited.plan.decisions.at(-1)).toMatchObject({
+      action: 'edit',
+      at: NOW,
+      version: 3,
+      actor: 'demo-officer',
+      fromStatus: 'approved',
+      toStatus: 'edited_pending',
+      fromVersion: 2,
+      toVersion: 3,
+    })
+    expect(edited.plan.decisions.at(-1)?.beforeAssignments).toContain('t1: a, b')
+    expect(edited.plan.decisions.at(-1)?.afterAssignments).toContain('t2: b')
+    const stale = applyDecision(edited.plan, { action: 'approve', expectedVersion: edited.plan.version }, { now: NOW, solveInput: input })
+    expect(stale.ok).toBe(false)
+    if (!stale.ok) {
+      expect(stale.httpStatus).toBe(409)
+      expect(stale.code).toBe('CONFLICT')
+      expect(stale.message).toBe('explanation stale; re-explain first')
+    }
+    edited.plan.explanation = { ...edited.plan.explanation, stale: false }
+    const approvedAgain = applyDecision(
+      edited.plan,
+      { action: 'approve', expectedVersion: edited.plan.version },
+      { now: NOW, solveInput: input },
+    )
     expect(approvedAgain.ok).toBe(true)
     if (approvedAgain.ok) expect(approvedAgain.plan.status).toBe('approved')
   })
@@ -117,15 +154,28 @@ describe('plan decisions', () => {
   it('does not place a hazardous stop on an ordinary truck', () => {
     const outcome = applyDecision(
       plan(),
-      { action: 'edit', edits: { moveStop: { stopId: 'haz', toTruckId: 't2' } } },
+      { action: 'edit', expectedVersion: 1, edits: { moveStop: { stopId: 'haz', toTruckId: 't2' } } },
       { now: NOW, solveInput: input },
     )
     expect(outcome.ok).toBe(false)
     if (!outcome.ok) expect(outcome.fields?.violations).toContain('hazardous_separate')
   })
 
+  it('refuses a decision when expectedVersion is stale', () => {
+    const outcome = applyDecision(plan(), { action: 'approve', expectedVersion: 9 }, { now: NOW, solveInput: input })
+    expect(outcome.ok).toBe(false)
+    if (!outcome.ok) {
+      expect(outcome.httpStatus).toBe(409)
+      expect(outcome.code).toBe('CONFLICT')
+    }
+  })
+
   it('refuses approval of a rejected plan', () => {
-    const outcome = applyDecision(plan({ status: 'rejected' }), { action: 'approve' }, { now: NOW, solveInput: input })
+    const outcome = applyDecision(
+      plan({ status: 'rejected' }),
+      { action: 'approve', expectedVersion: 1 },
+      { now: NOW, solveInput: input },
+    )
     expect(outcome.ok).toBe(false)
   })
 })

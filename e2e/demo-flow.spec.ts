@@ -40,7 +40,8 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   const reportLine = await page.getByText(/^Report rpt_/).textContent()
   const reportId = reportLine?.replace('Report ', '').trim() ?? ''
   expect(reportId).toMatch(/^rpt_/)
-  await expect(page.getByText('Not demo data')).toBeVisible()
+  await expect(page.getByText('Demo data')).toBeVisible()
+  await expect(page.getByText('Not demo data')).toHaveCount(0)
   await shot(page, '01-report')
 
   await page.getByRole('link', { name: 'View the dashboard' }).click()

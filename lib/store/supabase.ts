@@ -111,10 +111,21 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
       if (error) throw new Error(error.message)
       return data ? toReport(data as ReportRow) : null
     },
-    async createReport(report) {
-      const { error } = await client.from('reports').insert(toReportRow(report))
+    async createReport(report, idempotencyKey) {
+      if (idempotencyKey) {
+        const existing = await client.from('reports').select('*').eq('client_request_id', idempotencyKey).maybeSingle()
+        if (existing.error) throw new Error(existing.error.message)
+        if (existing.data) return { report: toReport(existing.data as ReportRow), created: false }
+      }
+      const row = { ...toReportRow(report), ...(idempotencyKey ? { client_request_id: idempotencyKey } : {}) }
+      const { error } = await client.from('reports').insert(row)
+      if (error && idempotencyKey && error.code === '23505') {
+        const again = await client.from('reports').select('*').eq('client_request_id', idempotencyKey).maybeSingle()
+        if (again.error) throw new Error(again.error.message)
+        if (again.data) return { report: toReport(again.data as ReportRow), created: false }
+      }
       if (error) throw new Error(error.message)
-      return report
+      return { report, created: true }
     },
     async updateReport(id, patch) {
       const existing = await this.getReport(id)

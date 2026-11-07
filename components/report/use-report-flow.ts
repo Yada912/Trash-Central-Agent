@@ -44,6 +44,7 @@ function sharesToPercents(classification: Classification): Record<TrashType, num
 
 export function useReportFlow() {
   const lock = useRef(false)
+  const clientRequestId = useRef(crypto.randomUUID())
   const [text, setText] = useState('')
   const [photo, setPhoto] = useState<{ base64: string; mimeType: 'image/jpeg'; previewUrl: string } | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
@@ -225,10 +226,12 @@ export function useReportFlow() {
     try {
       const response = await requestJson<Report>('/api/reports', {
         method: 'POST',
+        headers: { 'Idempotency-Key': clientRequestId.current },
         body: {
           text: text.trim(),
           lat: latNumber,
           lng: lngNumber,
+          clientRequestId: clientRequestId.current,
           ...(photo ? { image: { base64: photo.base64, mimeType: photo.mimeType } } : {}),
           classification,
           ...(source === 'ai' && aiClassification ? { aiClassification } : {}),
@@ -245,6 +248,7 @@ export function useReportFlow() {
   }
 
   function reset() {
+    clientRequestId.current = crypto.randomUUID()
     clearPhoto()
     setText('')
     setSource(null)

@@ -115,8 +115,8 @@ export function usePlanner() {
       return
     }
     const crewCount = Number(crews)
-    if (!Number.isInteger(crewCount) || crewCount < 0) {
-      setFormError('Crews must be a whole number, zero or more.')
+    if (!Number.isInteger(crewCount) || crewCount < 1) {
+      setFormError('Crews must be a whole number of at least 1.')
       return
     }
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(shiftStart) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(shiftEnd) || shiftEnd <= shiftStart) {
@@ -157,16 +157,21 @@ export function usePlanner() {
     runPlan,
     approve: () => {
       if (!plan) return
-      void run('approve', `/api/plans/${plan.id}/decision`, { action: 'approve' })
+      void run('approve', `/api/plans/${plan.id}/decision`, { action: 'approve', expectedVersion: plan.version })
     },
     reject: () => {
       if (!plan || note.trim().length === 0) return
-      void run('reject', `/api/plans/${plan.id}/decision`, { action: 'reject', note: note.trim() })
+      void run('reject', `/api/plans/${plan.id}/decision`, {
+        action: 'reject',
+        note: note.trim(),
+        expectedVersion: plan.version,
+      })
     },
     edit: () => {
       if (!plan || !moveStopId || !moveTruckId) return
       void run('edit', `/api/plans/${plan.id}/decision`, {
         action: 'edit',
+        expectedVersion: plan.version,
         edits: { moveStop: { stopId: moveStopId, toTruckId: moveTruckId } },
       })
     },

@@ -9,7 +9,7 @@ export type ReportQuery = {
 export interface Store {
   listReports(query?: ReportQuery): Promise<Report[]>
   getReport(id: string): Promise<Report | null>
-  createReport(report: Report): Promise<Report>
+  createReport(report: Report, idempotencyKey?: string): Promise<{ report: Report; created: boolean }>
   updateReport(id: string, patch: Partial<Pick<Report, 'status'>>): Promise<Report | null>
   listFacilities(): Promise<Facility[]>
   getPlan(id: string): Promise<Plan | null>

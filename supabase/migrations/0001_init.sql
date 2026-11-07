@@ -15,7 +15,8 @@ create table if not exists reports (
   edited boolean not null default false,
   status text not null,
   provenance text,
-  estimated_weight_kg double precision
+  estimated_weight_kg double precision,
+  client_request_id text unique
 );
 
 create index if not exists reports_kecamatan_idx on reports (kecamatan);

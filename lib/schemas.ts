@@ -198,6 +198,11 @@ export const classifyRequestSchema = z
   .strict()
 export type ClassifyRequest = z.infer<typeof classifyRequestSchema>
 
+/**
+ * POST /api/reports idempotency: send header `Idempotency-Key` and/or `clientRequestId`.
+ * The header wins when both are present. A repeat of the same key returns the original report id
+ * and does not create another row. Omitting both creates a new report every time.
+ */
 export const createReportSchema = z
   .object({
     text: z.string().trim().min(1).max(1000),
@@ -206,6 +211,7 @@ export const createReportSchema = z
     image: imageSchema.optional(),
     classification: classificationSchema,
     aiClassification: classificationSchema.optional(),
+    clientRequestId: z.string().trim().min(8).max(200).optional(),
   })
   .strict()
 export type CreateReportInput = z.infer<typeof createReportSchema>
@@ -291,7 +297,7 @@ export const planRequestSchema = z
           .strict(),
       )
       .min(1),
-    crews: z.number().int().min(0),
+    crews: z.number().int().min(1),
     shift: z
       .object({
         start: clockSchema,
@@ -349,11 +355,23 @@ export const explanationSchema = z.object({
 })
 export type Explanation = z.infer<typeof explanationSchema>
 
+/**
+ * Decision requests must send `expectedVersion` equal to the plan version the officer is looking at.
+ * A mismatch is 409 CONFLICT. `actor` defaults to demo-officer when omitted.
+ * Stored entries record actor, from/to status, from/to version, and, for edits, assignment summaries.
+ */
 export const decisionEntrySchema = z.object({
   action: z.enum(['approve', 'reject', 'edit']),
   note: z.string().optional(),
   at: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+08:00$/),
   version: z.number().int().positive(),
+  actor: z.string().min(1),
+  fromStatus: planStatusSchema,
+  toStatus: planStatusSchema,
+  fromVersion: z.number().int().positive(),
+  toVersion: z.number().int().positive(),
+  beforeAssignments: z.string().optional(),
+  afterAssignments: z.string().optional(),
 })
 export type DecisionEntry = z.infer<typeof decisionEntrySchema>
 
@@ -368,13 +386,32 @@ export const planSchema = z.object({
 })
 export type Plan = z.infer<typeof planSchema>
 
+const decisionActor = z.string().trim().min(1).max(120).optional()
+const decisionExpectedVersion = z.number().int().positive()
+
 export const decisionRequestSchema = z.discriminatedUnion('action', [
-  z.object({ action: z.literal('approve'), note: z.string().trim().min(1).optional() }).strict(),
-  z.object({ action: z.literal('reject'), note: z.string().trim().min(1) }).strict(),
+  z
+    .object({
+      action: z.literal('approve'),
+      note: z.string().trim().min(1).optional(),
+      actor: decisionActor,
+      expectedVersion: decisionExpectedVersion,
+    })
+    .strict(),
+  z
+    .object({
+      action: z.literal('reject'),
+      note: z.string().trim().min(1),
+      actor: decisionActor,
+      expectedVersion: decisionExpectedVersion,
+    })
+    .strict(),
   z
     .object({
       action: z.literal('edit'),
       note: z.string().trim().min(1).optional(),
+      actor: decisionActor,
+      expectedVersion: decisionExpectedVersion,
       edits: z
         .object({
           moveStop: z

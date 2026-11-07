@@ -26,7 +26,7 @@ export function ReportFlow() {
         <section role="status" className="grid gap-3 rounded-lg border border-ink/10 bg-card p-4">
           <h1 className="text-2xl font-semibold">Report submitted</h1>
           <p>Report {flow.success.id}</p>
-          <p>{flow.success.isDemo ? 'Demo data' : 'Not demo data'}</p>
+          <p>{flow.mode === 'demo' || flow.success.isDemo ? 'Demo data' : 'Not demo data'}</p>
           {hazardous ? (
             <p>
               {HAZARDOUS_HANDLING_TEXT} <span className="font-semibold">{HAZARDOUS_DEMO_TEXT}</span>

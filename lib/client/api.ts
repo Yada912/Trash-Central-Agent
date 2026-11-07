@@ -23,11 +23,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-export async function requestJson<T>(path: string, init?: { method?: string; body?: unknown }): Promise<{ data: T; meta: ApiMeta }> {
+export async function requestJson<T>(
+  path: string,
+  init?: { method?: string; body?: unknown; headers?: Record<string, string> },
+): Promise<{ data: T; meta: ApiMeta }> {
   const response = await fetch(path, {
     method: init?.method ?? (init?.body === undefined ? 'GET' : 'POST'),
     headers: {
       accept: 'application/json',
+      ...(init?.headers ?? {}),
       ...(init?.body === undefined ? {} : { 'content-type': 'application/json' }),
     },
     body: init?.body === undefined ? undefined : JSON.stringify(init.body),

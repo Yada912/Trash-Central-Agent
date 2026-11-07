@@ -86,7 +86,14 @@ describe('schemas', () => {
     ).toBe(false)
     expect(explainRequestSchema.safeParse({}).success).toBe(true)
     expect(explainRequestSchema.safeParse({ extra: true }).success).toBe(false)
-    expect(decisionRequestSchema.safeParse({ action: 'reject' }).success).toBe(false)
-    expect(decisionRequestSchema.safeParse({ action: 'reject', note: 'The shift is too short.' }).success).toBe(true)
+    expect(decisionRequestSchema.safeParse({ action: 'reject', note: 'The shift is too short.' }).success).toBe(false)
+    expect(decisionRequestSchema.safeParse({ action: 'reject', note: 'The shift is too short.', expectedVersion: 1 }).success).toBe(true)
+    expect(
+      planRequestSchema.safeParse({
+        trucks: [{ id: 'a', capacityLiters: 10 }],
+        crews: 0,
+        shift: { start: '06:00', end: '07:00' },
+      }).success,
+    ).toBe(false)
   })
 })
