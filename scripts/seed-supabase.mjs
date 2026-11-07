@@ -89,15 +89,60 @@ const facilities = JSON.parse(readFileSync(join(root, 'data/facilities.json'), '
   verified: facility.verified,
 }))
 
+const accounts = JSON.parse(readFileSync(join(root, 'data/accounts.json'), 'utf8')).map((acc) => ({
+  id: acc.id,
+  name: acc.name,
+  email: acc.email,
+  password: acc.password,
+  role: acc.role,
+  badge_id: acc.badgeId ?? null,
+  kecamatan: acc.kecamatan,
+  desa: acc.desa,
+  banjar_name: acc.banjarName ?? null,
+  tps3r_node: acc.tps3rNode ?? null,
+  birth_date: acc.birthDate ?? null,
+  address: acc.address,
+  lat: acc.lat ?? -8.6562,
+  lng: acc.lng ?? 115.2124,
+  account_type: acc.accountType ?? 'household',
+  waste_profile: acc.wasteProfile ?? null,
+}))
+
+const timetableSlots = JSON.parse(readFileSync(join(root, 'data/timetable.json'), 'utf8')).map((slot) => ({
+  id: slot.id,
+  kecamatan: slot.kecamatan,
+  stream: slot.stream,
+  days: slot.days,
+  window_start: slot.windowStart,
+  window_end: slot.windowEnd,
+  leeway_minutes: slot.leewayMinutes,
+  surge_tolerance_pct: slot.surgeTolerancePct,
+  max_liters_per_pickup: slot.maxLitersPerPickup,
+  notes: slot.notes ?? null,
+}))
+
 const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
+
 const facilityResult = await client.from('facilities').upsert(facilities)
 if (facilityResult.error) {
   console.error(`Facility seed failed: ${facilityResult.error.message}`)
   process.exit(1)
 }
+
 const reportResult = await client.from('reports').upsert(reports)
 if (reportResult.error) {
   console.error(`Report seed failed: ${reportResult.error.message}`)
   process.exit(1)
 }
-console.log(`Seeded ${facilities.length} facilities and ${reports.length} reports.`)
+
+const accountResult = await client.from('accounts').upsert(accounts)
+if (accountResult.error) {
+  console.warn(`Account seed note (migration 0006): ${accountResult.error.message}`)
+}
+
+const timetableResult = await client.from('timetable_slots').upsert(timetableSlots)
+if (timetableResult.error) {
+  console.warn(`Timetable seed note (migration 0006): ${timetableResult.error.message}`)
+}
+
+console.log(`Seeded ${facilities.length} facilities, ${reports.length} reports, ${accounts.length} accounts, and ${timetableSlots.length} timetable slots.`)

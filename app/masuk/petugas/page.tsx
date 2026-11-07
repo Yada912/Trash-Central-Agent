@@ -26,7 +26,7 @@ export default function MasukPetugasPage() {
     setBusy(false)
 
     if (!authed) {
-      setError('Otentikasi gagal. Pastikan email kedinasan dan kata sandi Anda terdaftar di sistem DLHK.')
+      setError('Otentikasi gagal. Pastikan email petugas dan kata sandi Anda terdaftar di sistem.')
       return
     }
 
@@ -44,7 +44,7 @@ export default function MasukPetugasPage() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-ink pb-3">
           <span className="vector-pill bg-lavender text-ink font-extrabold flex items-center gap-1.5">
             <MaterialIcon name="badge" size="sm" />
-            Portal Petugas DLHK Kota Denpasar
+            Portal Petugas Armada Denpasar
           </span>
           <Link
             href="/masuk"
@@ -60,7 +60,7 @@ export default function MasukPetugasPage() {
             Masuk sebagai Petugas Operasional
           </h1>
           <p className="text-sm text-ink/80 leading-relaxed">
-            Halaman otentikasi khusus pengemudi armada, operator cikar swakelola TPS3R, dan koordinator pengangkutan DLHK Kota Denpasar.
+            Halaman otentikasi khusus pengemudi armada, operator cikar swakelola TPS3R, dan koordinator pengangkutan sampah Kota Denpasar.
           </p>
         </div>
 
@@ -92,14 +92,14 @@ export default function MasukPetugasPage() {
         <form onSubmit={handleLogin} className="grid gap-3.5">
           <div className="grid gap-1">
             <Label htmlFor="petugas-input-email" className="text-xs font-extrabold uppercase text-ink">
-              Email Kedinasan Petugas
+              Email Akun Petugas
             </Label>
             <Input
               id="petugas-input-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nama@dlhk.denpasar.id"
+              placeholder="contoh: nama.petugas@armada.id"
               required
             />
           </div>
@@ -170,14 +170,13 @@ export default function MasukPetugasPage() {
         <div className="rounded-xl border-2 border-ink bg-bg p-3.5 text-xs text-ink font-semibold grid gap-1">
           <p className="font-black flex items-center gap-1 text-ink">
             <MaterialIcon name="shield" size="sm" className="text-primary" />
-            Perlindungan Data Kedinasan
+            Perlindungan Sesi Operasional Armada
           </p>
           <p className="text-ink/90 font-medium">
-            Akses portal petugas mencakup penetapan toleransi leeway armada, rute penjemputan VRP, dan data TPS3R kecamatan sesuai regulasi DLHK Kota Denpasar.
+            Akses portal petugas mencakup penetapan toleransi leeway armada, rute penjemputan VRP, dan data TPS3R kecamatan (simulasi operasional armada untuk wilayah Kota Denpasar).
           </p>
         </div>
       </section>
     </main>
   )
 }
-

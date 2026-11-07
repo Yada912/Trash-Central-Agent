@@ -1,0 +1,210 @@
+[
+  {
+    "id": "usr_warga_01",
+    "name": "I Made Adi Wijaya",
+    "email": "made.adi@warga.denpasar.id",
+    "password": "warga123",
+    "role": "warga",
+    "kecamatan": "Denpasar Barat",
+    "desa": "Pemecutan",
+    "banjarName": "Banjar Pekambingan",
+    "tps3rNode": "TPS3R Pemecutan (Desa Berbasis Sumber)",
+    "birthDate": "1996-05-14",
+    "address": "Jl. Hasanuddin Gang IV No. 12, Banjar Pekambingan",
+    "lat": -8.6562,
+    "lng": 115.2124,
+    "accountType": "household",
+    "wasteProfile": {
+      "currentCondition": "menumpuk",
+      "conditionNote": "Tumpukan sisa canang, daun halaman, dan kemasan plastik dapur selama 3 hari terakhir.",
+      "weeklyRegularLiters": 105,
+      "containerPreset": "kantong_15l",
+      "householdMembers": 5,
+      "sortingReadiness": "sebagian",
+      "compositionPct": {
+        "organic": 60,
+        "plastic": 20,
+        "paper": 10,
+        "metal": 2,
+        "residual": 8,
+        "hazardous": 0
+      },
+      "selectedBalineseEventIds": ["bali_galungan", "bali_kuningan", "bali_nyepi", "bali_sarawati", "bali_pagerwesi"],
+      "specialEvents": [
+        {
+          "id": "evt_galungan",
+          "name": "Hari Raya Galungan & Kuningan / Penampahan",
+          "frequency": "Setiap 210 hari (aktif bulan ini)",
+          "extraLiters": 60,
+          "dominantStream": "organik",
+          "activeThisWeek": true,
+          "notes": "Lonjakan janur, sampian, canang sari, daun pisang, dan sisa olahan dapur."
+        },
+        {
+          "id": "evt_akhir_pekan",
+          "name": "Kumpul Keluarga Akhir Pekan",
+          "frequency": "Mingguan (Sabtu–Minggu)",
+          "extraLiters": 30,
+          "dominantStream": "anorganik",
+          "activeThisWeek": false,
+          "notes": "Tambahan botol plastik, kardus makanan, dan kaleng minuman."
+        }
+      ],
+      "pickupHistory": [
+        {
+          "id": "pkp_past_01",
+          "date": "2026-11-02",
+          "window": "06:00–09:00 WITA",
+          "stream": "organik",
+          "liters": 30,
+          "containersLabel": "2 Kantong Kresek",
+          "status": "completed",
+          "notes": "Diangkut tepat waktu oleh Armada Kompos Swakelola Barat-01."
+        },
+        {
+          "id": "pkp_past_02",
+          "date": "2026-11-03",
+          "window": "08:00–11:30 WITA",
+          "stream": "anorganik",
+          "liters": 30,
+          "containersLabel": "2 Kantong Kresek",
+          "status": "completed",
+          "notes": "Botol plastik & kardus terpilah disalurkan ke Bank Sampah Banjar."
+        },
+        {
+          "id": "pkp_past_03",
+          "date": "2026-11-04",
+          "window": "06:00–09:00 WITA",
+          "stream": "organik",
+          "liters": 60,
+          "containersLabel": "4 Kantong Kresek",
+          "status": "completed",
+          "notes": "Lonjakan Galungan (janur & daun pisang) terangkut dalam batas leeway."
+        },
+        {
+          "id": "pkp_past_04",
+          "date": "2026-11-05",
+          "window": "06:00–09:00 WITA",
+          "stream": "organik",
+          "liters": 45,
+          "containersLabel": "3 Kantong Kresek",
+          "status": "completed",
+          "notes": "Sisa lungsuran Umanis Galungan selesai diangkut ke TPS3R Pemecutan."
+        },
+        {
+          "id": "pkp_next_01",
+          "date": "2026-11-09",
+          "window": "06:00–09:00 WITA",
+          "stream": "organik",
+          "liters": 45,
+          "containersLabel": "3 Kantong Kresek",
+          "status": "scheduled",
+          "notes": "Bertepatan dengan Tilem Sasih Kelima — siapkan kantong canang sebelum 06:00 WITA."
+        },
+        {
+          "id": "pkp_next_02",
+          "date": "2026-11-10",
+          "window": "08:00–11:30 WITA",
+          "stream": "anorganik",
+          "liters": 30,
+          "containersLabel": "2 Kantong Kresek",
+          "status": "scheduled",
+          "notes": "Penjemputan rutin anorganik Bank Sampah (plastik, kertas, kaleng)."
+        },
+        {
+          "id": "pkp_next_03",
+          "date": "2026-11-12",
+          "window": "06:00–09:00 WITA",
+          "stream": "organik",
+          "liters": 60,
+          "containersLabel": "4 Kantong Kresek",
+          "status": "scheduled",
+          "notes": "Penjemputan organik Kamis rutin TPS3R Pemecutan."
+        }
+      ]
+    }
+  },
+  {
+    "id": "usr_warga_02",
+    "name": "Ni Luh Putu Sari (Warung Sari Sanur)",
+    "email": "putu.sari@umkm.denpasar.id",
+    "password": "warga123",
+    "role": "warga",
+    "kecamatan": "Denpasar Selatan",
+    "desa": "Sanur",
+    "banjarName": "Banjar Intaran",
+    "tps3rNode": "TPS3R Sanur Kauh",
+    "birthDate": "1991-08-22",
+    "address": "Jl. Danau Tamblingan No. 48, Sanur",
+    "lat": -8.6915,
+    "lng": 115.2623,
+    "accountType": "company",
+    "wasteProfile": {
+      "currentCondition": "terkendali",
+      "conditionNote": "Sampah dapur warung sudah dipisah antara sisa makanan organik dan botol plastik.",
+      "weeklyRegularLiters": 350,
+      "containerPreset": "karung_50l",
+      "householdMembers": 8,
+      "sortingReadiness": "sudah_dipilah",
+      "compositionPct": {
+        "organic": 65,
+        "plastic": 22,
+        "paper": 6,
+        "metal": 2,
+        "residual": 5,
+        "hazardous": 0
+      },
+      "selectedBalineseEventIds": ["bali_galungan", "bali_kuningan", "bali_purnama_keenam"],
+      "specialEvents": [
+        {
+          "id": "evt_libur_panjang",
+          "name": "Akhir Pekan & Libur Wisatawan",
+          "frequency": "Jumat–Minggu",
+          "extraLiters": 150,
+          "dominantStream": "organik",
+          "activeThisWeek": true,
+          "notes": "Kenaikan pelanggan warung meningkatkan sisa makanan dan botol PET."
+        }
+      ],
+      "pickupHistory": [
+        {
+          "id": "pkp_umkm_01",
+          "date": "2026-11-04",
+          "window": "06:30–09:30 WITA",
+          "stream": "organik",
+          "liters": 100,
+          "containersLabel": "2 Karung Besar",
+          "status": "completed",
+          "notes": "Diangkut Cikar TPS3R Sanur-02."
+        },
+        {
+          "id": "pkp_umkm_02",
+          "date": "2026-11-09",
+          "window": "06:30–09:30 WITA",
+          "stream": "organik",
+          "liters": 100,
+          "containersLabel": "2 Karung Besar",
+          "status": "scheduled",
+          "notes": "Penjemputan pagi koridor Danau Tamblingan."
+        }
+      ]
+    }
+  },
+  {
+    "id": "usr_petugas_01",
+    "name": "I Wayan Gde Surya Wirawan",
+    "email": "surya.wirawan@dlhk.denpasar.id",
+    "password": "petugas123",
+    "role": "petugas",
+    "badgeId": "DLHK-DPS-042",
+    "kecamatan": "Denpasar Barat",
+    "desa": "Dauh Puri",
+    "banjarName": "Pos Koordinasi DLHK Denpasar",
+    "tps3rNode": "Sentra Koordinasi TPST & TPS3R Kota Denpasar",
+    "address": "Pos Koordinasi Armada DLHK Kota Denpasar",
+    "lat": -8.6595,
+    "lng": 115.2165,
+    "accountType": "company"
+  }
+]
+

@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import {
   computeResidentOptimization,
   getActiveAccount,
+  getRawAccount,
   listTimetableSlots,
   updateAccountProfile,
 } from '@/lib/accounts/store'
+import { syncAccountToSupabase } from '@/lib/accounts/supabase-sync'
 import { processResidentAgentChat } from '@/lib/ai/agent-chat'
 import { checkRateLimit, clientIpFromRequest } from '@/lib/security/guard'
 
@@ -58,6 +60,9 @@ export async function POST(request: Request) {
       wasteProfile: chatResult.updatedProfile,
     }) ?? active
 
+  const raw = getRawAccount(active.id)
+  if (raw) void syncAccountToSupabase(raw)
+
   const updatedOptimization = computeResidentOptimization(updatedAccount, timetable)
 
   return NextResponse.json({
@@ -70,4 +75,3 @@ export async function POST(request: Request) {
     },
   })
 }
-

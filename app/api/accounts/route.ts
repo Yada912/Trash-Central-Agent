@@ -4,20 +4,41 @@ import {
   computeResidentOptimization,
   createAccount,
   getActiveAccount,
+  getRawAccount,
   listAccounts,
   listTimetableSlots,
+  loadExternalAccounts,
+  loadExternalTimetable,
   setActiveAccountId,
   updateAccountProfile,
   updateTimetableSlot,
   type ResidentWasteProfile,
   type UserRole,
 } from '@/lib/accounts/store'
+import {
+  fetchAccountsFromSupabase,
+  fetchTimetableFromSupabase,
+  syncAccountToSupabase,
+  syncTimetableToSupabase,
+} from '@/lib/accounts/supabase-sync'
 import { checkRateLimit, clientIpFromRequest, redactPiiFromText } from '@/lib/security/guard'
 import { KECAMATAN, type AccountType, type Kecamatan } from '@/lib/schemas'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const accountId = url.searchParams.get('accountId')
+
+  const [extAccounts, extTimetable] = await Promise.all([
+    fetchAccountsFromSupabase(),
+    fetchTimetableFromSupabase(),
+  ])
+  if (extAccounts && extAccounts.length > 0) {
+    loadExternalAccounts(extAccounts)
+  }
+  if (extTimetable && extTimetable.length > 0) {
+    loadExternalTimetable(extTimetable)
+  }
+
   const accounts = listAccounts()
   const active = getActiveAccount(accountId)
   const timetable = listTimetableSlots()
@@ -118,6 +139,8 @@ export async function POST(request: Request) {
     if (!updated) {
       return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Akun tidak ditemukan.' } }, { status: 404 })
     }
+    const raw = getRawAccount(body.accountId)
+    if (raw) void syncAccountToSupabase(raw)
   } else if (body.action === 'create_account' && body.newAccount) {
     const { name, email, password, role, kecamatan, desa, banjarName, tps3rNode, birthDate, address, accountType } =
       body.newAccount
@@ -141,7 +164,7 @@ export async function POST(request: Request) {
         { status: 409 },
       )
     }
-    createAccount({
+    const created = createAccount({
       name,
       email: trimmedEmail,
       password,
@@ -155,6 +178,8 @@ export async function POST(request: Request) {
       accountType,
       wasteProfile: body.newAccount?.wasteProfile,
     })
+    const raw = getRawAccount(created.id)
+    if (raw) void syncAccountToSupabase(raw)
   } else if (body.action === 'update_timetable' && body.timetablePatch?.slotId) {
     const currentActor = getActiveAccount(body.accountId)
     if (currentActor.role !== 'petugas') {
@@ -168,6 +193,7 @@ export async function POST(request: Request) {
     if (!updatedSlot) {
       return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Slot jadwal tidak ditemukan.' } }, { status: 404 })
     }
+    void syncTimetableToSupabase(updatedSlot)
   } else {
     return NextResponse.json({ error: { code: 'VALIDATION', message: 'Tindakan akun tidak valid.' } }, { status: 400 })
   }

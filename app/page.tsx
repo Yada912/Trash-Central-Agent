@@ -122,6 +122,12 @@ export default function HomePage() {
             <p className="text-lg font-medium text-ink/85">
               Platform pengelolaan sampah cerdas yang menghubungkan <strong>Warga &amp; UMKM Provinsi Bali</strong> dengan <strong>Armada Petugas DLHK &amp; TPS3R Desa</strong>. Dilengkapi asisten AI Kresna berbasis permintaan, kalender rahinan interaktif, dan optimasi rute pengangkutan desentralisasi.
             </p>
+            <div className="rounded-lg border-2 border-dashed border-ink bg-amber/35 p-3 text-xs text-ink font-semibold flex items-start gap-2 shadow-[1px_1px_0_#1F2933]">
+              <MaterialIcon name="info" size="sm" className="text-primary mt-0.5 shrink-0" />
+              <p className="leading-relaxed">
+                <strong>Proposal Inovasi Teknologi:</strong> Prototipe independen karya Tim Punya Dendam untuk Bali DigiFest 2026. Belum ada kerja sama formal dengan dinas/petugas operasional; sistem ini mendemonstrasikan usulan solusi persampahan desentralisasi cerdas berbasis AI agen untuk Bali.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
                 href="/warga"

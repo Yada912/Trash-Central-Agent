@@ -737,6 +737,36 @@ function constantTimeMatch(a: string, b: string): boolean {
   return diff === 0
 }
 
+export function loadExternalAccounts(externalAccounts: UserAccount[]): void {
+  const state = getAccountState()
+  const map = new Map<string, UserAccount>()
+  for (const acc of state.accounts) {
+    map.set(acc.id, acc)
+  }
+  for (const ext of externalAccounts) {
+    map.set(ext.id, ext)
+  }
+  state.accounts = Array.from(map.values())
+}
+
+export function loadExternalTimetable(externalTimetable: PetugasTimetableSlot[]): void {
+  const state = getAccountState()
+  const map = new Map<string, PetugasTimetableSlot>()
+  for (const slot of state.timetable) {
+    map.set(slot.id, slot)
+  }
+  for (const ext of externalTimetable) {
+    map.set(ext.id, ext)
+  }
+  state.timetable = Array.from(map.values())
+}
+
+export function getRawAccount(id: string): UserAccount | null {
+  const state = getAccountState()
+  const found = state.accounts.find((acc) => acc.id === id)
+  return found ? structuredClone(found) : null
+}
+
 export function listAccounts(): UserAccount[] {
   return getAccountState().accounts.map(sanitizeAccount)
 }

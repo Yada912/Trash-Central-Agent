@@ -5,23 +5,40 @@ import { MaterialIcon } from '@/components/ui/material-icon'
 export const metadata: Metadata = {
   title: 'Kebijakan Privasi — Central Trash Agent Bali',
   description:
-    'Kebijakan perlindungan data pribadi pengguna layanan persampahan cerdas Central Trash Agent Bali berdasarkan UU No. 27 Tahun 2022 (UU PDP).',
+    'Kebijakan perlindungan data pribadi pengguna prototipe Central Trash Agent Bali berdasarkan prinsip UU No. 27 Tahun 2022 (UU PDP).',
 }
 
 export default function KebijakanPrivasiPage() {
   return (
     <main id="main" className="grid gap-6 max-w-4xl mx-auto" data-testid="kebijakan-privasi-page">
       <section className="vector-card bg-card p-6 md:p-8 grid gap-4">
+        {/* DISCLAIMER PROTOTIPE KOMPETISI & PROPOSAL */}
+        <div
+          role="note"
+          className="rounded-xl border-2 border-ink bg-coral/30 p-4 text-xs font-semibold text-ink leading-relaxed shadow-[2px_2px_0_#1F2933]"
+        >
+          <div className="flex items-center gap-2 font-black text-sm text-alert pb-1">
+            <MaterialIcon name="warning" size="sm" />
+            <span>Pemberitahuan Status Prototipe Kompetisi &amp; Proposal Teknis</span>
+          </div>
+          <p>
+            <strong>Prototipe kompetisi:</strong> Central Trash Agent Bali adalah prototipe karya <strong>Tim Punya Dendam</strong> untuk <em>AI Web Innovation Challenge Bali DigiFest 2026</em>. Aplikasi ini tidak berafiliasi, tidak dioperasikan, dan tidak diakui oleh Pemerintah Kota Denpasar, DLHK, atau instansi pemerintah mana pun. Peran &quot;Petugas&quot; adalah simulasi. Seluruh akun dan laporan bawaan berisi data fiktif.
+          </p>
+          <p className="mt-1.5 text-ink/90 font-medium">
+            <strong>Catatan Proposal Teknis:</strong> Tim pengembang belum menjalin komunikasi resmi dengan pihak petugas operasional kebersihan maupun instansi kedinasan. Secara garis besar, aplikasi ini kami ajukan sebagai proposal inovasi dan bukti konsep (proof of concept) bahwa sistem persampahan desentralisasi cerdas berbasis agen AI dapat diwujudkan secara nyata di Bali.
+          </p>
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           <span className="vector-pill bg-mint text-ink font-extrabold flex items-center gap-1.5">
             <MaterialIcon name="verified_user" size="sm" />
-            UU No. 27 Tahun 2022 (UU PDP)
-          </span>
-          <span className="vector-pill bg-amber text-ink font-extrabold">
-            Perda Denpasar No. 8/2023
+            Prinsip UU No. 27 Tahun 2022 (UU PDP)
           </span>
           <span className="vector-pill bg-lavender text-ink font-extrabold">
-            Pergub Bali No. 47/2019
+            Karya Tim Punya Dendam
+          </span>
+          <span className="vector-pill bg-sky text-ink font-extrabold">
+            Bali DigiFest 2026
           </span>
         </div>
 
@@ -29,49 +46,46 @@ export default function KebijakanPrivasiPage() {
           Kebijakan Privasi &amp; Pelindungan Data Pribadi
         </h1>
         <p className="text-sm font-black text-ink">
-          Berlaku Efektif: 1 Januari 2026 · Terakhir Diperbarui: 7 November 2026
+          Terakhir Diperbarui: 7 November 2026 · Tim Pengembang Tim Punya Dendam
         </p>
 
         <div className="rounded-xl border-2 border-ink bg-mint/30 p-4 text-xs font-medium text-ink leading-relaxed">
-          Pemerintah Kota Denpasar melalui Dinas Lingkungan Hidup dan Kebersihan (DLHK) berkomitmen penuh melindungi hak privasi dan keamanan data pribadi setiap warga, pelaku usaha, dan pengemudi armada persampahan sesuai amanat <strong>Undang-Undang Republik Indonesia Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong>.
+          Tim Punya Dendam sebagai pengembang prototipe Central Trash Agent Bali berkomitmen menerapkan standar keamanan dan pelindungan data pribadi pengguna sesuai prinsip <strong>Undang-Undang Republik Indonesia Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)</strong>.
         </div>
 
         <div className="grid gap-6 pt-2 text-sm text-ink/90 leading-relaxed">
-          {/* 1. Pengendali & Dasar Hukum */}
+          {/* 1. Pengendali & Konteks Prototipe */}
           <section className="grid gap-2 border-t-2 border-ink/20 pt-4">
             <h2 className="text-lg font-black text-ink flex items-center gap-2">
               <MaterialIcon name="gavel" className="text-primary" size="sm" />
-              1. Identitas Pengendali Data &amp; Dasar Hukum Pemrosesan
+              1. Identitas Pengendali Data &amp; Konteks Prototipe
             </h2>
             <p>
-              Pengendali Data Pribadi pada platform Central Trash Agent Bali adalah <strong>Dinas Lingkungan Hidup dan Kebersihan (DLHK)</strong> bekerja sama dengan Unit Pengelola Sampah Terpadu (TPS3R) di tingkat desa dan kelurahan.
+              Pengendali Data pada prototipe Central Trash Agent Bali adalah <strong>Tim Punya Dendam (Tim Pengembang)</strong> untuk keperluan demonstrasi dan evaluasi kompetisi <em>AI Web Innovation Challenge Bali DigiFest 2026</em>.
             </p>
-            <p>Pemrosesan data dilaksanakan berdasarkan ketentuan:</p>
-            <ul className="list-disc pl-5 grid gap-1 text-xs font-semibold text-ink/80">
-              <li>Pasal 20 ayat (2) huruf b UU No. 27/2022: Pelaksanaan kewajiban hukum pengelola pelayanan publik persampahan.</li>
-              <li>Peraturan Gubernur Bali Nomor 47 Tahun 2019 tentang Pengelolaan Sampah Berbasis Sumber di Desa/Kelurahan dan Desa Adat.</li>
-              <li>Peraturan Daerah Kota Denpasar Nomor 8 Tahun 2023 tentang Pengelolaan Sampah.</li>
-            </ul>
+            <p>
+              Prinsip pemrosesan data merujuk pada standar etika pelindungan data dan simulasi operasional berbasis sumber sesuai semangat Pergub Bali No. 47/2019.
+            </p>
           </section>
 
           {/* 2. Data yang Dikumpulkan */}
           <section className="grid gap-2 border-t-2 border-ink/20 pt-4">
             <h2 className="text-lg font-black text-ink flex items-center gap-2">
               <MaterialIcon name="folder_shared" className="text-primary" size="sm" />
-              2. Jenis Data Pribadi yang Diproses
+              2. Jenis Data yang Diproses
             </h2>
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="vector-card-soft bg-bg p-3.5 text-xs grid gap-1">
-                <span className="font-extrabold text-primary">Data Identitas Umum</span>
-                <p>Nama lengkap, alamat email kedinasan/pribadi, nomor telepon (bila diisi), dan jenis akun (rumah tangga atau badan usaha).</p>
+                <span className="font-extrabold text-primary">Data Identitas Sesi</span>
+                <p>Nama profil, email percontohan/pendaftaran, dan tipe tempat timbulan (rumah tangga atau badan usaha).</p>
               </div>
               <div className="vector-card-soft bg-bg p-3.5 text-xs grid gap-1">
                 <span className="font-extrabold text-primary">Data Lokasi Geospasial</span>
-                <p>Kecamatan, nama desa/kelurahan, nama banjar adat, dan koordinat GPS (latitude/longitude) titik penjemputan sampah.</p>
+                <p>Kecamatan, desa/kelurahan, nama banjar adat, dan koordinat GPS titik penjemputan sampah.</p>
               </div>
               <div className="vector-card-soft bg-bg p-3.5 text-xs grid gap-1">
                 <span className="font-extrabold text-primary">Karakteristik Timbulan &amp; Foto</span>
-                <p>Foto tumpukan sampah untuk estimasi volume, catatan kondisi tempat sampah, dan jenis wadah penampungan rutin.</p>
+                <p>Foto tumpukan sampah untuk estimasi volume, catatan kondisi tempat sampah, dan ukuran wadah rutin.</p>
               </div>
               <div className="vector-card-soft bg-bg p-3.5 text-xs grid gap-1">
                 <span className="font-extrabold text-primary">Kalender Adat &amp; Pawukon (Otonan)</span>
@@ -87,10 +101,10 @@ export default function KebijakanPrivasiPage() {
               3. Pemrosesan Citra oleh Kecerdasan Buatan (AI) Tanpa Pengenalan Wajah
             </h2>
             <p>
-              Model penglihatan komputer (vision AI) yang terpasang pada platform ini dirancang secara ketat untuk menganalisis material fisik sampah (organik, botol plastik, kertas, residu, dan indikasi B3) serta volume wadah.
+              Model penglihatan komputer (vision AI) yang terpasang pada prototipe ini dirancang secara ketat untuk menganalisis material fisik sampah (organik, botol plastik, kertas, residu, dan indikasi B3) serta volume wadah.
             </p>
             <div className="rounded-lg border-2 border-ink bg-sky/20 p-3 text-xs font-semibold text-ink">
-              <strong>Prinsip Privasi di Sumber:</strong> Sistem TIDAK melakukan pengenalan wajah biometrik (facial recognition), tidak mengidentifikasi pelat kendaraan bermotor, dan secara otomatis menyaring dokumen berharga atau data sensitif yang tidak sengaja tertangkap dalam foto.
+              <strong>Prinsip Privasi di Sumber:</strong> Sistem TIDAK melakukan pengenalan wajah biometrik (facial recognition), tidak mengidentifikasi pelat kendaraan bermotor, dan menyaring teks sensitif secara otomatis.
             </div>
           </section>
 
@@ -98,18 +112,18 @@ export default function KebijakanPrivasiPage() {
           <section className="grid gap-2 border-t-2 border-ink/20 pt-4">
             <h2 className="text-lg font-black text-ink flex items-center gap-2">
               <MaterialIcon name="shield" className="text-primary" size="sm" />
-              4. Hak-Hak Anda sebagai Subjek Data (UU PDP Pasal 5–13)
+              4. Hak Pengguna sebagai Subjek Data
             </h2>
-            <p>Sebagai warga terdaftar, Anda memiliki hak penuh untuk:</p>
+            <p>Pengguna memiliki hak penuh dalam prototipe ini untuk:</p>
             <ul className="list-disc pl-5 grid gap-1 text-xs font-semibold text-ink/80">
-              <li><strong>Hak Akses:</strong> Melihat seluruh data profil timbulan, riwayat penjemputan, dan memori personal yang dicatat oleh agen AI Kresna.</li>
+              <li><strong>Hak Akses:</strong> Melihat data profil timbulan, riwayat penjemputan, dan memori yang dicatat oleh asisten personal Kresna.</li>
               <li><strong>Hak Pembaruan:</strong> Mengubah alamat, banjar, perkiraan kantong mingguan, atau pilihan rahinan Bali kapan saja melalui halaman Profil.</li>
-              <li><strong>Hak Penghapusan (Right to Erasure):</strong> Meminta penghapusan akun dan riwayat koordinat penjemputan melalui layanan kontak DLHK.</li>
-              <li><strong>Hak Menolak Otomatisasi:</strong> Warga memiliki hak menentukan persentase pemilahan manual tanpa wajib mengikuti saran otomatis AI.</li>
+              <li><strong>Hak Penghapusan (Right to Erasure):</strong> Keluar akun atau meminta pembersihan data uji coba melalui kanal pengembang.</li>
+              <li><strong>Hak Kontrol:</strong> Warga memiliki hak menentukan persentase pemilahan manual tanpa wajib mengikuti estimasi otomatis AI.</li>
             </ul>
           </section>
 
-          {/* 5. Keamanan & Retensi Data */}
+          {/* 5. Keamanan Data */}
           <section className="grid gap-2 border-t-2 border-ink/20 pt-4">
             <h2 className="text-lg font-black text-ink flex items-center gap-2">
               <MaterialIcon name="lock" className="text-primary" size="sm" />
@@ -120,17 +134,16 @@ export default function KebijakanPrivasiPage() {
             </p>
           </section>
 
-          {/* 6. Kontak DPO */}
+          {/* 6. Kontak Pengembang */}
           <section className="grid gap-2 border-t-2 border-ink/20 pt-4">
             <h2 className="text-lg font-black text-ink flex items-center gap-2">
               <MaterialIcon name="contact_mail" className="text-primary" size="sm" />
-              6. Pejabat Pelindung Data Pribadi (Data Protection Officer)
+              6. Kontak Tim Pengembang
             </h2>
             <div className="vector-card-soft bg-mint/40 p-4 text-xs font-medium text-ink grid gap-1">
-              <p className="font-extrabold text-sm">Unit Pelindung Data — DLHK Kota Denpasar</p>
-              <p>Alamat: Jl. Mulawarman No. 1, Lumintang, Denpasar Utara, Kota Denpasar, Bali 80231</p>
-              <p>Surel Resmi: dpo-persampahan@dlhk.denpasar.id</p>
-              <p>Telepon: (0361) 424245 / Layanan Pengaduan PRO Denpasar</p>
+              <p className="font-extrabold text-sm">Tim Pengembang — Tim Punya Dendam</p>
+              <p>Proyek: Prototipe Central Trash Agent Bali (Bali DigiFest 2026)</p>
+              <p>Repositori: github.com/Yada912/Trash-Central-Agent (Issues)</p>
             </div>
           </section>
         </div>
@@ -140,7 +153,7 @@ export default function KebijakanPrivasiPage() {
             href="/syarat-ketentuan"
             className="btn-tactile bg-sky text-ink px-4 py-2 text-xs font-black border-2 border-ink shadow-[2px_2px_0_#1F2933]"
           >
-            Baca Syarat &amp; Ketentuan Layanan →
+            Baca Ketentuan Prototipe →
           </Link>
           <Link
             href="/"
@@ -153,4 +166,3 @@ export default function KebijakanPrivasiPage() {
     </main>
   )
 }
-

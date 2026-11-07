@@ -1,0 +1,147 @@
+[
+  {
+    "id": "slot_barat_organik",
+    "kecamatan": "Denpasar Barat",
+    "stream": "organik",
+    "days": ["Mon", "Wed", "Thu", "Sat"],
+    "windowStart": "06:00",
+    "windowEnd": "09:00",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 35,
+    "maxLitersPerPickup": 60,
+    "notes": "Desentralisasi Pergub Bali 47/2019: Cikar swakelola TPS3R Pemecutan/Padangsambian menjemput organik untuk kompos lokal. Toleransi surge +35% saat rahinan adat."
+  },
+  {
+    "id": "slot_barat_anorganik",
+    "kecamatan": "Denpasar Barat",
+    "stream": "anorganik",
+    "days": ["Tue", "Fri", "Sun"],
+    "windowStart": "08:00",
+    "windowEnd": "11:30",
+    "leewayMinutes": 60,
+    "surgeTolerancePct": 30,
+    "maxLitersPerPickup": 45,
+    "notes": "Jalur Bank Sampah Banjar & Unit Daur Ulang TPS3R: Botol plastik, kardus, dan kaleng wajib terpilah."
+  },
+  {
+    "id": "slot_barat_residu",
+    "kecamatan": "Denpasar Barat",
+    "stream": "residu",
+    "days": ["Thu", "Sun"],
+    "windowStart": "13:00",
+    "windowEnd": "16:00",
+    "leewayMinutes": 30,
+    "surgeTolerancePct": 15,
+    "maxLitersPerPickup": 35,
+    "notes": "Khusus sampah residu non-organik/non-daur ulang untuk diangkut armada DLHK menuju TPST Padangsambian."
+  },
+  {
+    "id": "slot_selatan_organik",
+    "kecamatan": "Denpasar Selatan",
+    "stream": "organik",
+    "days": ["Mon", "Wed", "Thu", "Sat"],
+    "windowStart": "06:30",
+    "windowEnd": "09:30",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 40,
+    "maxLitersPerPickup": 140,
+    "notes": "Jalur pesisir Sanur–Sesetan–Panjer menuju TPS3R Sanur Kauh & Tahura Ngurah Rai."
+  },
+  {
+    "id": "slot_selatan_anorganik",
+    "kecamatan": "Denpasar Selatan",
+    "stream": "anorganik",
+    "days": ["Tue", "Fri", "Sun"],
+    "windowStart": "08:30",
+    "windowEnd": "12:00",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 30,
+    "maxLitersPerPickup": 90,
+    "notes": "Jalur daur ulang Bank Sampah Banjar Sanur & unit pilah TPS3R."
+  },
+  {
+    "id": "slot_selatan_residu",
+    "kecamatan": "Denpasar Selatan",
+    "stream": "residu",
+    "days": ["Thu", "Sun"],
+    "windowStart": "13:30",
+    "windowEnd": "16:30",
+    "leewayMinutes": 30,
+    "surgeTolerancePct": 20,
+    "maxLitersPerPickup": 60,
+    "notes": "Pengangkutan residu resmi menuju TPST Tahura."
+  },
+  {
+    "id": "slot_timur_organik",
+    "kecamatan": "Denpasar Timur",
+    "stream": "organik",
+    "days": ["Mon", "Wed", "Thu", "Sat"],
+    "windowStart": "06:00",
+    "windowEnd": "09:00",
+    "leewayMinutes": 40,
+    "surgeTolerancePct": 30,
+    "maxLitersPerPickup": 65,
+    "notes": "Jalur Kesiman–Sumerta–Penatih menuju TPS3R Biaung & TPST Kesiman Kertalangu."
+  },
+  {
+    "id": "slot_timur_anorganik",
+    "kecamatan": "Denpasar Timur",
+    "stream": "anorganik",
+    "days": ["Tue", "Fri", "Sun"],
+    "windowStart": "09:00",
+    "windowEnd": "12:00",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 25,
+    "maxLitersPerPickup": 50,
+    "notes": "Jalur Bank Sampah terpilah Kesiman & Penatih."
+  },
+  {
+    "id": "slot_timur_residu",
+    "kecamatan": "Denpasar Timur",
+    "stream": "residu",
+    "days": ["Thu", "Sun"],
+    "windowStart": "14:00",
+    "windowEnd": "17:00",
+    "leewayMinutes": 30,
+    "surgeTolerancePct": 15,
+    "maxLitersPerPickup": 40,
+    "notes": "Pengangkutan residu menuju TPST Kesiman Kertalangu."
+  },
+  {
+    "id": "slot_utara_organik",
+    "kecamatan": "Denpasar Utara",
+    "stream": "organik",
+    "days": ["Mon", "Wed", "Thu", "Sat"],
+    "windowStart": "06:00",
+    "windowEnd": "09:00",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 35,
+    "maxLitersPerPickup": 70,
+    "notes": "Jalur Ubung–Peguyangan–Tonja menuju TPS3R Swakelola Desa."
+  },
+  {
+    "id": "slot_utara_anorganik",
+    "kecamatan": "Denpasar Utara",
+    "stream": "anorganik",
+    "days": ["Tue", "Fri", "Sun"],
+    "windowStart": "08:00",
+    "windowEnd": "11:00",
+    "leewayMinutes": 45,
+    "surgeTolerancePct": 30,
+    "maxLitersPerPickup": 50,
+    "notes": "Jalur anorganik layak daur ulang Bank Sampah."
+  },
+  {
+    "id": "slot_utara_residu",
+    "kecamatan": "Denpasar Utara",
+    "stream": "residu",
+    "days": ["Thu", "Sun"],
+    "windowStart": "13:00",
+    "windowEnd": "16:00",
+    "leewayMinutes": 30,
+    "surgeTolerancePct": 15,
+    "maxLitersPerPickup": 40,
+    "notes": "Jalur residu mingguan menuju TPST DLHK Denpasar."
+  }
+]
+

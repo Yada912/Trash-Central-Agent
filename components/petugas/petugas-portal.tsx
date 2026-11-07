@@ -288,6 +288,14 @@ export function PetugasPortal() {
           </div>
         </div>
 
+        {/* Proposal & Simulasi Note */}
+        <div className="rounded-xl border-2 border-ink bg-sky/20 p-3 text-xs text-ink font-semibold flex items-start gap-2 shadow-[1px_1px_0_#1F2933]">
+          <MaterialIcon name="info" size="sm" className="text-primary mt-0.5 shrink-0" />
+          <p className="leading-relaxed">
+            <strong>Catatan Proposal Inovasi:</strong> Pengembang belum menjalin komunikasi resmi dengan pihak petugas operasional kebersihan. Panel ini merupakan <strong>usulan teknis dan simulasi operasional</strong> yang memperlihatkan bagaimana petugas armada dapat menerima rute Google Maps VRP, memantau kalender adat Bali, dan mengelola batas toleransi lonjakan (<em>leeway</em>).
+          </p>
+        </div>
+
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div className="grid gap-1.5">
             <h1 className="text-3xl font-extrabold tracking-tight">
