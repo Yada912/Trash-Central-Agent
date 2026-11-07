@@ -4,18 +4,18 @@ test('hazard share edit clears the stale flag and review filters move the totals
   await page.goto('/report')
   await page.getByLabel('Apa yang Anda lihat?').fill('A leaking battery is beside the public path.')
   await page.getByRole('button', { name: 'Klasifikasi' }).click()
-  await expect(page.getByText('Bendera pengklasifikasi: hazardous_present, no_image')).toBeVisible()
-  await expect(page.getByRole('checkbox', { name: 'Sertakan bendera hazardous_present pada klasifikasi terkonfirmasi' })).toBeChecked()
+  await expect(page.getByText('Classifier flags: hazardous_present, no_image')).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: 'Sertakan hazardous_present pada klasifikasi terkonfirmasi' })).toBeChecked()
 
   await page.getByLabel('hazardous %').fill('0')
   await page.getByLabel('plastic %').fill('100')
-  await expect(page.getByRole('checkbox', { name: 'Sertakan bendera hazardous_present pada klasifikasi terkonfirmasi' })).not.toBeChecked()
-  await expect(page.getByText('Bendera terkonfirmasi: no_image')).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: 'Sertakan hazardous_present pada klasifikasi terkonfirmasi' })).not.toBeChecked()
+  await expect(page.getByText('Confirmed flags: no_image')).toBeVisible()
   await expect(page.getByText('Hazard cleared by resident, needs check')).toBeVisible()
 
   await page.getByLabel('Lintang (Latitude)').fill('-8.670000')
   await page.getByLabel('Bujur (Longitude)').fill('115.210000')
-  await page.getByRole('checkbox', { name: 'Saya telah memeriksa data ini' }).check()
+  await page.getByRole('checkbox', { name: 'Saya telah meninjau hasil ini' }).check()
 
   const posted = page.waitForResponse((response) => response.url().endsWith('/api/reports') && response.request().method() === 'POST')
   await page.getByRole('button', { name: 'Kirim laporan' }).click()
