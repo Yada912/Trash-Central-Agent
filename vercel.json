@@ -6,6 +6,12 @@
     "app/api/reports/classify/route.ts": {
       "maxDuration": 30
     },
+    "app/api/agent/chat/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/eval/route.ts": {
+      "maxDuration": 60
+    },
     "app/api/plans/route.ts": {
       "maxDuration": 30
     },
@@ -14,4 +20,3 @@
     }
   }
 }
-
