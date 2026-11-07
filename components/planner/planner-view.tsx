@@ -106,10 +106,11 @@ export function PlannerView() {
         <h2 id="step-proposal" className="text-xl font-semibold">
           2. Proposal
         </h2>
-        {!plan ? <p>Run the planner to see a proposal.</p> : null}
+        {planner.loadingPlan && !plan ? <p>Loading the saved plan…</p> : null}
+        {!plan && !planner.loadingPlan ? <p>Run the planner to see a proposal.</p> : null}
         {plan ? (
           <>
-            <p className="text-sm">
+            <p className="text-sm" data-testid="plan-status">
               Status {plan.status}. Version {plan.version}.
               {planner.busy === 'edit' ? ' Recomputing the plan. Totals stay unchanged until the server responds.' : ''}
             </p>
@@ -215,7 +216,11 @@ export function PlannerView() {
                 </ul>
               </div>
             ) : null}
-            {!allFeasible ? <p className="text-sm font-semibold text-alert">Approve stays blocked until every route is feasible.</p> : null}
+            {!allFeasible ? (
+              <p className="text-sm font-semibold text-alert">
+                One or more routes are infeasible. Approving now is rejected until every route is feasible.
+              </p>
+            ) : null}
             <div className="grid gap-3 md:grid-cols-2">
               <div className="grid gap-1">
                 <Label htmlFor="move-stop">Move stop</Label>
@@ -248,14 +253,14 @@ export function PlannerView() {
               <Input id="reject-note" value={planner.note} onChange={(event) => planner.setNote(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button onClick={planner.approve} disabled={!canDecide || !allFeasible}>
+              <Button onClick={planner.approve} disabled={!canDecide}>
                 {planner.busy === 'approve' ? 'Approving…' : 'Approve'}
               </Button>
               <Button variant="alert" onClick={planner.reject} disabled={!canDecide || planner.note.trim().length === 0}>
                 {planner.busy === 'reject' ? 'Rejecting…' : 'Reject'}
               </Button>
             </div>
-            <section aria-labelledby="audit-log">
+            <section aria-labelledby="audit-log" data-testid="audit-log">
               <h3 id="audit-log" className="text-lg font-semibold">
                 Audit log
               </h3>

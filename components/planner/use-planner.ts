@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { ApiError, messageForApiError, requestJson } from '@/lib/client/api'
 import type { Plan } from '@/lib/schemas'
 
@@ -14,7 +15,11 @@ const DEFAULT_TRUCKS: TruckDraft[] = [
 ]
 
 export function usePlanner() {
+  const router = useRouter()
+  const params = useSearchParams()
+  const planId = params.get('plan')
   const lock = useRef(false)
+  const [loadingPlan, setLoadingPlan] = useState(Boolean(planId))
   const [trucks, setTrucks] = useState<TruckDraft[]>(DEFAULT_TRUCKS)
   const [crews, setCrews] = useState('4')
   const [shiftStart, setShiftStart] = useState('06:00')
@@ -33,6 +38,45 @@ export function usePlanner() {
     setTrucks((current) => current.map((truck) => (truck.key === key ? { ...truck, ...patch } : truck)))
   }
 
+  useEffect(() => {
+    if (!planId) {
+      setLoadingPlan(false)
+      return
+    }
+    let cancelled = false
+    setLoadingPlan(true)
+    void requestJson<Plan>(`/api/plans/${planId}`)
+      .then((response) => {
+        if (cancelled) return
+        setPlan(response.data)
+        setMode(response.meta.mode)
+        setTrucks(
+          response.data.input.trucks.map((truck, index) => ({
+            key: `loaded-${index + 1}`,
+            id: truck.id,
+            capacity: String(truck.capacityLiters),
+          })),
+        )
+        setCrews(String(response.data.input.crews))
+        setShiftStart(response.data.input.shift.start)
+        setShiftEnd(response.data.input.shift.end)
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setRequestError(messageForApiError(error))
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingPlan(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [planId])
+
+  function remember(next: Plan) {
+    const href = `/planner?plan=${next.id}`
+    if (params.get('plan') !== next.id) router.replace(href)
+  }
+
   async function run(action: typeof busy, path: string, body: unknown) {
     if (lock.current || !action) return
     lock.current = true
@@ -43,10 +87,12 @@ export function usePlanner() {
       const response = await requestJson<Plan>(path, { method: 'POST', body })
       setPlan(response.data)
       setMode(response.meta.mode)
+      remember(response.data)
       if (action === 'edit' || action === 'approve' || action === 'reject') setNote('')
     } catch (error) {
       if (error instanceof ApiError && error.fields?.violations) setViolations(error.fields.violations)
-      setRequestError(messageForApiError(error))
+      const prefix = error instanceof ApiError && error.status === 409 ? '409 ' : ''
+      setRequestError(`${prefix}${messageForApiError(error)}`)
     } finally {
       lock.current = false
       setBusy(null)
@@ -99,6 +145,7 @@ export function usePlanner() {
     requestError,
     violations,
     plan,
+    loadingPlan,
     mode,
     busy,
     note,
