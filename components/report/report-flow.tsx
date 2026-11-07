@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+import { useAccount } from '@/components/account/use-account'
 import { ActionBar } from '@/components/report/ActionBar'
 import { ClassificationEditor } from '@/components/report/ClassificationEditor'
 import { ClassificationStatus } from '@/components/report/ClassificationStatus'
@@ -19,13 +21,25 @@ import {
 import { HAZARDOUS_LABEL, isSeparateHazard } from '@/components/report/hazard-policy'
 import { useReportFlow } from '@/components/report/use-report-flow'
 import { Button } from '@/components/ui/button'
+import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
-import Link from 'next/link'
 
-const STEPS = ['Deskripsikan', 'Tinjau', 'Lokasi dan kirim'] as const
+const STEPS = ['1. Foto, Suara & Kondisi', '2. Takaran & Konfirmasi', '3. Titik Jemput & Kirim'] as const
 
 export function ReportFlow() {
   const flow = useReportFlow()
+  const { activeAccount, optimization } = useAccount()
+
+  function applyProfileDefaults() {
+    if (!activeAccount) return
+    flow.setLat(activeAccount.lat.toFixed(6))
+    flow.setLng(activeAccount.lng.toFixed(6))
+    flow.setAccountType(activeAccount.accountType)
+    if (activeAccount.wasteProfile && !flow.text.trim()) {
+      flow.setText(activeAccount.wasteProfile.conditionNote)
+    }
+  }
+
   if (flow.success) {
     const hazardous = isSeparateHazard(flow.success.classification)
     return (
@@ -33,27 +47,33 @@ export function ReportFlow() {
         <DemoBadge mode={flow.mode} />
         <section
           role="status"
-          className="grid gap-3 rounded-lg border border-ink/10 bg-card p-4"
+          className="vector-card bg-mint/35 p-6 grid gap-3"
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+          <p className="text-xs font-extrabold uppercase tracking-wide text-primary flex items-center gap-1.5">
+            <MaterialIcon name="check_circle" size="sm" />
             Laporan tersimpan
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight">Laporan terkirim</h1>
-          <p>Laporan {flow.success.id}</p>
-          <p data-testid="stored-record">
+          <h1 className="text-3xl font-extrabold tracking-tight">Laporan terkirim</h1>
+          <p className="font-bold">Laporan {flow.success.id}</p>
+          <p data-testid="stored-record" className="text-sm">
             {storedRecordLabel({
               isDemo: flow.success.isDemo,
               source: flow.success.classification.source,
               mode: flow.mode,
             })}
           </p>
-          {hazardous ? <p>{HAZARDOUS_LABEL}</p> : null}
-          <Link href="/dashboard" className="font-semibold text-primary">
-            Lihat dasbor
-          </Link>
-          <Button variant="secondary" onClick={flow.reset}>
-            Laporkan tumpukan lain
-          </Button>
+          {hazardous ? <p className="font-bold text-alert">{HAZARDOUS_LABEL}</p> : null}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Link href="/dashboard" className="btn-tactile bg-primary text-white">
+              Lihat dasbor
+            </Link>
+            <Link href="/schedule" className="btn-tactile bg-card text-ink">
+              Lihat jadwal pengangkutan
+            </Link>
+            <Button variant="secondary" onClick={flow.reset}>
+              Laporkan tumpukan lain
+            </Button>
+          </div>
         </section>
       </main>
     )
@@ -71,16 +91,27 @@ export function ReportFlow() {
 
   return (
     <main id="main" className="grid gap-6">
-      <div className="grid gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-            Laporan warga
-          </p>
-          <DemoBadge mode={flow.mode} />
+      <div className="vector-card bg-card p-6 grid gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="vector-pill bg-mint text-ink tilt-left">
+              <MaterialIcon name="add_a_photo" size="sm" />
+              Laporan warga
+            </span>
+            <DemoBadge mode={flow.mode} />
+          </div>
+          {activeAccount ? (
+            <Button variant="secondary" className="min-h-9 py-1 text-xs" onClick={applyProfileDefaults}>
+              <MaterialIcon name="person_pin_circle" size="sm" />
+              Gunakan Alamat & Kondisi Profil ({activeAccount.name})
+            </Button>
+          ) : null}
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">
+
+        <h1 className="text-3xl font-extrabold tracking-tight">
           Anda yang menentukan apa yang dikirim.
         </h1>
+
         <ol className="grid gap-2 sm:grid-cols-3">
           {STEPS.map((label, index) => (
             <li
@@ -88,26 +119,39 @@ export function ReportFlow() {
               aria-current={index === stepIndex ? 'step' : undefined}
               className={
                 index === stepIndex
-                  ? 'rounded-md border border-primary/30 bg-card px-3 py-2 text-sm font-semibold text-primary'
-                  : 'rounded-md border border-ink/10 bg-card px-3 py-2 text-sm'
+                  ? 'vector-card bg-primary text-white px-3 py-2 text-sm font-extrabold'
+                  : 'vector-card-soft bg-bg px-3 py-2 text-sm font-bold text-ink/75'
               }
             >
               0{index + 1} · {label}
             </li>
           ))}
         </ol>
-        <p className="text-sm">
-          Foto dan lokasi hanya digunakan untuk merencanakan pengangkutan sampah dalam mode
-          demonstrasi ini.
-        </p>
+
+        {optimization ? (
+          <div className="vector-card-soft bg-amber/30 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 font-bold">
+              <MaterialIcon name="schedule" className="text-primary" />
+              <span>
+                Profil Mingguan Anda ({activeAccount?.kecamatan}): <strong>{optimization.totalWeeklyLiters} L/minggu</strong> — {optimization.headline}
+              </span>
+            </div>
+            <Link href="/akun" className="font-extrabold text-primary underline">
+              Ubah Profil Mingguan & Acara
+            </Link>
+          </div>
+        ) : null}
       </div>
+
       <ErrorNotice message={flow.error} />
+
       <section
-        className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4"
+        className="vector-card p-6 grid gap-5"
         aria-labelledby="describe-heading"
       >
-        <h2 id="describe-heading" className="text-xl font-semibold">
-          Foto dan deskripsi
+        <h2 id="describe-heading" className="text-xl font-extrabold flex items-center gap-2">
+          <MaterialIcon name="camera_enhance" className="text-primary" />
+          Foto, Suara, dan Kondisi Sampah Sekarang
         </h2>
         <PhotoUploader
           previewUrl={flow.photo?.previewUrl ?? null}
@@ -120,7 +164,7 @@ export function ReportFlow() {
           actions={[
             {
               label:
-                flow.busy === 'classify' ? 'Mengklasifikasikan…' : 'Klasifikasikan',
+                flow.busy === 'classify' ? 'Mengklasifikasi…' : 'Klasifikasi',
               onClick: flow.classify,
               disabled: !flow.canClassify,
             },
@@ -143,6 +187,7 @@ export function ReportFlow() {
           ]}
         />
       </section>
+
       {flow.notTrashReason || flow.insufficient || flow.shown ? (
         <>
           <ClassificationStatus
@@ -167,6 +212,7 @@ export function ReportFlow() {
           ) : null}
         </>
       ) : null}
+
       {flow.hasDraft ? (
         <>
           {demoMockLabel(flow.mode) ? (
@@ -187,8 +233,8 @@ export function ReportFlow() {
             onChange={flow.setHazardChecked}
           />
           {flow.draft ? (
-            <p className="text-sm">
-              Confirmed flags:{' '}
+            <p className="text-sm font-semibold">
+              Bendera terkonfirmasi:{' '}
               {flow.draft.flags.length > 0 ? flow.draft.flags.join(', ') : 'none'}
             </p>
           ) : (
@@ -196,8 +242,11 @@ export function ReportFlow() {
               Keenam persentase harus berjumlah 100 sebelum flag terkonfirmasi dapat disimpan.
             </p>
           )}
-          <div className="grid gap-2 rounded-lg border border-primary/20 bg-primary/10 p-4">
-            <h2 className="text-xl font-semibold">Konfirmasi Anda</h2>
+          <div className="vector-card bg-mint/40 p-5 grid gap-2">
+            <h2 className="text-xl font-extrabold flex items-center gap-1.5">
+              <MaterialIcon name="fact_check" className="text-primary" />
+              Konfirmasi Anda
+            </h2>
             <p className="text-sm">
               Periksa jenis, volume, urgensi, foto, dan pin lokasi. Mengubah salah satu nilai
               tersebut akan mereset centang konfirmasi ini.
@@ -208,7 +257,7 @@ export function ReportFlow() {
               disabled={flow.percentTotal !== 100}
             />
           </div>
-          <label className="grid gap-2 text-sm font-semibold">
+          <label className="grid gap-2 text-sm font-extrabold">
             Jenis akun
             <Select
               aria-label="Jenis akun"

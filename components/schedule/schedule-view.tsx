@@ -1,6 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import { useAccount } from '@/components/account/use-account'
 import { ModeBadge } from '@/components/mode-badge'
 import {
   formatScheduleDaysId,
@@ -12,7 +14,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
+import { formatSlotDaysId } from '@/lib/accounts/store'
 import { messageForApiError, requestJson } from '@/lib/client/api'
 import {
   ACCOUNT_TYPES,
@@ -26,6 +30,7 @@ import {
 } from '@/lib/schemas'
 
 export function ScheduleView() {
+  const { activeAccount, timetable, optimization } = useAccount()
   const [kecamatan, setKecamatan] = useState<Kecamatan | ''>('')
   const [stream, setStream] = useState<WasteStream | ''>('')
   const [accountType, setAccountType] = useState<AccountType>('household')
@@ -68,15 +73,19 @@ export function ScheduleView() {
   const entries = data?.entries ?? []
   const streamSummary = groupScheduleByStream(entries)
   const sortingGuide = sourceSortingCards()
+  const filteredTimetable = kecamatan
+    ? timetable.filter((slot) => slot.kecamatan === kecamatan)
+    : timetable.filter((slot) => slot.kecamatan === (activeAccount?.kecamatan ?? 'Denpasar Barat'))
 
   return (
     <div className="grid gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-            Denpasar · Jadwal Pengangkutan Simulasi (R02 &amp; O05)
-          </p>
-          <h1 className="text-3xl font-bold">Jadwal Pengangkutan Sampah</h1>
+      <div className="vector-card bg-card p-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="grid gap-1">
+          <span className="vector-pill bg-amber text-ink w-fit tilt-left">
+            <MaterialIcon name="calendar_month" size="sm" />
+            Denpasar · Jadwal Pengangkutan &amp; Leeway Armada
+          </span>
+          <h1 className="text-3xl font-extrabold mt-1">Jadwal Pengangkutan Sampah</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ModeBadge mode={mode} />
@@ -84,30 +93,67 @@ export function ScheduleView() {
             variant={viewRole === 'resident' ? 'primary' : 'secondary'}
             onClick={() => setViewRole('resident')}
           >
-            Tampilan Warga (R02)
+            <MaterialIcon name="person" size="sm" />
+            Tampilan Warga
           </Button>
           <Button
             variant={viewRole === 'officer' ? 'primary' : 'secondary'}
             onClick={() => setViewRole('officer')}
           >
-            Tabel Area Petugas (O05)
+            <MaterialIcon name="table_chart" size="sm" />
+            Tabel Area Petugas
           </Button>
         </div>
       </div>
 
-      <Card className="grid gap-2 border-gold/50 bg-gold/10 text-sm">
-        <p className="font-semibold">
+      {/* Personalized Warga Optimization & Petugas Leeway Integration */}
+      {optimization && activeAccount ? (
+        <section className="vector-card bg-mint/35 p-5 grid gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="grid gap-1">
+              <span className="vector-pill bg-card text-ink w-fit">
+                <MaterialIcon name="verified" size="sm" className="text-primary" />
+                Optimasi Profil Warga: {activeAccount.name} ({activeAccount.kecamatan})
+              </span>
+              <h2 className="text-xl font-extrabold">{optimization.headline}</h2>
+            </div>
+            <Button asChild variant="gold">
+              <Link href="/akun">
+                <MaterialIcon name="tune" size="sm" />
+                Sesuaikan Takaran Mingguan &amp; Acara
+              </Link>
+            </Button>
+          </div>
+          <div className="grid gap-3 md:grid-cols-4">
+            {optimization.streams.map((st) => (
+              <div key={st.stream} className="vector-card-soft bg-card p-3.5 grid gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold uppercase">{st.stream}</span>
+                  <span className="rounded border border-ink bg-amber/50 px-1.5 py-0.5 text-[11px] font-bold">
+                    {st.weeklyLiters} L/mgg
+                  </span>
+                </div>
+                <p className="text-xs font-bold text-primary">{st.windowLabel}</p>
+                <p className="text-[11px] text-ink/70">{st.leewayLabel}</p>
+                <p className="mt-1 text-xs font-medium">{st.recommendation}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <Card className="vector-card-soft grid gap-2 bg-amber/25 p-4 text-sm">
+        <p className="font-bold flex items-center gap-1.5">
+          <MaterialIcon name="info" size="sm" className="text-primary" />
           {data?.disclaimer ??
             'Simulated demo schedule derived from reports; not an official DLH Denpasar schedule.'}
         </p>
-        <p className="text-ink/80">
-          Sumber data: <code>{data?.generatedFrom ?? 'seed+reports'}</code> — Jadwal ini adalah
-          simulasi demonstrasi berdasarkan laporan terkonfirmasi, bukan jadwal resmi DLHK Kota
-          Denpasar dan bukan jaminan ketersediaan truk.
+        <p className="text-ink/80 text-xs">
+          Sumber data: <code>{data?.generatedFrom ?? 'seed+reports'}</code> — Dikombinasikan dengan pengaturan jadwal tetap &amp; toleransi leeway petugas kecamatan.
         </p>
       </Card>
 
-      <Card className="grid gap-4 sm:grid-cols-4">
+      <Card className="vector-card p-5 grid gap-4 sm:grid-cols-4">
         <div className="grid gap-2">
           <Label htmlFor="schedule-kecamatan">Kecamatan</Label>
           <Select
@@ -170,6 +216,7 @@ export function ScheduleView() {
             <span>Simulasikan ketersediaan truk mingguan (solver_checked)</span>
           </label>
           <Button variant="secondary" onClick={() => void loadSchedule()} disabled={busy}>
+            <MaterialIcon name="refresh" size="sm" />
             {busy ? 'Memuat…' : 'Muat ulang jadwal'}
           </Button>
         </div>
@@ -178,7 +225,7 @@ export function ScheduleView() {
       {error ? (
         <p
           role="alert"
-          className="rounded-md border border-alert bg-card px-3 py-2 text-sm font-semibold text-alert"
+          className="vector-card bg-coral px-4 py-3 text-sm font-bold text-alert"
         >
           {error}
         </p>
@@ -186,7 +233,8 @@ export function ScheduleView() {
 
       {viewRole === 'resident' ? (
         <section className="grid gap-4" aria-label="Kartu jadwal warga">
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-extrabold flex items-center gap-2">
+            <MaterialIcon name="local_shipping" className="text-primary" />
             Jadwal Pengangkutan Saya (
             {accountType === 'household' ? 'Rumah Tangga' : 'Perusahaan'})
           </h2>
@@ -196,17 +244,17 @@ export function ScheduleView() {
                 key={item.stream}
                 className={
                   item.stream === 'B3'
-                    ? 'grid gap-2 border-alert/40 bg-alert/10'
-                    : 'grid gap-2'
+                    ? 'vector-card grid gap-2 bg-coral/40 p-5'
+                    : 'vector-card grid gap-2 bg-card p-5'
                 }
               >
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-lg font-semibold">{item.label}</h3>
+                  <h3 className="text-lg font-extrabold">{item.label}</h3>
                   <Badge
                     className={
                       item.stream === 'B3'
-                        ? 'border-alert text-alert'
-                        : 'border-primary text-primary'
+                        ? 'vector-pill bg-alert text-white'
+                        : 'vector-pill bg-mint text-ink'
                     }
                   >
                     {item.mode === 'on_request' ? 'Khusus / On-request' : 'Rutin'}
@@ -219,15 +267,15 @@ export function ScheduleView() {
                   <strong>Jendela waktu:</strong> {item.windowText}
                 </p>
                 {item.nextPickup ? (
-                  <p className="text-sm font-semibold text-primary">
+                  <p className="text-sm font-bold text-primary">
                     Pengangkutan simulasi berikutnya: {item.nextPickup}
                   </p>
                 ) : null}
-                <p className="text-xs text-ink/80">
+                <p className="text-xs text-ink/80 font-medium">
                   Basis laporan terkonfirmasi: {item.totalReports} laporan · {item.totalLiters} L
                 </p>
                 {item.stream === 'B3' ? (
-                  <p className="text-xs font-semibold text-alert">
+                  <p className="text-xs font-bold text-alert">
                     Sampah B3 tidak pernah digabung ke truk pengangkut biasa. Hubungi DLH untuk
                     penanganan terpisah.
                   </p>
@@ -238,48 +286,48 @@ export function ScheduleView() {
         </section>
       ) : (
         <section className="grid gap-4" aria-label="Tabel jadwal area petugas">
-          <h2 className="text-xl font-semibold">
-            Tabel Jadwal Pengangkutan per Kecamatan (O05)
+          <h2 className="text-xl font-extrabold">
+            Tabel Jadwal Pengangkutan per Kecamatan
           </h2>
-          <Card className="overflow-x-auto">
+          <Card className="vector-card overflow-x-auto p-4">
             {entries.length === 0 ? (
               <p className="text-sm">Tidak ada entri jadwal untuk filter yang dipilih.</p>
             ) : (
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-ink/15">
-                    <th className="py-2 pr-4 font-semibold">Kecamatan</th>
-                    <th className="py-2 pr-4 font-semibold">Aliran</th>
-                    <th className="py-2 pr-4 font-semibold">Akun</th>
-                    <th className="py-2 pr-4 font-semibold">Hari</th>
-                    <th className="py-2 pr-4 font-semibold">Waktu (WITA)</th>
-                    <th className="py-2 pr-4 font-semibold">Volume &amp; Laporan</th>
-                    <th className="py-2 font-semibold">Status Kelayakan</th>
+                  <tr className="border-b-2 border-ink">
+                    <th className="py-2 pr-4 font-extrabold">Kecamatan</th>
+                    <th className="py-2 pr-4 font-extrabold">Aliran</th>
+                    <th className="py-2 pr-4 font-extrabold">Akun</th>
+                    <th className="py-2 pr-4 font-extrabold">Hari</th>
+                    <th className="py-2 pr-4 font-extrabold">Waktu (WITA)</th>
+                    <th className="py-2 pr-4 font-extrabold">Volume &amp; Laporan</th>
+                    <th className="py-2 font-extrabold">Status Kelayakan</th>
                   </tr>
                 </thead>
                 <tbody>
                   {entries.map((entry) => (
                     <tr
                       key={`${entry.kecamatan}-${entry.stream}-${entry.accountType}`}
-                      className="border-b border-ink/10"
+                      className="border-b border-ink/15"
                     >
-                      <td className="py-2 pr-4 font-medium">{entry.kecamatan}</td>
-                      <td className="py-2 pr-4">{formatStreamLabelId(entry.stream)}</td>
-                      <td className="py-2 pr-4">{entry.accountType}</td>
-                      <td className="py-2 pr-4">{formatScheduleDaysId(entry.days)}</td>
-                      <td className="py-2 pr-4">
+                      <td className="py-2.5 pr-4 font-bold">{entry.kecamatan}</td>
+                      <td className="py-2.5 pr-4">{formatStreamLabelId(entry.stream)}</td>
+                      <td className="py-2.5 pr-4">{entry.accountType}</td>
+                      <td className="py-2.5 pr-4">{formatScheduleDaysId(entry.days)}</td>
+                      <td className="py-2.5 pr-4">
                         {entry.window ? `${entry.window.start}–${entry.window.end}` : 'On-request'}
                         {entry.nextPickup ? ` (berikutnya: ${entry.nextPickup})` : ''}
                       </td>
-                      <td className="py-2 pr-4">
+                      <td className="py-2.5 pr-4 font-semibold">
                         {entry.basis.liters} L ({entry.basis.reports} laporan)
                       </td>
-                      <td className="py-2">
+                      <td className="py-2.5">
                         <Badge
                           className={
                             entry.stream === 'B3'
-                              ? 'border-alert text-alert'
-                              : 'border-ink/30 text-ink'
+                              ? 'vector-pill bg-coral text-alert'
+                              : 'vector-pill bg-sky text-ink'
                           }
                         >
                           {entry.feasibility}
@@ -294,8 +342,46 @@ export function ScheduleView() {
         </section>
       )}
 
-      <section className="grid gap-3" aria-label="Panduan pemilahan sumber">
-        <h2 className="text-xl font-semibold">
+      {/* Petugas Timetable Leeway Window Cards */}
+      <section className="vector-card p-5 grid gap-4" aria-label="Toleransi leeway jadwal petugas">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-extrabold flex items-center gap-1.5">
+              <MaterialIcon name="schedule" className="text-primary" />
+              Kelonggaran (Leeway) Armada Petugas ({kecamatan || activeAccount?.kecamatan || 'Denpasar Barat'})
+            </h2>
+            <p className="text-xs text-ink/75">
+              Batas muatan per penjemputan dan cadangan kapasitas saat terjadi lonjakan hari raya/upacara.
+            </p>
+          </div>
+          <Button asChild variant="secondary">
+            <Link href="/akun">
+              <MaterialIcon name="edit_calendar" size="sm" />
+              Ubah Leeway (Mode Petugas)
+            </Link>
+          </Button>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {filteredTimetable.map((slot) => (
+            <div key={slot.id} className="vector-card-soft bg-bg p-3.5 grid gap-1 text-xs">
+              <div className="flex items-center justify-between font-extrabold text-sm">
+                <span className="uppercase">{slot.stream}</span>
+                <span>{formatSlotDaysId(slot.days)}</span>
+              </div>
+              <p className="font-bold text-primary">
+                Jam: {slot.windowStart}–{slot.windowEnd} WITA (±{slot.leewayMinutes} mnt leeway)
+              </p>
+              <p className="font-semibold">
+                Muatan normal: {slot.maxLitersPerPickup} L · Toleransi lonjakan: +{slot.surgeTolerancePct}%
+              </p>
+              <p className="text-ink/75">{slot.notes}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="vector-card p-5 grid gap-3" aria-label="Panduan pemilahan sumber">
+        <h2 className="text-xl font-extrabold">
           Panduan Pemilahan 5 Jenis Sumber ke 4 Aliran Pengangkutan (
           {sortingGuide[0]?.citation})
         </h2>
@@ -306,17 +392,17 @@ export function ScheduleView() {
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {sortingGuide.map((card) => (
-            <Card key={card.sourceType} className="grid gap-2 p-4">
+            <Card key={card.sourceType} className="vector-card-soft bg-bg grid gap-2 p-4">
               <Badge
                 className={
                   card.stream === 'B3'
-                    ? 'border-alert text-alert'
-                    : 'border-primary text-primary'
+                    ? 'vector-pill bg-coral text-alert w-fit'
+                    : 'vector-pill bg-mint text-ink w-fit'
                 }
               >
                 {card.stream}
               </Badge>
-              <h3 className="text-sm font-semibold">{card.titleId}</h3>
+              <h3 className="text-sm font-extrabold">{card.titleId}</h3>
               <p className="text-xs text-ink/70">{card.titleEn}</p>
             </Card>
           ))}
