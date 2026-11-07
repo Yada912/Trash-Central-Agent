@@ -2,7 +2,7 @@
 // Dates and times are copied from that result. District names are not copied,
 // so text inside a kecamatan label cannot become an instruction.
 
-import type { WeeklyAccountType, WeeklyScheduleResult, WeeklyStream } from '@/lib/planner/weekly'
+import type { WeeklyAccountType, WeeklyScheduleResult } from '@/lib/planner/weekly'
 
 export interface WeeklyGuidance {
   simulated: true
@@ -28,24 +28,26 @@ const B3 = [
   'No collection date is promised, and no handling procedure is given.',
 ]
 
-function nextLine(result: WeeklyScheduleResult, accountType: WeeklyAccountType, stream: WeeklyStream): string | null {
-  const next = result.nextPickups.find((item) => item.accountType === accountType && item.stream === stream && item.date)
-  if (!next?.date || !next.start || !next.end) return null
-  return `Next simulated ${stream} set-out for the ${accountType} group is ${next.date} from ${next.start} to ${next.end}.`
+function earliestNext(result: WeeklyScheduleResult, accountType: WeeklyAccountType) {
+  return result.nextPickups
+    .filter((item) => item.accountType === accountType && item.date && item.start && item.end)
+    .sort((a, b) => a.date!.localeCompare(b.date!) || a.start!.localeCompare(b.start!) || a.stream.localeCompare(b.stream))[0]
 }
 
 export function weeklyGuidance(result: WeeklyScheduleResult, accountType: WeeklyAccountType): WeeklyGuidance {
   const lines = [
     'Simulated planning only. This is not a dispatch and not an official schedule.',
     result.feasibility === 'solver_checked'
-      ? 'Truck and shift figures were checked only against the availability supplied with this plan.'
-      : 'Truck and shift availability were not supplied. Nothing here is a capacity assurance.',
+      ? 'The only capacity check is supplied liters against truck capacity and runMinutes against the shift window. It is not a travel or dispatch check.'
+      : 'Truck and shift availability were not supplied. Nothing here is a capacity assurance or a booked run.',
   ]
   if (accountType === 'household') lines.push(...HOUSEHOLD)
   else lines.push(...COMPANY)
-  for (const stream of ['organik', 'anorganik', 'residu'] as const) {
-    const line = nextLine(result, accountType, stream)
-    if (line) lines.push(line)
+  const next = earliestNext(result, accountType)
+  if (next?.date && next.start && next.end) {
+    lines.push(`Next simulated ${next.stream} set-out for the ${accountType} group is ${next.date} from ${next.start} to ${next.end}.`)
+  } else {
+    lines.push('No simulated pickup for this account type has a window still open at the supplied as-of moment.')
   }
   const b3 = result.unassigned.some((row) => row.stream === 'B3' && row.accountType === accountType)
   if (b3) lines.push(...B3)

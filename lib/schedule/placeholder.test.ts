@@ -252,4 +252,43 @@ describe('buildSchedule placeholder', () => {
     expect(special?.nextPickup).toBeUndefined()
     expect(entries.reduce((sum, entry) => sum + entry.basis.liters, 0)).toBe(100)
   })
+
+  it('keeps an in-progress window and drops one that has already ended', () => {
+    const ordinary = report({
+      id: 'organik',
+      kecamatan: 'Denpasar Barat',
+      classification: {
+        types: [{ type: 'organic', share: 1 }],
+        volume: { liters: 90, label: 'medium' },
+        urgency: 'low',
+        confidence: 0.8,
+        rationale: 'Food scraps.',
+        flags: [],
+        needsReview: false,
+        reviewReasons: [],
+        source: 'manual',
+      },
+    })
+    const availability = {
+      trucks: [{ id: 't1', capacityLiters: 1000 }],
+      slots: [
+        { truckId: 't1', date: '2026-11-02', start: '06:00', end: '09:00', accountType: 'household' as const },
+        { truckId: 't1', date: '2026-11-04', start: '06:00', end: '09:00', accountType: 'household' as const },
+        { truckId: 't1', date: '2026-11-06', start: '06:00', end: '09:00', accountType: 'household' as const },
+      ],
+    }
+    const during = buildSchedule([ordinary], {
+      availability,
+      weekStart: '2026-11-02',
+      asOf: '2026-11-02T08:00:00+08:00',
+    })
+    const after = buildSchedule([ordinary], {
+      availability,
+      weekStart: '2026-11-02',
+      asOf: '2026-11-02T09:00:00+08:00',
+    })
+    expect(during[0]?.nextPickup).toBe('2026-11-02')
+    expect(during[0]?.basis.liters).toBe(90)
+    expect(after[0]?.nextPickup).toBe('2026-11-04')
+  })
 })

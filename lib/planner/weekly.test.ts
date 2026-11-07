@@ -231,6 +231,70 @@ describe('solveWeekly', () => {
     expect(result.runs.reduce((total, run) => total + units(run.liters), 0)).toBe(units(0.3))
   })
 
+  it('does not multiply organic liters by the frequency target', () => {
+    const result = solveWeekly(
+      base({
+        demand: [{ kecamatan: 'Denpasar Barat', stream: 'organik', accountType: 'household', weeklyLiters: 1 }],
+      }),
+    )
+    expect(result.runs).toHaveLength(3)
+    expect(result.runs.reduce((total, run) => total + units(run.liters), 0)).toBe(units(1))
+    expect(result.reconciliation.assignedLiters).toBe(result.reconciliation.weeklyLitersIn)
+    expect(result.reconciliation.unassignedLiters).toBe(0)
+  })
+
+  it('lets two trucks share a clock time and keeps one slot to one group', () => {
+    const shared = solveWeekly(
+      base({
+        availability: {
+          trucks: [
+            { id: 't1', capacityLiters: 100 },
+            { id: 't2', capacityLiters: 100 },
+          ],
+          slots: [
+            { truckId: 't1', date: '2026-11-02', start: '06:00', end: '09:00', accountType: 'household' },
+            { truckId: 't2', date: '2026-11-02', start: '06:00', end: '09:00', accountType: 'household' },
+          ],
+        },
+        demand: [
+          { kecamatan: 'Denpasar Barat', stream: 'residu', accountType: 'household', weeklyLiters: 10.5 },
+          { kecamatan: 'Denpasar Timur', stream: 'residu', accountType: 'household', weeklyLiters: 0.25 },
+        ],
+      }),
+    )
+    expect(shared.runs).toHaveLength(2)
+    expect(new Set(shared.runs.map((run) => run.truckId))).toEqual(new Set(['t1', 't2']))
+    expect(shared.runs.reduce((total, run) => total + units(run.liters), 0)).toBe(units(10.75))
+
+    const oneSlot = solveWeekly(
+      base({
+        availability: {
+          trucks: [{ id: 't1', capacityLiters: 100 }],
+          slots: [{ truckId: 't1', date: '2026-11-02', start: '06:00', end: '09:00', accountType: 'household' }],
+        },
+        policy: { frequencyTargets: { residu: 1 } },
+        demand: [
+          { kecamatan: 'Denpasar Barat', stream: 'residu', accountType: 'household', weeklyLiters: 10 },
+          { kecamatan: 'Denpasar Timur', stream: 'residu', accountType: 'household', weeklyLiters: 7 },
+        ],
+      }),
+    )
+    expect(oneSlot.runs).toHaveLength(1)
+    expect(oneSlot.runs[0]?.kecamatan).toBe('Denpasar Barat')
+    expect(units(oneSlot.reconciliation.assignedLiters) + units(oneSlot.reconciliation.unassignedLiters)).toBe(units(17))
+    expect(oneSlot.unassigned).toEqual([expect.objectContaining({ kecamatan: 'Denpasar Timur', liters: 7, reason: 'no_slot' })])
+  })
+
+  it('keeps an in-progress window as next and drops a window that has ended', () => {
+    const demand = [{ kecamatan: 'Denpasar Barat', stream: 'organik' as const, accountType: 'household' as const, weeklyLiters: 90, backlogLiters: 8 }]
+    const during = solveWeekly(base({ asOf: '2026-11-02T08:00+08:00', demand }))
+    expect(during.nextPickups[0]).toMatchObject({ date: '2026-11-02', start: '06:00', end: '09:00' })
+    expect(during.reconciliation.backlogLiters).toBe(8)
+    expect(during.runs.reduce((total, run) => total + units(run.liters), 0)).toBe(units(90))
+    const ended = solveWeekly(base({ asOf: '2026-11-02T09:00+08:00', demand }))
+    expect(ended.nextPickups[0]).toMatchObject({ date: '2026-11-04', start: '06:00', end: '09:00' })
+  })
+
   it('grounds the next pickup on asOf and leaves a late asOf unscheduled', () => {
     const early = solveWeekly(
       base({

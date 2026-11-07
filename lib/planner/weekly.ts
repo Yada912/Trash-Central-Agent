@@ -7,9 +7,17 @@
 // organik | anorganik | residu | B3. Account type is household | company.
 // Company rows are groups (kecamatan x stream x accountType), not named firms.
 //
-// Availability omitted: feasibility 'unverified_template'. No runs are invented.
+// weeklyLiters is confirmed demand for this horizon only. It is not a forecast.
+// Confirmed reports are passed as weeklyLiters, not as backlogLiters. Optional
+// backlogLiters stay visible and are never placed on a run.
+//
+// Availability omitted: feasibility 'unverified_template'. Runs stay empty.
+// No weekday template, truck, or nextPickup is invented here. The adapter owns
+// any unverified weekday pattern and must not treat these rows as booked runs.
 // Availability present, including empty arrays: feasibility 'solver_checked'.
 // Empty trucks or slots leave demand unassigned. They do not fall back to a template.
+// B3 is never dated. A next pickup is the earliest run whose window has not
+// ended by asOf (date-only asOf is 00:00; overnight end < start ends next day).
 //
 // Adapter to Hensen's ScheduleEntry (he owns the canonical type):
 //   routine run -> days: [weekday of run.date], window: {start, end},
@@ -52,7 +60,7 @@ export interface WeeklyDemand {
   kecamatan: string
   stream: WeeklyStream
   accountType: WeeklyAccountType
-  /** Liters to place this week. Not backlog. */
+  /** Confirmed liters for this horizon. Not a forecast and not backlog. */
   weeklyLiters: number
   /** Held outside this week. Reported and not scheduled. */
   backlogLiters?: number
@@ -233,6 +241,15 @@ function weekdayIndex(value: string): number {
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay()
 }
 
+function addDays(value: string, days: number): string {
+  const { year, month, day } = parseDateParts(value, 'date')
+  const utc = new Date(Date.UTC(year, month - 1, day + days))
+  const y = utc.getUTCFullYear()
+  const m = String(utc.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(utc.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 function dayOffset(weekStart: string, date: string): number {
   const start = parseDateParts(weekStart, 'weekStart')
   const current = parseDateParts(date, 'date')
@@ -396,9 +413,11 @@ function assumptions(policy: WeeklyScheduleResult['policy'], feasibility: Weekly
     `A company group at or above ${policy.highVolumeCompanyLiters} weekly liters is marked dedicated. That is not a booking for a named company.`,
     'Source separation is a caller prerequisite. Mixed or contaminated liters belong in excluded, not in a clean stream.',
     'B3 is a simulated request for separate DLH handling. No specialist date or truck is assigned.',
+    'weeklyLiters is demand for this supplied horizon only. It is not a forecast of later weeks.',
+    'Optional backlogLiters are visible in groups and reconciliation and are never placed on a run.',
     feasibility === 'unverified_template'
-      ? 'Truck and shift availability were not supplied. No capacity check was performed.'
-      : 'Truck capacity and shift windows were checked against the supplied availability.',
+      ? 'Truck and shift availability were not supplied. Runs are empty. No capacity check was performed.'
+      : 'solver_checked compares liters with supplied truck capacity and the window with runMinutes. That is not a travel or dispatch feasibility check.',
   ]
 }
 
@@ -425,10 +444,19 @@ function compareMoment(date: string, time: string, asOf: Normalized['asOf']): nu
   return time < probe ? -1 : 1
 }
 
+function windowEnd(date: string, start: string, end: string): { date: string; time: string } {
+  if (end > start) return { date, time: end }
+  return { date: addDays(date, 1), time: end }
+}
+
 function nextFor(runs: WeeklyRun[], row: WeeklyDemand, asOf: Normalized['asOf']): WeeklyNextPickup {
+  const probe = asOf.time ?? '00:00'
   const candidates = runs
     .filter((run) => run.kecamatan === row.kecamatan && run.stream === row.stream && run.accountType === row.accountType)
-    .filter((run) => compareMoment(run.date, run.start, asOf) >= 0)
+    .filter((run) => {
+      const end = windowEnd(run.date, run.start, run.end)
+      return compareMoment(end.date, end.time, { date: asOf.date, time: probe }) > 0
+    })
     .sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start) || a.truckId.localeCompare(b.truckId))
   const next = candidates[0]
   return {
