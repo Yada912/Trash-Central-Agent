@@ -6,6 +6,7 @@ import { ActionBar } from '@/components/report/ActionBar'
 import { ClassificationEditor } from '@/components/report/ClassificationEditor'
 import { ClassificationStatus } from '@/components/report/ClassificationStatus'
 import { ConfidenceAlert } from '@/components/report/ConfidenceAlert'
+import { DemoBadge } from '@/components/report/DemoBadge'
 import { DescriptionField } from '@/components/report/DescriptionField'
 import { ErrorNotice } from '@/components/report/ErrorNotice'
 import { HazardWarning } from '@/components/report/HazardWarning'
@@ -14,6 +15,7 @@ import { PhotoUploader } from '@/components/report/PhotoUploader'
 import { ResidentApproval } from '@/components/report/ResidentApproval'
 import {
   classifierHeading,
+  demoMockLabel,
   storedRecordLabel,
 } from '@/components/report/report-labels'
 import { HAZARDOUS_LABEL, isSeparateHazard } from '@/components/report/hazard-policy'
@@ -51,6 +53,7 @@ export function ReportFlow() {
             Laporan tersimpan
           </p>
           <h1 className="text-3xl font-extrabold tracking-tight">Laporan terkirim</h1>
+          <DemoBadge mode={flow.mode} />
           <p className="font-bold">Laporan {flow.success.id}</p>
           <p data-testid="stored-record" className="text-sm">
             {storedRecordLabel({
@@ -187,6 +190,7 @@ export function ReportFlow() {
           <ClassificationStatus
             busy={flow.busy === 'classify'}
             heading={heading}
+            demoLabel={demoMockLabel(flow.mode)}
             notTrashReason={flow.notTrashReason}
             insufficient={flow.insufficient}
             classification={flow.shown}
@@ -202,6 +206,9 @@ export function ReportFlow() {
 
       {flow.hasDraft ? (
         <>
+          {demoMockLabel(flow.mode) ? (
+            <p className="text-sm font-semibold">{demoMockLabel(flow.mode)}</p>
+          ) : null}
           <ClassificationEditor
             percents={flow.percents}
             liters={flow.liters}
@@ -217,9 +224,14 @@ export function ReportFlow() {
             onChange={flow.setHazardChecked}
           />
           {flow.draft ? (
-            <div className="rounded-xl border-2 border-ink bg-mint/40 px-3.5 py-2 text-xs font-black text-ink flex items-center gap-2 shadow-[2px_2px_0_#1F2933]">
-              <MaterialIcon name="check_circle" size="sm" className="text-primary" />
-              <span>Komposisi 100% tervalidasi dan siap untuk disetujui.</span>
+            <div className="grid gap-2">
+              <div className="rounded-xl border-2 border-ink bg-mint/40 px-3.5 py-2 text-xs font-black text-ink flex items-center gap-2 shadow-[2px_2px_0_#1F2933]">
+                <MaterialIcon name="check_circle" size="sm" className="text-primary" />
+                <span>Komposisi 100% tervalidasi dan siap untuk disetujui.</span>
+              </div>
+              <p className="text-sm font-semibold">
+                Bendera terkonfirmasi: {flow.draft.flags.length > 0 ? flow.draft.flags.join(', ') : 'none'}
+              </p>
             </div>
           ) : (
             <div className="rounded-xl border-2 border-ink bg-coral/20 px-3.5 py-2 text-xs font-black text-alert flex items-center gap-2">
