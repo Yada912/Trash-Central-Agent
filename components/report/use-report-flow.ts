@@ -4,21 +4,29 @@ import { useRef, useState } from 'react'
 import { compressPhoto } from '@/components/report/compress-photo'
 import { flagsForConfirmation } from '@/components/report/confirmed-flags'
 import { isSeparateHazard } from '@/components/report/hazard-policy'
-import { initialHazardWarning, nextHazardWarning, type HazardWarningState } from '@/components/report/hazard-warning-state'
-import { nextIdempotencyState, reportPayloadFingerprint, type IdempotencyState } from '@/components/report/idempotency-key'
+import {
+  initialHazardWarning,
+  nextHazardWarning,
+  type HazardWarningState,
+} from '@/components/report/hazard-warning-state'
+import {
+  nextIdempotencyState,
+  reportPayloadFingerprint,
+  type IdempotencyState,
+} from '@/components/report/idempotency-key'
 import { ApiError, messageForApiError, requestJson } from '@/lib/client/api'
 import { isInsideDenpasar } from '@/lib/geo'
 import { stampClassification } from '@/lib/review'
 import {
   TRASH_TYPES,
   volumeLabelFor,
+  type AccountType,
   type Classification,
   type ClassificationFlag,
-  type InsufficientMissing,
   type ClassifyOutcome,
+  type InsufficientMissing,
   type Report,
   type TrashType,
-  type AccountType,
   type Urgency,
 } from '@/lib/schemas'
 
@@ -36,12 +44,16 @@ const EMPTY_PERCENTS = (): Record<TrashType, number> => ({
 
 function sharesToPercents(classification: Classification): Record<TrashType, number> {
   const percents = EMPTY_PERCENTS()
-  for (const entry of classification.types) percents[entry.type] = Math.round(entry.share * 100)
+  for (const entry of classification.types) {
+    percents[entry.type] = Math.round(entry.share * 100)
+  }
   let total = TRASH_TYPES.reduce((sum, type) => sum + percents[type], 0)
   if (total === 0) percents.residual = 100
   total = TRASH_TYPES.reduce((sum, type) => sum + percents[type], 0)
   if (total !== 100) {
-    const largest = TRASH_TYPES.reduce((best, type) => (percents[type] > percents[best] ? type : best))
+    const largest = TRASH_TYPES.reduce((best, type) =>
+      percents[type] > percents[best] ? type : best,
+    )
     percents[largest] += 100 - total
   }
   return percents
@@ -52,17 +64,27 @@ export function useReportFlow() {
   const submitted = useRef(false)
   const idempotency = useRef<IdempotencyState | null>(null)
   const [text, setTextState] = useState('')
-  const [photo, setPhoto] = useState<{ base64: string; mimeType: 'image/jpeg'; previewUrl: string } | null>(null)
+  const [photo, setPhoto] = useState<{
+    base64: string
+    mimeType: 'image/jpeg'
+    previewUrl: string
+  } | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [source, setSource] = useState<Source | null>(null)
   const [aiClassification, setAiClassification] = useState<Classification | null>(null)
   const [shown, setShown] = useState<Classification | null>(null)
   const [notTrashReason, setNotTrashReason] = useState<string | null>(null)
-  const [insufficient, setInsufficient] = useState<{ reason: string; missing: InsufficientMissing[] } | null>(null)
+  const [insufficient, setInsufficient] = useState<{
+    reason: string
+    missing: InsufficientMissing[]
+  } | null>(null)
   const [percents, setPercents] = useState(EMPTY_PERCENTS)
   const [liters, setLitersState] = useState('50')
   const [urgency, setUrgencyState] = useState<Urgency>('medium')
-  const [hazard, setHazard] = useState<HazardWarningState>({ checked: false, explicit: false })
+  const [hazard, setHazard] = useState<HazardWarningState>({
+    checked: false,
+    explicit: false,
+  })
   const [reviewed, setReviewed] = useState(false)
   const [accountType, setAccountTypeState] = useState<AccountType>('household')
   const [lat, setLatState] = useState('')
@@ -78,10 +100,22 @@ export function useReportFlow() {
   const litersNumber = Number(liters)
   const latNumber = Number(lat)
   const lngNumber = Number(lng)
-  const locationOk = lat !== '' && lng !== '' && Number.isFinite(latNumber) && Number.isFinite(lngNumber) && isInsideDenpasar(latNumber, lngNumber)
+  const locationOk =
+    lat !== '' &&
+    lng !== '' &&
+    Number.isFinite(latNumber) &&
+    Number.isFinite(lngNumber) &&
+    isInsideDenpasar(latNumber, lngNumber)
 
   function workingClassification(): Classification | null {
-    if (!source || percentTotal !== 100 || !Number.isInteger(litersNumber) || litersNumber < 1) return null
+    if (
+      !source ||
+      percentTotal !== 100 ||
+      !Number.isInteger(litersNumber) ||
+      litersNumber < 1
+    ) {
+      return null
+    }
     const types = TRASH_TYPES.map((type) => ({ type, share: percents[type] / 100 }))
       .filter((entry) => entry.share > 0)
       .sort((a, b) => b.share - a.share || a.type.localeCompare(b.type))
@@ -93,7 +127,7 @@ export function useReportFlow() {
         volume: { liters: litersNumber, label: volumeLabelFor(litersNumber) },
         urgency,
         confidence: base?.confidence ?? 0,
-        rationale: base?.rationale ?? 'Entered manually by the resident.',
+        rationale: base?.rationale ?? 'Diisi secara manual oleh warga.',
         flags: flagsForConfirmation({
           baseFlags,
           hasImage: Boolean(photo),
@@ -134,8 +168,8 @@ export function useReportFlow() {
       const reason = caught instanceof Error ? caught.message : ''
       setPhotoError(
         reason === 'size'
-          ? 'That photo is still over 3 MB after compression. Choose a smaller one.'
-          : 'Use a JPEG, PNG, or WebP photo.',
+          ? 'Ukuran foto masih melebihi 3 MB setelah kompresi. Pilih foto yang lebih kecil.'
+          : 'Gunakan foto berformat JPEG, PNG, atau WebP.',
       )
     }
   }
@@ -173,7 +207,7 @@ export function useReportFlow() {
           volume: { liters: 50, label: 'medium' },
           urgency: 'medium',
           confidence: 0,
-          rationale: 'Entered manually by the resident.',
+          rationale: 'Diisi secara manual oleh warga.',
           flags: photo ? [] : ['no_image'],
         },
         { text, hasImage: Boolean(photo), source: 'manual' },
@@ -188,7 +222,9 @@ export function useReportFlow() {
   }
 
   async function classify() {
-    if (lock.current || text.trim().length > 1000 || (text.trim().length < 1 && !photo)) return
+    if (lock.current || text.trim().length > 1000 || (text.trim().length < 1 && !photo)) {
+      return
+    }
     lock.current = true
     setBusy('classify')
     setError(null)
@@ -197,7 +233,9 @@ export function useReportFlow() {
         method: 'POST',
         body: {
           text: text.trim(),
-          ...(photo ? { image: { base64: photo.base64, mimeType: photo.mimeType } } : {}),
+          ...(photo
+            ? { image: { base64: photo.base64, mimeType: photo.mimeType } }
+            : {}),
         },
       })
       setMode(response.meta.mode)
@@ -210,7 +248,10 @@ export function useReportFlow() {
         return
       }
       if (response.data.kind === 'insufficient') {
-        setInsufficient({ reason: response.data.reason, missing: response.data.missing })
+        setInsufficient({
+          reason: response.data.reason,
+          missing: response.data.missing,
+        })
         setNotTrashReason(null)
         setSource(null)
         setShown(null)
@@ -231,18 +272,24 @@ export function useReportFlow() {
 
   function useMyLocation() {
     if (!navigator.geolocation) {
-      setGeoMessage('Location services are not available in this browser. Enter a pin or coordinates instead.')
+      setGeoMessage(
+        'Layanan lokasi tidak tersedia di peramban ini. Pasang pin di peta atau ketik koordinat.',
+      )
       return
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLatState(position.coords.latitude.toFixed(6))
         setLngState(position.coords.longitude.toFixed(6))
-        setGeoMessage('Location filled from this device. You can still move the pin.')
+        setGeoMessage(
+          'Lokasi diisi dari perangkat ini. Anda masih dapat menggeser pin di peta.',
+        )
         markEdited()
       },
       () => {
-        setGeoMessage('Location permission was denied. Enter a pin or coordinates instead.')
+        setGeoMessage(
+          'Izin lokasi ditolak. Pasang pin di peta atau ketik koordinat secara manual.',
+        )
       },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
     )
@@ -250,7 +297,9 @@ export function useReportFlow() {
 
   async function submit() {
     const classification = workingClassification()
-    if (lock.current || submitted.current || !classification || !reviewed || !locationOk) return
+    if (lock.current || submitted.current || !classification || !reviewed || !locationOk) {
+      return
+    }
     const fingerprint = reportPayloadFingerprint({
       text: text.trim(),
       lat: latNumber,
@@ -260,7 +309,11 @@ export function useReportFlow() {
       aiClassification: source === 'ai' ? aiClassification : null,
       accountType,
     })
-    const issued = nextIdempotencyState(idempotency.current, fingerprint, crypto.randomUUID())
+    const issued = nextIdempotencyState(
+      idempotency.current,
+      fingerprint,
+      crypto.randomUUID(),
+    )
     idempotency.current = issued
     lock.current = true
     setBusy('submit')
@@ -274,7 +327,9 @@ export function useReportFlow() {
           lat: latNumber,
           lng: lngNumber,
           clientRequestId: issued.key,
-          ...(photo ? { image: { base64: photo.base64, mimeType: photo.mimeType } } : {}),
+          ...(photo
+            ? { image: { base64: photo.base64, mimeType: photo.mimeType } }
+            : {}),
           classification,
           accountType,
           ...(source === 'ai' && aiClassification ? { aiClassification } : {}),
@@ -364,8 +419,17 @@ export function useReportFlow() {
     draft,
     hazardous: draft ? isSeparateHazard(draft) : percents.hazardous > 0,
     confidence: shown?.confidence ?? null,
-    canClassify: (text.trim().length >= 1 || Boolean(photo)) && text.trim().length <= 1000 && !busy,
-    canSubmit: Boolean(draft) && reviewed && locationOk && !busy && percentTotal === 100 && (text.trim().length >= 1 || Boolean(photo)),
+    canClassify:
+      (text.trim().length >= 1 || Boolean(photo)) &&
+      text.trim().length <= 1000 &&
+      !busy,
+    canSubmit:
+      Boolean(draft) &&
+      reviewed &&
+      locationOk &&
+      !busy &&
+      percentTotal === 100 &&
+      (text.trim().length >= 1 || Boolean(photo)),
     classify,
     enterManually,
     submit,
@@ -375,7 +439,9 @@ export function useReportFlow() {
       const parsed = Number(value)
       if (!Number.isInteger(parsed) || parsed < 0 || parsed > 100) return
       setPercents((current) => ({ ...current, [type]: parsed }))
-      if (type === 'hazardous') setHazard((current) => nextHazardWarning(current, parsed))
+      if (type === 'hazardous') {
+        setHazard((current) => nextHazardWarning(current, parsed))
+      }
       markEdited()
     },
     setLiters: (value: string) => {

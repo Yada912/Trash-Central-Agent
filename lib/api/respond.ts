@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { hasGeminiApiKey } from '@/lib/ai/keys'
 import type { ApiMode, ErrorCode } from '@/lib/schemas'
 
 export function requestIdFrom(request: Request): string {
@@ -8,7 +9,7 @@ export function requestIdFrom(request: Request): string {
 }
 
 export function apiMode(): ApiMode {
-  return process.env.GEMINI_API_KEY?.trim() ? 'live' : 'demo'
+  return hasGeminiApiKey() ? 'live' : 'demo'
 }
 
 function withHeaders(response: NextResponse, requestId: string): NextResponse {

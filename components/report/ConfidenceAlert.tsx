@@ -12,10 +12,15 @@ export function ConfidenceAlert({
   hasImage: boolean
 }) {
   if (!needsReview) return null
-  const detail = reasons.map((reason) => reasonSentence(reason, { textLength, hasImage })).join('; ')
+  const detail = reasons
+    .map((reason) => reasonSentence(reason, { textLength, hasImage }))
+    .join('; ')
   return (
-    <p role="status" className="rounded-lg border border-alert/30 bg-alert/10 px-4 py-3 text-sm font-semibold text-alert">
-      Please double-check this before you submit. {detail}.
+    <p
+      role="status"
+      className="rounded-lg border border-alert/30 bg-alert/10 px-4 py-3 text-sm font-semibold text-alert"
+    >
+      Mohon periksa kembali sebelum mengirim. {detail}.
     </p>
   )
 }

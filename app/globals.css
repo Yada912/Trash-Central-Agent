@@ -2,22 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   CENTRAL TRASH AGENT — DESIGN SYSTEM TOKENS
+   Mudah diubah untuk kustomisasi warna, garis vektor, dan efek 3D taktil.
+   ========================================================================== */
 :root {
   color-scheme: light;
-  background: #faf7f2;
-  color: #1f2933;
+  --color-bg: #faf7f2;
+  --color-card: #ffffff;
+  --color-ink: #1f2933;
+  --color-primary: #0f766e;
+  --color-primary-edge: #094c47;
+  --color-accent: #1d4e89;
+  --color-gold: #c8a24a;
+  --color-gold-edge: #8f6f24;
+  --color-alert: #b4532a;
+  --color-alert-edge: #7c3518;
+  --color-mint: #d1fae5;
+  --color-amber: #fef3c7;
+  --color-sky: #e0f2fe;
+  --color-coral: #ffedd5;
+  --color-lavender: #ede9fe;
+  background: var(--color-bg);
+  color: var(--color-ink);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #faf7f2;
-  color: #1f2933;
+  background: var(--color-bg);
+  background-image: radial-gradient(rgba(31, 41, 51, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--color-ink);
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 :focus-visible {
-  outline: 2px solid #1f2933;
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
@@ -27,10 +49,12 @@ body {
   top: 8px;
   z-index: 50;
   transform: translateY(-150%);
-  background: #ffffff;
-  color: #1f2933;
+  background: var(--color-card);
+  color: var(--color-ink);
   padding: 8px 16px;
+  border: 2px solid var(--color-ink);
   border-radius: 10px;
+  font-weight: 700;
 }
 
 .skip-link:focus {
@@ -39,6 +63,85 @@ body {
 
 .site-header :focus-visible {
   outline-color: #ffffff;
+}
+
+/* ==========================================================================
+   TACTILE 3D VECTOR SURFACES (TANPA BAYANGAN KABUR / NO SOFT SHADOWS)
+   ========================================================================== */
+@layer components {
+  .vector-card {
+    @apply rounded-xl border-2 border-ink bg-card;
+    box-shadow: 4px 4px 0 #1F2933;
+  }
+
+  .vector-card-soft {
+    @apply rounded-xl border-2 border-ink/80 bg-card;
+    box-shadow: 3px 3px 0 #1F2933;
+  }
+
+  .vector-card-3d {
+    @apply rounded-xl border-2 border-ink bg-card transition-all duration-150;
+    box-shadow: 5px 5px 0 #1F2933;
+  }
+
+  .vector-card-3d:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 #1F2933;
+  }
+
+  .vector-interactive-3d {
+    @apply cursor-pointer rounded-xl border-2 border-ink bg-card transition-all duration-150;
+    box-shadow: 3px 3px 0 #1F2933;
+  }
+
+  .vector-interactive-3d:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #1F2933;
+  }
+
+  .vector-interactive-3d:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #1F2933;
+  }
+
+  .vector-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-3 py-1 text-xs font-bold tracking-wide uppercase;
+    box-shadow: 2px 2px 0 #1F2933;
+  }
+
+  .vector-input-3d {
+    @apply rounded-lg border-2 border-ink bg-white px-3 py-2 text-sm text-ink transition-all duration-150 focus:outline-none focus:ring-0;
+    box-shadow: 2px 2px 0 #1F2933;
+  }
+
+  .vector-input-3d:focus {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #00A676;
+    border-color: #00A676;
+  }
+
+  .tilt-left {
+    transform: rotate(-1deg);
+  }
+
+  .tilt-right {
+    transform: rotate(1deg);
+  }
+
+  .btn-tactile {
+    @apply relative inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border-2 border-ink px-4 py-2 text-sm font-bold tracking-tight transition-all duration-100 select-none;
+    box-shadow: 4px 4px 0 #1F2933;
+  }
+
+  .btn-tactile:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 #1F2933;
+  }
+
+  .btn-tactile:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 #1F2933;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

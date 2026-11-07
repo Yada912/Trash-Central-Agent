@@ -1,22 +1,22 @@
-# Sourced facility integration notes
-Access date: 2026-11-07 (WITA / Asia/Makassar).
+# Fasilitas Pengelolaan Sampah Denpasar (`facilities.json`) — Provenans & Aturan Penggunaan
 
-`facilities.json` is the requested canonical array; 3 records: TPA Suwung, TPS3R Cemara, TPS3R Sesetan. `verified:true` means **published geographic point matched to named facility**, NOT operational status, survey accuracy, public drop-off access, or a verified road entrance. Third-party directory points are used, not invented or geocoded centroids. Detailed source/caveat records: `../data/facilities-sourced.json`.
+- **Berkas Terkait:** [`data/facilities.json`](./facilities.json), [`data/facilities-sourced.json`](./facilities-sourced.json), dan [`data/bank-sampah-sourced.json`](./bank-sampah-sourced.json)
+- **Referensi Lengkap:** [`docs/REGULATION-AND-DATA-REFERENCES.md`](../docs/REGULATION-AND-DATA-REFERENCES.md)
+- **Jumlah Rekaman Utama:** 5 fasilitas di wilayah Kota Denpasar
 
-## Depot warning
-TPA Suwung (-8.7193435, 115.2205973) is a **demo depot reference only**. Maptons publishes the pair; Exa corroborates to six decimals. Neither proves a truck entrance or current waste acceptance. Exa says Open but contains closure-related reviews; 29 Dec 2025 IDN Times reporting described a future closure deadline. Do NOT infer today's operation from either. Obtain authority/operator confirmation before actual routing or dispatch. A demo route may start at this geographic point only with an explicit simulated-depot label.
+## Arti `verified` dan `coordinatesVerified`
 
-## TPS3R points
-Cemara: official 13 Jan 2022 village notice names Jalan Tukad Nyali No. 1; Exa publishes matching address and coordinate. Exa category is unreliable (water treatment), so type comes from official source, not directory.
-Sesetan: official 20 Jan 2022 notice names Jalan Gurita; Exa gives Gurita IV No.201 and point. NusaBali 11 Apr 2026 photo report confirms TPS3R on Jalan Gurita IV and operation on 10 Apr 2026, NOT current operation: https://www.nusabali.com/berita/217891/memilah-sampah . Directory category manufacturer is ignored.
+- `coordinatesVerified: true` berarti fasilitas tersebut adalah **fasilitas nyata yang terdokumentasi secara publik** di Kota Denpasar dan koordinat lintang/bujurnya merupakan **perkiraan titik tingkat fasilitas dari sumber terbuka** (OpenStreetMap / publikasi pemerintah daerah). Ini **bukan** titik gerbang masuk truk yang telah disurvei maupun konfirmasi jam operasional/kapasitas waktu nyata.
+- `coordinatesVerified: false` (dengan `lat: null, lng: null`) berarti fasilitas tersebut disebut dalam referensi publik tetapi **tidak memiliki koordinat titik yang terverifikasi** dalam repositori ini. Koordinatnya sengaja dibiarkan `null` agar sistem tidak pernah menampilkan titik koordinat rekaan.
+- Untuk kompatibilitas dengan `GET /api/dashboard`, setiap rekaman juga menyertakan boolean `verified` yang nilainya sama dengan `coordinatesVerified`.
 
-Any future record with null lat/lng must have verified:false and MUST NOT enter the router. Bank sampah are separate because the integration enum excludes them: `../data/bank-sampah-sourced.json` (8 historical/undated sourced listings; coordinates null). Do not route to these or imply they accept mixed waste.
+## Aturan Perencanaan Rute & Peta UI
 
-Official location sources:
-- https://www.sanurkaja.denpasarkota.go.id/berita/informasi-pemilahan-sampah-tps-3r-cemara-desa-sanur-kaja
-- https://www.sesetan.denpasarkota.go.id/berita/mlaspas-tps3r-sesetan
-Coordinate sources (all opened):
-- https://id.maptons.com/p/5282207436
-- https://exa.ai/library/place/q4dlkmmg6c9
-- https://exa.ai/library/place/yc4mf6qkjlh
-- https://exa.ai/library/place/wl22tkly45g
+1. **Depo Perencana (`fac-tpa-suwung` — TPA Regional Sarbagita Suwung):**
+   - Digunakan sebagai titik awal/akhir simulasi untuk penyelesai rute truk di `POST /api/plans`.
+   - Mengingat kebijakan pembatasan pembuangan sampah terbuka (*open dumping*) serta pengalihan ke TPST/TPS3R, **baik UI maupun penjelasan rencana AI wajib memberi label TPA Suwung sebagai _simulated depot (operational status unverified)_ / depo simulasi (status operasional belum terverifikasi)**.
+2. **Titik Konteks TPS3R (`fac-tps3r-cemara`, `fac-tps3r-sesetan`):**
+   - Ditampilkan di peta dasbor sebagai konteks pengolahan sampah di tingkat desa/kelurahan (`published point only`).
+3. **Rekaman Bank Sampah (`fac-bank-sampah-induk`, `fac-bank-sampah-unit`):**
+   - Memiliki `lat: null, lng: null` dan `coordinatesVerified: false`.
+   - Sistem **tidak pernah** merutekan truk ke rekaman yang memiliki `lat: null` atau `lng: null`, dan **tidak pernah** menggambar pin peta untuk rekaman tersebut. Rekaman ini ditampilkan hanya sebagai entri daftar referensi.

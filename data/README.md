@@ -1,64 +1,36 @@
-# SYNTHETIC DEMO ONLY — Denpasar report fixtures
+# Data Laporan Awal (`reports.json`) — Catatan Provenans & Penggunaan
 
-Canonical integration artifact: `reports.json` (JSON array, exactly 150). Read `reports.metadata.json` alongside it. No real reports, people, photos, facility pins, observed conditions, or environmental statistics are included. Every description starts `[DEMO]`.
+- **Skema Acuan:** [`docs/API-CONTRACT.md`](../docs/API-CONTRACT.md) dan [`lib/schemas.ts`](../lib/schemas.ts) (tipe rekaman `Report`)
+- **Jumlah Rekaman Awal:** 150 laporan (`rep-001` .. `rep-150`)
 
-## Contract and data dictionary
-No API/schema file was present among the standalone project brief files inspected. This follows the later supplied Hensen integration contract (camelCase), not the original fallback snake_case contract. Extra additive fields are `provenance`, `descriptionEn`, and `estimatedWeightKg`; strip these only if a strict downstream parser requires it, preserving demo labeling.
+## Provenans & Kejujuran Data
 
-| Field | Type / meaning |
-|---|---|
-| id | String, unique `demo-001` through `demo-150` |
-| isDemo | Boolean, always true |
-| provenance | String, always `synthetic` |
-| createdAt | ISO 8601 timestamp with explicit +08:00 (WITA), invented within previous 14 days |
-| lat, lng | Decimal degrees, approximate invented neighborhood points, not verified/geocoded |
-| kecamatan | Denpasar Barat / Denpasar Timur / Denpasar Selatan / Denpasar Utara |
-| desa | Approximate desa/kelurahan neighborhood label; assignment not boundary-verified |
-| description | Short synthetic resident-style Indonesian text, with demo disclaimer |
-| descriptionEn | English equivalent, also explicitly demo |
-| types | Array of `{type, share}`; share is volume fraction, positive and totals 1 |
-| types[].type | organic / plastic / paper / metal / residual / hazardous |
-| volumeLiters | Positive bulk volume in liters; divide by 1000 for m³ |
-| estimatedWeightKg | Positive illustrative modeled mass in kg, not measured |
-| urgency | low / medium / high, invented triage label |
-| confidence | 0–1 invented UI fixture, not AI calibration |
-| status | new / planned / collected, fictional lifecycle state |
+Seluruh 150 rekaman awal di dalam `data/reports.json` adalah **data simulasi untuk demonstrasi** (`isDemo: true`, `provenance: "synthetic_demo_derived_from_sipsn_aggregates"`). Rekaman ini **bukan** tiket laporan warga nyata dan tidak disajikan sebagai lokasi tumpukan sampah langsung yang terverifikasi.
 
-## Generation and quality
-Run `python3 /workspace/digifest/seed/generate-reports.py` to deterministically regenerate canonical JSON, metadata, validation summary and byte-identical compatibility copies in `../data/`. Standard library only; RNG seed 20261107. Fixed scenario cutoff: 7 November 2026 13:53 WITA (UTC+08:00), not execution time. Generator overwrites these generated files only; it does not touch facilities files.
+Distribusi statistiknya dikalibrasi terhadap sumber publik yang terdokumentasi di [`docs/REGULATION-AND-DATA-REFERENCES.md`](../docs/REGULATION-AND-DATA-REFERENCES.md):
 
-150 records across 28 approximate neighborhoods: Barat 40, Utara 40, Timur 35, Selatan 35. Status mix: new 105, planned 28, collected 17. Report times span 24 October 2026 15:32 through 7 November 2026 12:14 WITA. Composition includes single-type and mixed-type loads; shares are by volume, not mass. Liters × weighted illustrative density / 1000 gives kg (rounded to 2 decimals). Assumed kg/m³: organic 280, plastic 55, paper 90, metal 180, residual 160, hazardous 200. These are synthetic planning parameters, not sourced waste statistics. Hazardous examples are small separate loads with high urgency; do not schedule on ordinary collection vehicles without a separate handling rule.
+1. **Komposisi jenis sampah** mencerminkan profil timbulan sampah Kota Denpasar pada **SIPSN KLHK** (Sistem Informasi Pengelolaan Sampah Nasional, `sipsn.menlhk.go.id`):
+   - Sisa makanan / organik mendominasi (~55–60% timbulan kota), diikuti plastik (~15–18%), kertas (~8–10%), residu (~10–12%), logam (~2–3%), dan B3/berbahaya rumah tangga (<2%).
+   - Dalam kumpulan 150 laporan ini, jenis dominan tersebar menjadi: `organic` 65, `plastic` 45, `residual` 17, `paper` 9, `metal` 7, `hazardous` 7.
+2. **Sebaran geografis** mencakup keempat kecamatan resmi di **Kota Denpasar** (BPS Kota Denpasar, *Kota Denpasar Dalam Angka*):
+   - `Denpasar Selatan` (41 laporan) — koridor pesisir Sanur, Serangan, Sidakarya, Sesetan, Panjer, Renon, Pedungan, Pemogan.
+   - `Denpasar Barat` (39 laporan) — koridor pasar dan permukiman padat di Pemecutan, Dauh Puri, Padangsambian, Tegal Harum, Tegal Kertha.
+   - `Denpasar Utara` (36 laporan) — koridor terminal dan pasar di Ubung, Peguyangan, Tonja, Dauh Puri Kaja, Dangin Puri Kaja.
+   - `Denpasar Timur` (34 laporan) — Sumerta, Kesiman (Kertalangu, Petilan), Penatih, Dangin Puri.
+   - Seluruh koordinat berada tepat di dalam kotak batas kontrak API (`lat -8.75..-8.57`, `lng 115.16..115.28`) dan di daratan.
+3. **Rentang waktu:** Stempel waktu mencakup 14 hari dalam zona waktu WITA (`2026-10-25` hingga `2026-11-07`, `+08:00`). Status laporan terdiri dari `new` (96), `planned` (34), dan `collected` (20) sehingga dasbor dan perencana rute langsung memiliki antrean aktif maupun riwayat.
 
-Coordinates use manually selected inland neighborhood anchors and +/-0.0015° jitter (roughly at most 235 m diagonal). Conservative overall bounds (-8.72 to -8.59 latitude, 115.18 to 115.27 longitude) plus per-anchor limits reduce coastal risk. No official boundary/coastline, road routing, geocoding, or parcel verification occurred. Points may fall inside buildings, on private property, or across a local administrative boundary. They are NOT real TPS/TPS3R/bank sampah locations and must never be used for dispatch. Equalized district coverage and repetitive profile patterns are intentional demo design, not geographic prevalence estimates.
+## Aturan Kontrak yang Diterapkan
 
-Validation assertions cover exact count, IDs, enum values, positive units, fractions, formula consistency, hazardous separation, timestamp timezone/range, approximate inland bounds/anchor proximity, district coverage and bilingual demo flags. See `validation-summary.json`: PASS. Land checks establish plausibility only, not authoritative on-land or administrative membership. Keep a conspicuous UI-level “DEMO — synthetic reports” banner and exclude this dataset from real operational analytics. No prediction accuracy, observed waste prevalence, or real emergency is implied.
-
-## Sample
-```json
-{
-  "id": "demo-001",
-  "isDemo": true,
-  "provenance": "synthetic",
-  "createdAt": "2026-10-28T11:46:00+08:00",
-  "lat": -8.654077,
-  "lng": 115.18395,
-  "kecamatan": "Denpasar Barat",
-  "desa": "Padangsambian",
-  "description": "[DEMO] Ada sisa organik dekat gang permukiman rekaan, sekitar Padangsambian; kira-kira 1064.3 liter. Bukan kejadian nyata.",
-  "descriptionEn": "[DEMO] There is organic scraps near an invented residential lane, around Padangsambian; about 1064.3 liters. Not a real incident.",
-  "types": [
-    {
-      "type": "organic",
-      "share": 1
-    }
-  ],
-  "volumeLiters": 1064.3,
-  "estimatedWeightKg": 298.0,
-  "urgency": "medium",
-  "confidence": 0.73,
-  "status": "new"
-}
-```
-
-## Real facility sources
-`facilities.json` contains three sourced geographic points, separate from the fictional resident reports. Read `README-facilities.md` and `../data/facilities-sourced.json` for coordinate and official identity sources. `verified` refers to a sourced location only, never current operations or truck access. TPA Suwung is a simulated depot reference, not a confirmed operational destination. Eight bank sampah address records are available in `../data/bank-sampah-sourced.json`, with no invented coordinates. Waste-statistics citations and coverage caveats are in `../data/waste-evidence.md`.
+- `classification.types`: 1–6 entri per laporan, terurut menurun berdasarkan `share`, setiap nilai `share` dibulatkan ke 2 angka desimal dan berjumlah `1.00`.
+- `classification.volume`: `small` (<50 L), `medium` (50–300 L), `large` (>300 L).
+- `classification.needsReview` mengikuti aturan deterministik di [`lib/review.ts`](../lib/review.ts):
+  - `low_confidence` jika `confidence < 0.5`
+  - `hazardous` jika proporsi `hazardous > 0` atau terdapat bendera `hazardous_present`
+  - `low_image_quality` jika terdapat bendera `low_image_quality`
+  - `insufficient_text` atau `contradictory` jika model menyetel bendera tersebut
+- **Penanganan B3:** 10 laporan memiliki `hazardous > 0` atau `hazardous_present`. Laporan-laporan ini selalu dikecualikan dari rute truk reguler oleh perencana dan dikembalikan di `result.unassigned` dengan alasan `'hazardous_separate'`.
+- **Kolom tambahan untuk konteks UI/penjelasan** (diteruskan oleh API):
+  - `descriptionEn`: ringkasan Bahasa Inggris yang mendampingi `description` Bahasa Indonesia.
+  - `estimatedWeightKg`: perkiraan berat dalam kilogram menggunakan kepadatan sampah lepas (~0,22 kg/L untuk organik/campuran, ~0,12 kg/L untuk plastik/kertas, ~0,35 kg/L untuk logam).
+  - `provenance`: `"synthetic_demo_derived_from_sipsn_aggregates"`.
