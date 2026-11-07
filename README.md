@@ -15,7 +15,7 @@ Two people use it:
 
 ## Key Features
 
-- Report: text, an optional photo compressed in the browser, then a classification the resident can edit, then a location, then submit.
+- Report: a photo or a description, then a classification the resident can edit, then a location, then submit.
 - Dashboard: a Denpasar map with pickup zones, totals, an accessible report list, and hazardous reports kept separate.
 - Planner: truck, crew, and shift inputs; a deterministic route proposal; an explanation; approve, edit, or reject, with an audit log.
 - Schedule: `GET /api/schedule` is a simulated demo schedule derived from reports. It is not the official DLH Denpasar schedule.
@@ -173,7 +173,7 @@ Not deployed from this repository yet. Import the repo into Vercel Hobby. No env
 
 ## Demo Account (jika diperlukan - jangan simpan password sensitif di public repo)
 
-No account. The app has no login.
+No account. The app has no login. The demo role switch is not a security boundary.
 
 ## Known Limitations
 
@@ -183,7 +183,7 @@ No account. The app has no login.
 - Kecamatan for a new report is the nearest seeded demo point, not an official boundary.
 - There is no authentication, no rate limit, and no real message to DLH. Hazardous copy says the report is flagged for special handling and that demo routing was not sent.
 - The pickup schedule is simulated. Capacity feasibility is not checked. It is not the official DLH Denpasar schedule.
-- Photos are stored on the report as a data URL.
+- Photos are stored on the report as a data URL. Location only comes from the opt-in pin. Do not photograph people or documents.
 - After an edit, the explanation stays stale until someone calls re-explain.
 - Recycling points, a marketplace, and bank sampah integration are not built.
 

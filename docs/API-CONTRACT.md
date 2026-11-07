@@ -40,7 +40,8 @@ Defaults when the resident skips editing: use AI values as-is. Manual entry (no 
 UI must show confidence; < 0.5 => prompt resident to check.
 
 ## Endpoints
-POST /api/reports/classify  { text: string(1–1000), image?: { base64, mimeType } } -> ClassifyOutcome   (budget 15 s)
+POST /api/reports/classify  { text?: string(0–1000), image?: { base64, mimeType } } -> ClassifyOutcome   (budget 15 s)
+   A request needs a non-empty trimmed description or a photo that passes the magic-byte check. Both missing, including whitespace-only text and no photo, is 400 empty_report. The server does not invent a description. Demo mode returns insufficient for a photo with no description.
    ClassifyOutcome = { kind: 'trash', classification: Classification } | { kind: 'not_trash', reason: string /*≤280*/, confidence: number } | { kind: 'insufficient', reason: string /*≤280*/, missing: Array<'type'|'volume'|'location_context'> }
    not_trash is a normal 200 result (no fabricated trash). insufficient means the input is too vague to estimate without inventing numbers; it is not a claim that there is no trash.
    UI shows the returned reason for both, keeps the resident's text and photo, and offers manual entry. POST /api/reports always requires a full Classification.

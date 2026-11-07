@@ -188,7 +188,7 @@ export function useReportFlow() {
   }
 
   async function classify() {
-    if (lock.current || text.trim().length < 1 || text.trim().length > 1000) return
+    if (lock.current || text.trim().length > 1000 || (text.trim().length < 1 && !photo)) return
     lock.current = true
     setBusy('classify')
     setError(null)
@@ -364,8 +364,8 @@ export function useReportFlow() {
     draft,
     hazardous: draft ? isSeparateHazard(draft) : percents.hazardous > 0,
     confidence: shown?.confidence ?? null,
-    canClassify: text.trim().length >= 1 && text.trim().length <= 1000 && !busy,
-    canSubmit: Boolean(draft) && reviewed && locationOk && !busy && percentTotal === 100,
+    canClassify: (text.trim().length >= 1 || Boolean(photo)) && text.trim().length <= 1000 && !busy,
+    canSubmit: Boolean(draft) && reviewed && locationOk && !busy && percentTotal === 100 && (text.trim().length >= 1 || Boolean(photo)),
     classify,
     enterManually,
     submit,

@@ -49,6 +49,24 @@ describe('no-key classify demo', () => {
     }
   })
 
+  it('returns insufficient for a photo and no description', async () => {
+    const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xd9]).toString('base64')
+    delete process.env.GEMINI_API_KEY
+    const response = await POST(
+      new Request('http://127.0.0.1/api/reports/classify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: '', image: { base64: jpeg, mimeType: 'image/jpeg' } }),
+      }),
+    )
+    expect(response.status).toBe(200)
+    const body = (await response.json()) as { data: { kind: string; missing?: string[] }; meta: { model?: string } }
+    expect(body.meta.model).toBe('demo-mock')
+    expect(body.data.kind).toBe('insufficient')
+    expect(body.data.missing).toEqual(['type', 'volume'])
+    expect(body.data).not.toHaveProperty('classification')
+  })
+
   it('abstains on a 9-character note with no photo', async () => {
     const data = await demo('123456789')
     expect(data).toMatchObject({

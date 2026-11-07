@@ -165,8 +165,8 @@ function validateClassifyInput(input: ClassifyInput): ValidatedInput {
     throw new ClassifyError('VALIDATION', 'Report text must be a string of 1 to 1000 characters.')
   }
   const textLength = input.text.trim().length
-  if (textLength < 1 || textLength > 1000) {
-    throw new ClassifyError('VALIDATION', 'Report text must be a string of 1 to 1000 characters.')
+  if (textLength > 1000 || (textLength < 1 && !input.image)) {
+    throw new ClassifyError('VALIDATION', 'Send a photo or a description of 1 to 1000 characters.')
   }
   if (!input.image) return { text: input.text }
   const { base64, mimeType } = input.image

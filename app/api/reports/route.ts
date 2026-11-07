@@ -56,17 +56,21 @@ export async function POST(request: Request) {
     if (!parsed.ok) return parsed.response
     const imageError = guardImage(parsed.data.image, requestId)
     if (imageError) return imageError
+    const text = parsed.data.text ?? ''
+    if (!text && !parsed.data.image) {
+      return jsonErr(requestId, 400, 'empty_report', 'Send a photo or a description.')
+    }
     const store = getStore()
     const idempotencyKey = idempotencyKeyFrom(request.headers.get('idempotency-key'), parsed.data.clientRequestId)
     const hasImage = Boolean(parsed.data.image)
     const classification = stampClassification(parsed.data.classification, {
-      text: parsed.data.text,
+      text,
       hasImage,
       source: parsed.data.aiClassification ? (process.env.GEMINI_API_KEY?.trim() ? 'gemini' : 'mock') : 'manual',
       aiClassification: parsed.data.aiClassification,
     })
     const bodyHash = canonicalReportBodyHash({
-      text: parsed.data.text,
+      text,
       lat: parsed.data.lat,
       lng: parsed.data.lng,
       image: parsed.data.image,
@@ -85,7 +89,7 @@ export async function POST(request: Request) {
       lat: parsed.data.lat,
       lng: parsed.data.lng,
       kecamatan,
-      description: parsed.data.text,
+      description: text,
       ...(parsed.data.image
         ? { photoUrl: `data:${parsed.data.image.mimeType};base64,${parsed.data.image.base64}` }
         : {}),

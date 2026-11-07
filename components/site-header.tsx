@@ -35,7 +35,13 @@ export function SiteHeader() {
             })}
           </ul>
         </nav>
-        <p className="text-xs font-semibold tracking-wide text-white">Demo product · not live dispatch</p>
+        <label className="flex items-center gap-2 text-xs font-semibold tracking-wide text-white">
+          Demo role, not a login
+          <select aria-label="Demo role, not a login" defaultValue="resident" className="rounded-md bg-white px-2 py-1 text-xs text-ink">
+            <option value="resident">Resident</option>
+            <option value="officer">Officer</option>
+          </select>
+        </label>
       </div>
     </header>
   )

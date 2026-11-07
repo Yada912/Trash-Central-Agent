@@ -42,6 +42,12 @@ function demoInsufficient(reason: string, missing: Array<'type' | 'volume'>): Cl
  */
 function demoClassify(input: { text: string; image?: { base64: string; mimeType: string } }): ClassifyOutcome {
   const text = input.text.trim().toLowerCase()
+  if (!text && input.image) {
+    return demoInsufficient(
+      'Demo output: this note does not support a trash type or volume without guessing.',
+      ['type', 'volume'],
+    )
+  }
   if (text.length < 10 && !input.image) {
     return demoInsufficient(
       'Demo output: this note is too short to estimate the waste type or volume without guessing.',
@@ -116,10 +122,15 @@ export async function POST(request: Request) {
     if (!parsed.ok) return parsed.response
     const imageError = guardImage(parsed.data.image, requestId)
     if (imageError) return imageError
+    const text = parsed.data.text ?? ''
+    if (!text && !parsed.data.image) {
+      return jsonErr(requestId, 400, 'empty_report', 'Send a photo or a description.')
+    }
     const hasImage = Boolean(parsed.data.image)
+    const requestInput = { text, ...(parsed.data.image ? { image: parsed.data.image } : {}) }
     const outcome = geminiConfigured()
-      ? stampOutcome(await classifyReport(parsed.data), parsed.data.text, hasImage)
-      : stampOutcome(demoClassify(parsed.data), parsed.data.text, hasImage)
+      ? stampOutcome(await classifyReport(requestInput), text, hasImage)
+      : stampOutcome(demoClassify(requestInput), text, hasImage)
     return jsonOk(requestId, outcome, {
       model: geminiConfigured() ? 'gemini-2.5-flash' : 'demo-mock',
       latencyMs: Date.now() - started,

@@ -86,6 +86,7 @@ export const ERROR_CODES = [
   'CONFLICT',
   'PAYLOAD_TOO_LARGE',
   'INTERNAL',
+  'empty_report',
 ] as const
 export const errorCodeSchema = z.enum(ERROR_CODES)
 export type ErrorCode = z.infer<typeof errorCodeSchema>
@@ -221,9 +222,12 @@ export const imageSchema = z
   })
   .strict()
 
+/** A photo or a trimmed description. Empty string is allowed; the route rejects when both are missing. */
+export const reportTextSchema = z.string().trim().max(1000).default('')
+
 export const classifyRequestSchema = z
   .object({
-    text: z.string().trim().min(1).max(1000),
+    text: reportTextSchema,
     image: imageSchema.optional(),
   })
   .strict()
@@ -236,7 +240,7 @@ export type ClassifyRequest = z.infer<typeof classifyRequestSchema>
  */
 export const createReportSchema = z
   .object({
-    text: z.string().trim().min(1).max(1000),
+    text: reportTextSchema,
     lat: z.number().gte(DENPASAR_LAT_MIN).lte(DENPASAR_LAT_MAX),
     lng: z.number().gte(DENPASAR_LNG_MIN).lte(DENPASAR_LNG_MAX),
     image: imageSchema.optional(),
@@ -256,7 +260,7 @@ export const reportSchema = z.object({
   lng: z.number(),
   kecamatan: kecamatanSchema,
   desa: z.string().min(1).optional(),
-  description: z.string().min(1),
+  description: z.string(),
   photoUrl: z.string().min(1).optional(),
   classification: classificationSchema,
   /** Original model classification, kept when the resident corrects it. */

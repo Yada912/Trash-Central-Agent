@@ -25,6 +25,7 @@ export async function GET(request: Request) {
     const accountType = readFilter(url.searchParams.get('accountType'), accountTypeSchema, 'accountType')
     if (!accountType.ok) return jsonErr(requestId, 400, 'VALIDATION', 'Unknown accountType.', accountType.fields)
     const reports = await getStore().listReports()
+    // Schedule rows are derived from stored reports. Decisions and route assignments stay on the plan record in the same store.
     const entries = buildSchedule(reports, {
       ...(kecamatan.value ? { kecamatan: kecamatan.value } : {}),
       ...(stream.value ? { stream: stream.value } : {}),
