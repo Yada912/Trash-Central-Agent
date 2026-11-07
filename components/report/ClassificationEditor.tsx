@@ -154,7 +154,7 @@ export function ClassificationEditor({
               <MaterialIcon name="shopping_bag" size="sm" />
               <span>1. Hitung Kantong / Ember</span>
             </div>
-            <p className={inputMode === 'bags' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink/70'}>
+            <p className={inputMode === 'bags' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink font-semibold'}>
               Paling mudah! Cukup klik + / - jumlah kantong, persen dihitung otomatis.
             </p>
           </button>
@@ -172,7 +172,7 @@ export function ClassificationEditor({
               <MaterialIcon name="straighten" size="sm" />
               <span>2. Nilai Langsung (Liter)</span>
             </div>
-            <p className={inputMode === 'direct_liters' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink/70'}>
+            <p className={inputMode === 'direct_liters' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink font-semibold'}>
               Ketik liter per jenis sampah, total & persentase dihitung otomatis.
             </p>
           </button>
@@ -190,7 +190,7 @@ export function ClassificationEditor({
               <MaterialIcon name="percent" size="sm" />
               <span>3. Persentase (%) Manual</span>
             </div>
-            <p className={inputMode === 'percent' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink/70'}>
+            <p className={inputMode === 'percent' ? 'mt-1 text-[11px] text-white/90' : 'mt-1 text-[11px] text-ink font-semibold'}>
               Atur porsi % secara langsung + tombol seimbangkan otomatis ke 100%.
             </p>
           </button>
@@ -238,7 +238,7 @@ export function ClassificationEditor({
                       <MaterialIcon name={meta.icon} size="sm" />
                       {meta.labelId}
                     </span>
-                    <span className="text-[11px] font-bold text-ink/75">
+                    <span className="text-[11px] font-bold text-ink">
                       ≈ {directLitersByType[type]} L ({percents[type]}%)
                     </span>
                   </div>
@@ -292,7 +292,7 @@ export function ClassificationEditor({
       {/* Canonical Percent Inputs (Always rendered & accessible so resident or E2E can inspect/edit exact %) */}
       <div className="grid gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-extrabold uppercase tracking-wide text-ink/75">
+          <p className="text-xs font-black uppercase tracking-wide text-ink">
             Rincian Persentase per Jenis (harus berjumlah 100%):
           </p>
           {total !== 100 ? (

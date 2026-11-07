@@ -144,7 +144,7 @@ export function SiteHeader() {
               className={
                 active
                   ? 'flex flex-col items-center justify-center rounded-md bg-primary/15 px-2 py-1 text-[11px] font-extrabold text-primary'
-                  : 'flex flex-col items-center justify-center px-2 py-1 text-[11px] font-semibold text-ink/75'
+                  : 'flex flex-col items-center justify-center px-2 py-1 text-[11px] font-bold text-ink'
               }
             >
               <MaterialIcon name={item.icon} size="md" />

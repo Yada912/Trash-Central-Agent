@@ -188,7 +188,7 @@ export function PhotoUploader({
               <MaterialIcon name="check_circle" size="sm" />
               Foto siap dianalisis bersama deskripsi Anda
             </p>
-            <p className="text-xs text-ink/75">
+            <p className="text-xs font-semibold text-ink">
               Anda dapat mengganti foto atau menghapusnya jika ingin mengirim laporan teks saja.
             </p>
             <div className="flex gap-2">
@@ -200,7 +200,7 @@ export function PhotoUploader({
           </div>
         </div>
       ) : (
-        <p className="text-xs font-medium text-ink/75">
+        <p className="text-xs font-bold text-ink">
           Mendukung JPEG, PNG, atau WebP. Gunakan tombol kamera untuk memotret langsung di lokasi atau impor dari galeri.
         </p>
       )}

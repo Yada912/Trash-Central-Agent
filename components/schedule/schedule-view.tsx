@@ -130,7 +130,7 @@ export function ScheduleView() {
                   </span>
                 </div>
                 <p className="text-xs font-bold text-primary">{st.windowLabel}</p>
-                <p className="text-[11px] text-ink/70">{st.leewayLabel}</p>
+                <p className="text-[11px] font-bold text-ink">{st.leewayLabel}</p>
                 <p className="mt-1 text-xs font-medium">{st.recommendation}</p>
               </div>
             ))}
@@ -346,7 +346,7 @@ export function ScheduleView() {
               <MaterialIcon name="schedule" className="text-primary" />
               Kelonggaran (Leeway) Armada Petugas ({kecamatan || activeAccount?.kecamatan || 'Denpasar Barat'})
             </h2>
-            <p className="text-xs text-ink/75">
+            <p className="text-xs font-bold text-ink">
               Batas muatan per penjemputan dan cadangan kapasitas saat terjadi lonjakan hari raya/upacara.
             </p>
           </div>
@@ -372,7 +372,7 @@ export function ScheduleView() {
               <p className="font-semibold">
                 Muatan normal: {slot.maxLitersPerPickup} L · Toleransi lonjakan: +{slot.surgeTolerancePct}%
               </p>
-              <p className="text-ink/75">{slot.notes}</p>
+              <p className="text-ink font-semibold">{slot.notes}</p>
             </div>
           ))}
         </div>
@@ -401,7 +401,7 @@ export function ScheduleView() {
                 {card.stream}
               </Badge>
               <h3 className="text-sm font-extrabold">{card.titleId}</h3>
-              <p className="text-xs text-ink/70">{card.titleEn}</p>
+              <p className="text-xs font-bold text-ink">{card.titleEn}</p>
             </Card>
           ))}
         </div>

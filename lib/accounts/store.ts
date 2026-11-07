@@ -156,7 +156,7 @@ export type ResidentOptimizationSummary = {
   }
 }
 
-const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
+export const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
 
 const DEFAULT_ACCOUNTS: UserAccount[] = [
   {
@@ -817,19 +817,20 @@ export function createAccount(input: {
   birthDate?: string
   address: string
   accountType: AccountType
+  wasteProfile?: Partial<ResidentWasteProfile>
 }): UserAccount {
   const state = getAccountState()
   const id = `usr_${input.role}_${Date.now().toString(36)}`
   const defaultProfile: ResidentWasteProfile | undefined =
     input.role === 'warga'
       ? {
-          currentCondition: 'terkendali',
-          conditionNote: 'Sampah rumah tangga rutin mingguan.',
-          weeklyRegularLiters: 75,
-          containerPreset: 'kantong_15l',
-          householdMembers: 4,
-          sortingReadiness: 'sebagian',
-          compositionPct: {
+          currentCondition: input.wasteProfile?.currentCondition ?? 'terkendali',
+          conditionNote: input.wasteProfile?.conditionNote ?? 'Sampah rumah tangga rutin mingguan.',
+          weeklyRegularLiters: input.wasteProfile?.weeklyRegularLiters ?? 75,
+          containerPreset: input.wasteProfile?.containerPreset ?? 'kantong_15l',
+          householdMembers: input.wasteProfile?.householdMembers ?? 4,
+          sortingReadiness: input.wasteProfile?.sortingReadiness ?? 'sebagian',
+          compositionPct: input.wasteProfile?.compositionPct ?? {
             organic: 60,
             plastic: 20,
             paper: 10,
@@ -837,8 +838,8 @@ export function createAccount(input: {
             residual: 10,
             hazardous: 0,
           },
-          selectedBalineseEventIds: DEFAULT_SELECTED_BALI_EVENTS,
-          specialEvents: [
+          selectedBalineseEventIds: input.wasteProfile?.selectedBalineseEventIds ?? DEFAULT_SELECTED_BALI_EVENTS,
+          specialEvents: input.wasteProfile?.specialEvents ?? [
             {
               id: `evt_${Date.now().toString(36)}`,
               name: 'Hari Raya / Upacara Keluarga',
@@ -849,7 +850,7 @@ export function createAccount(input: {
               notes: 'Tambahan janur, canang, daun, dan kemasan.',
             },
           ],
-          pickupHistory: [
+          pickupHistory: input.wasteProfile?.pickupHistory ?? [
             {
               id: `pkp_${Date.now().toString(36)}`,
               date: '2026-11-09',

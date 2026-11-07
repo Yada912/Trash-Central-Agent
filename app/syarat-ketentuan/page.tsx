@@ -28,7 +28,7 @@ export default function SyaratKetentuanPage() {
         <h1 className="text-3xl font-black text-ink tracking-tight">
           Syarat &amp; Ketentuan Layanan
         </h1>
-        <p className="text-sm font-semibold text-ink/75">
+        <p className="text-sm font-black text-ink">
           Berlaku Efektif: 1 Januari 2026 · Dinas Lingkungan Hidup dan Kebersihan Kota Denpasar
         </p>
 

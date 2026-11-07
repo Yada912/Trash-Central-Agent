@@ -67,6 +67,7 @@ export async function POST(request: Request) {
       birthDate?: string
       address: string
       accountType: AccountType
+      wasteProfile?: Partial<ResidentWasteProfile>
     }
     timetablePatch?: {
       slotId: string
@@ -152,6 +153,7 @@ export async function POST(request: Request) {
       birthDate,
       address,
       accountType,
+      wasteProfile: body.newAccount?.wasteProfile,
     })
   } else if (body.action === 'update_timetable' && body.timetablePatch?.slotId) {
     const currentActor = getActiveAccount(body.accountId)

@@ -74,8 +74,8 @@ export function AccountView() {
   const [savedBanner, setSavedBanner] = useState<string | null>(null)
 
   // Petugas Escalation Authentication State
-  const [petugasEmail, setPetugasEmail] = useState('surya.wirawan@dlhk.denpasar.id')
-  const [petugasPassword, setPetugasPassword] = useState('petugas123')
+  const [petugasEmail, setPetugasEmail] = useState('')
+  const [petugasPassword, setPetugasPassword] = useState('')
   const [petugasLoginBusy, setPetugasLoginBusy] = useState(false)
   const [petugasLoginError, setPetugasLoginError] = useState<string | null>(null)
 
@@ -257,7 +257,7 @@ export function AccountView() {
               <p className="mt-1 text-base font-extrabold text-ink">
                 {computedOtonan.pawukonLabel}
               </p>
-              <p className="text-xs text-ink/75 mt-0.5">
+              <p className="text-xs font-semibold text-ink mt-0.5">
                 Siklus 210 hari · Jatuh pada {computedOtonan.nextOtonanDate} (prediksi ekstra +30 L lungsuran banten otonan pada jadwal organik terdekat).
               </p>
             </div>
@@ -272,7 +272,7 @@ export function AccountView() {
               <p className="mt-1 text-base font-extrabold text-ink">
                 {activeAccount.tps3rNode ?? 'TPS3R Swakelola Desa Pemecutan'}
               </p>
-              <p className="text-xs text-ink/75 mt-0.5">
+              <p className="text-xs font-semibold text-ink mt-0.5">
                 Pengelolaan Berbasis Sumber Pergub 47/2019: Organik diolah jadi kompos & eco-enzyme lokal; Anorganik disalurkan ke Bank Sampah.
               </p>
             </div>
@@ -297,7 +297,7 @@ export function AccountView() {
             </div>
             <MaterialIcon name="person" className="text-primary" size="lg" />
           </div>
-          <p className="text-sm text-ink/75">
+          <p className="text-sm font-semibold text-ink">
             Tanggal lahir digunakan oleh AI untuk menghitung wuku kelahiran, siklus 210 hari Otonan Bali Anda, dan memprediksi kebutuhan ekstra wadah organik untuk lungsuran banten.
           </p>
           <div className="grid gap-4 md:grid-cols-3">
@@ -870,15 +870,6 @@ export function AccountView() {
                 <MaterialIcon name="verified_user" size="sm" />
                 {petugasLoginBusy ? 'Memverifikasi…' : 'Otentikasi & Aktifkan Mode Petugas'}
               </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void handlePetugasEscalation('surya.wirawan@dlhk.denpasar.id', 'petugas123')}
-                disabled={petugasLoginBusy}
-              >
-                <MaterialIcon name="bolt" size="sm" />
-                Masuk Cepat Petugas Uji (I Wayan Gde Surya Wirawan)
-              </Button>
             </div>
           </form>
         </section>
@@ -894,7 +885,7 @@ export function AccountView() {
                 <MaterialIcon name="badge" className="text-primary" />
                 Anda Sedang Berada dalam Mode Petugas Operasional (DLHK Kota Denpasar)
               </h2>
-              <p className="text-xs text-ink/75 mt-0.5">
+              <p className="text-xs font-semibold text-ink mt-0.5">
                 Nomor Induk Petugas: <strong>{activeAccount.badgeId ?? 'DLHK-DPS-042'}</strong> · Wilayah Penugasan: <strong>{activeAccount.kecamatan}</strong>
               </p>
             </div>
@@ -912,7 +903,7 @@ export function AccountView() {
           <MaterialIcon name="manage_accounts" size="sm" className="text-primary" />
           <div>
             <p className="text-sm font-extrabold text-ink">Keluar dari Sesi Aplikasi</p>
-            <p className="text-xs text-ink/70">
+            <p className="text-xs font-semibold text-ink">
               Keluar dari akun {activeAccount.name} ({activeAccount.email}).
             </p>
           </div>

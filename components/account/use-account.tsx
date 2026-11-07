@@ -54,6 +54,7 @@ type AccountContextValue = {
     birthDate?: string
     address: string
     accountType: AccountType
+    wasteProfile?: Partial<ResidentWasteProfile>
   }) => Promise<UserAccount | null>
   updateTimetable: (patch: {
     slotId: string

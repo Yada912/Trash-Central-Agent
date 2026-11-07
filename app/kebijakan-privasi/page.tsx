@@ -28,7 +28,7 @@ export default function KebijakanPrivasiPage() {
         <h1 className="text-3xl font-black text-ink tracking-tight">
           Kebijakan Privasi &amp; Pelindungan Data Pribadi
         </h1>
-        <p className="text-sm font-semibold text-ink/75">
+        <p className="text-sm font-black text-ink">
           Berlaku Efektif: 1 Januari 2026 · Terakhir Diperbarui: 7 November 2026
         </p>
 

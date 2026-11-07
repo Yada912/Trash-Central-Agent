@@ -12,8 +12,8 @@ import { MaterialIcon } from '@/components/ui/material-icon'
 export default function MasukPetugasPage() {
   const router = useRouter()
   const { login, activeAccount, isSignedIn, logout } = useAccount()
-  const [email, setEmail] = useState('surya.wirawan@dlhk.denpasar.id')
-  const [password, setPassword] = useState('petugas123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -32,23 +32,6 @@ export default function MasukPetugasPage() {
 
     if (authed.role !== 'petugas') {
       setError('Akun ini terdaftar sebagai Warga, bukan Petugas Operasional. Silakan masuk melalui halaman login Warga.')
-      return
-    }
-
-    router.push('/petugas')
-  }
-
-  async function handleQuickLogin() {
-    setEmail('surya.wirawan@dlhk.denpasar.id')
-    setPassword('petugas123')
-    setError(null)
-    setBusy(true)
-
-    const authed = await login('surya.wirawan@dlhk.denpasar.id', 'petugas123')
-    setBusy(false)
-
-    if (!authed || authed.role !== 'petugas') {
-      setError('Gagal masuk sebagai Petugas Uji.')
       return
     }
 
@@ -144,26 +127,15 @@ export default function MasukPetugasPage() {
               <MaterialIcon name="verified_user" size="sm" />
               <span>{busy ? 'Memverifikasi…' : 'Masuk ke Portal Petugas'}</span>
             </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={busy}
-              onClick={() => void handleQuickLogin()}
-              className="btn-tactile bg-mint text-ink w-full py-2 font-black text-xs flex items-center justify-center gap-1.5"
-            >
-              <MaterialIcon name="bolt" size="sm" />
-              <span>Masuk Cepat: I Wayan Gde Surya Wirawan (Driver Barat)</span>
-            </Button>
           </div>
         </form>
 
-        <div className="rounded-xl border border-ink/30 bg-bg p-3 text-xs text-ink/75 grid gap-1">
-          <p className="font-bold flex items-center gap-1 text-ink">
+        <div className="rounded-xl border-2 border-ink bg-bg p-3.5 text-xs text-ink font-semibold grid gap-1">
+          <p className="font-black flex items-center gap-1 text-ink">
             <MaterialIcon name="shield" size="sm" className="text-primary" />
             Perlindungan Data Kedinasan
           </p>
-          <p>
+          <p className="text-ink/90 font-medium">
             Akses portal petugas mencakup penetapan toleransi leeway armada, rute penjemputan VRP, dan data TPS3R kecamatan sesuai regulasi DLHK Kota Denpasar.
           </p>
         </div>

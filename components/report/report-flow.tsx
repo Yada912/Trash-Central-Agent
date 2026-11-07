@@ -117,7 +117,7 @@ export function ReportFlow() {
               className={
                 index === stepIndex
                   ? 'vector-card bg-primary text-white px-3 py-2 text-sm font-extrabold'
-                  : 'vector-card-soft bg-bg px-3 py-2 text-sm font-bold text-ink/75'
+                  : 'vector-card-soft bg-bg px-3 py-2 text-sm font-black text-ink'
               }
             >
               0{index + 1} · {label}
