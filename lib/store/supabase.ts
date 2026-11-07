@@ -24,6 +24,9 @@ type ReportRow = {
 }
 
 function assertServiceRole(key: string): void {
+  if (key.startsWith('sb_publishable_')) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY must be a service_role key, but received a publishable (anon) key.')
+  }
   const segment = key.split('.')[1]
   if (!segment) return
   try {

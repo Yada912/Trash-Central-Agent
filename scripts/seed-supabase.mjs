@@ -4,11 +4,16 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const url = process.env.SUPABASE_URL
+const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!url || !key) {
-  console.error('Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY. No values were printed.')
+  console.error('Set SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY. No values were printed.')
+  process.exit(1)
+}
+
+if (key.startsWith('sb_publishable_')) {
+  console.error('SUPABASE_SERVICE_ROLE_KEY is a publishable (anon) key, not a service_role secret key. Refusing to seed.')
   process.exit(1)
 }
 
