@@ -37,6 +37,10 @@ body {
   transform: none;
 }
 
+.site-header :focus-visible {
+  outline-color: #ffffff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {
     scroll-behavior: auto;

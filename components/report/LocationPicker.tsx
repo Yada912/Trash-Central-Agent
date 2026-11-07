@@ -21,7 +21,7 @@ export function LocationPicker({
   const lngNum = Number(lng)
   const pin = Number.isFinite(latNum) && Number.isFinite(lngNum) && lat !== '' && lng !== '' ? { lat: latNum, lng: lngNum } : null
   return (
-    <section className="grid gap-4" aria-labelledby="location-heading">
+    <section className="grid gap-4 rounded-lg border border-ink/10 bg-card p-4" aria-labelledby="location-heading">
       <div className="grid gap-2">
         <h2 id="location-heading" className="text-xl font-semibold">
           Location

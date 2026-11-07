@@ -8,19 +8,22 @@ const MISSING_TEXT: Record<InsufficientMissing, string> = {
 
 export function ClassificationStatus({
   busy,
+  heading,
   notTrashReason,
   insufficient,
   classification,
 }: {
   busy: boolean
+  heading: string
   notTrashReason: string | null
   insufficient: { reason: string; missing: readonly InsufficientMissing[] } | null
   classification: Classification | null
 }) {
   return (
-    <section className="grid gap-2" aria-labelledby="classification-heading" aria-busy={busy}>
+    <section className="grid gap-3 rounded-lg border border-gold/40 bg-gold/10 p-4" aria-labelledby="classification-heading" aria-busy={busy}>
+      <p className="text-xs font-semibold uppercase tracking-wide text-primary">Classifier result</p>
       <h2 id="classification-heading" className="text-xl font-semibold">
-        Classification
+        {heading}
       </h2>
       {busy ? <p>Classifying…</p> : null}
       {notTrashReason ? (
@@ -40,9 +43,13 @@ export function ClassificationStatus({
       ) : null}
       {classification ? (
         <div className="grid gap-1 text-sm">
-          <p>Confidence: {classification.confidence.toFixed(2)}</p>
+          <p className={classification.confidence < 0.5 ? 'font-semibold text-alert' : 'font-semibold'}>
+            Confidence: {Math.round(classification.confidence * 100)}% ({classification.confidence.toFixed(2)})
+            {classification.confidence < 0.5 ? ' — low' : ''}
+          </p>
           <p>Rationale: {classification.rationale}</p>
-          <p>Flags: {classification.flags.length > 0 ? classification.flags.join(', ') : 'none'}</p>
+          <p>Classifier flags: {classification.flags.length > 0 ? classification.flags.join(', ') : 'none'}</p>
+          <p>This result stays as it was returned. Edits below change the confirmed shares, volume, urgency, and flags.</p>
         </div>
       ) : null}
     </section>

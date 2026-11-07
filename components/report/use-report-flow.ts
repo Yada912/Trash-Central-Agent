@@ -2,18 +2,23 @@
 
 import { useRef, useState } from 'react'
 import { compressPhoto } from '@/components/report/compress-photo'
+import { flagsForConfirmation } from '@/components/report/confirmed-flags'
+import { isSeparateHazard } from '@/components/report/hazard-policy'
+import { initialHazardWarning, nextHazardWarning, type HazardWarningState } from '@/components/report/hazard-warning-state'
+import { nextIdempotencyState, reportPayloadFingerprint, type IdempotencyState } from '@/components/report/idempotency-key'
 import { ApiError, messageForApiError, requestJson } from '@/lib/client/api'
 import { isInsideDenpasar } from '@/lib/geo'
 import { stampClassification } from '@/lib/review'
 import {
-  isHazardousClassification,
   TRASH_TYPES,
   volumeLabelFor,
   type Classification,
+  type ClassificationFlag,
   type InsufficientMissing,
   type ClassifyOutcome,
   type Report,
   type TrashType,
+  type AccountType,
   type Urgency,
 } from '@/lib/schemas'
 
@@ -44,8 +49,9 @@ function sharesToPercents(classification: Classification): Record<TrashType, num
 
 export function useReportFlow() {
   const lock = useRef(false)
-  const clientRequestId = useRef(crypto.randomUUID())
-  const [text, setText] = useState('')
+  const submitted = useRef(false)
+  const idempotency = useRef<IdempotencyState | null>(null)
+  const [text, setTextState] = useState('')
   const [photo, setPhoto] = useState<{ base64: string; mimeType: 'image/jpeg'; previewUrl: string } | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [source, setSource] = useState<Source | null>(null)
@@ -54,15 +60,18 @@ export function useReportFlow() {
   const [notTrashReason, setNotTrashReason] = useState<string | null>(null)
   const [insufficient, setInsufficient] = useState<{ reason: string; missing: InsufficientMissing[] } | null>(null)
   const [percents, setPercents] = useState(EMPTY_PERCENTS)
-  const [liters, setLiters] = useState('50')
-  const [urgency, setUrgency] = useState<Urgency>('medium')
+  const [liters, setLitersState] = useState('50')
+  const [urgency, setUrgencyState] = useState<Urgency>('medium')
+  const [hazard, setHazard] = useState<HazardWarningState>({ checked: false, explicit: false })
   const [reviewed, setReviewed] = useState(false)
-  const [lat, setLat] = useState('')
-  const [lng, setLng] = useState('')
+  const [accountType, setAccountTypeState] = useState<AccountType>('household')
+  const [lat, setLatState] = useState('')
+  const [lng, setLngState] = useState('')
   const [geoMessage, setGeoMessage] = useState<string | null>(null)
   const [busy, setBusy] = useState<'classify' | 'submit' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode | null>(null)
+  const [model, setModel] = useState<string | null>(null)
   const [success, setSuccess] = useState<Report | null>(null)
 
   const percentTotal = TRASH_TYPES.reduce((sum, type) => sum + percents[type], 0)
@@ -77,6 +86,7 @@ export function useReportFlow() {
       .filter((entry) => entry.share > 0)
       .sort((a, b) => b.share - a.share || a.type.localeCompare(b.type))
     const base = source === 'ai' ? aiClassification : null
+    const baseFlags: readonly ClassificationFlag[] = base?.flags ?? []
     return stampClassification(
       {
         types,
@@ -84,12 +94,18 @@ export function useReportFlow() {
         urgency,
         confidence: base?.confidence ?? 0,
         rationale: base?.rationale ?? 'Entered manually by the resident.',
-        flags: base?.flags ?? (photo ? [] : ['no_image']),
+        flags: flagsForConfirmation({
+          baseFlags,
+          hasImage: Boolean(photo),
+          includeHazardousPresent: hazard.checked,
+          hazardousShare: percents.hazardous / 100,
+        }),
       },
       {
         text,
         hasImage: Boolean(photo),
         source: source === 'manual' ? 'manual' : 'mock',
+        ...(source === 'ai' && aiClassification ? { aiClassification } : {}),
       },
     )
   }
@@ -100,6 +116,11 @@ export function useReportFlow() {
     setReviewed(false)
   }
 
+  function setText(value: string) {
+    setTextState(value)
+    markEdited()
+  }
+
   async function onPhoto(file: File) {
     setPhotoError(null)
     try {
@@ -108,6 +129,7 @@ export function useReportFlow() {
         if (current) URL.revokeObjectURL(current.previewUrl)
         return next
       })
+      markEdited()
     } catch (caught) {
       const reason = caught instanceof Error ? caught.message : ''
       setPhotoError(
@@ -124,23 +146,26 @@ export function useReportFlow() {
       return null
     })
     setPhotoError(null)
+    markEdited()
   }
 
   function applyAi(classification: Classification) {
+    const nextPercents = sharesToPercents(classification)
     setNotTrashReason(null)
     setInsufficient(null)
     setSource('ai')
     setAiClassification(classification)
     setShown(classification)
-    setPercents(sharesToPercents(classification))
-    setLiters(String(classification.volume.liters))
-    setUrgency(classification.urgency)
+    setPercents(nextPercents)
+    setLitersState(String(classification.volume.liters))
+    setUrgencyState(classification.urgency)
+    setHazard(initialHazardWarning(classification.flags, nextPercents.hazardous))
     setReviewed(false)
-    setNotTrashReason(null)
   }
 
   function enterManually() {
     setSource('manual')
+    setAiClassification(null)
     setShown(
       stampClassification(
         {
@@ -155,8 +180,9 @@ export function useReportFlow() {
       ),
     )
     setPercents({ ...EMPTY_PERCENTS(), residual: 100 })
-    setLiters('50')
-    setUrgency('medium')
+    setLitersState('50')
+    setUrgencyState('medium')
+    setHazard({ checked: false, explicit: false })
     setReviewed(false)
     setError(null)
   }
@@ -175,6 +201,7 @@ export function useReportFlow() {
         },
       })
       setMode(response.meta.mode)
+      setModel(response.meta.model ?? null)
       if (response.data.kind === 'not_trash') {
         setNotTrashReason(response.data.reason)
         setInsufficient(null)
@@ -192,7 +219,10 @@ export function useReportFlow() {
       applyAi(response.data.classification)
     } catch (caught) {
       setError(messageForApiError(caught))
-      if (caught instanceof ApiError) setMode(null)
+      if (caught instanceof ApiError && !source) {
+        setMode(null)
+        setModel(null)
+      }
     } finally {
       lock.current = false
       setBusy(null)
@@ -206,9 +236,10 @@ export function useReportFlow() {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLat(position.coords.latitude.toFixed(6))
-        setLng(position.coords.longitude.toFixed(6))
+        setLatState(position.coords.latitude.toFixed(6))
+        setLngState(position.coords.longitude.toFixed(6))
         setGeoMessage('Location filled from this device. You can still move the pin.')
+        markEdited()
       },
       () => {
         setGeoMessage('Location permission was denied. Enter a pin or coordinates instead.')
@@ -219,26 +250,39 @@ export function useReportFlow() {
 
   async function submit() {
     const classification = workingClassification()
-    if (lock.current || !classification || !reviewed || !locationOk) return
+    if (lock.current || submitted.current || !classification || !reviewed || !locationOk) return
+    const fingerprint = reportPayloadFingerprint({
+      text: text.trim(),
+      lat: latNumber,
+      lng: lngNumber,
+      imageBase64: photo?.base64 ?? null,
+      classification,
+      aiClassification: source === 'ai' ? aiClassification : null,
+      accountType,
+    })
+    const issued = nextIdempotencyState(idempotency.current, fingerprint, crypto.randomUUID())
+    idempotency.current = issued
     lock.current = true
     setBusy('submit')
     setError(null)
     try {
       const response = await requestJson<Report>('/api/reports', {
         method: 'POST',
-        headers: { 'Idempotency-Key': clientRequestId.current },
+        headers: { 'Idempotency-Key': issued.key },
         body: {
           text: text.trim(),
           lat: latNumber,
           lng: lngNumber,
-          clientRequestId: clientRequestId.current,
+          clientRequestId: issued.key,
           ...(photo ? { image: { base64: photo.base64, mimeType: photo.mimeType } } : {}),
           classification,
+          accountType,
           ...(source === 'ai' && aiClassification ? { aiClassification } : {}),
         },
       })
       setMode(response.meta.mode)
       setSuccess(response.data)
+      submitted.current = true
     } catch (caught) {
       setError(messageForApiError(caught))
     } finally {
@@ -248,23 +292,28 @@ export function useReportFlow() {
   }
 
   function reset() {
-    clientRequestId.current = crypto.randomUUID()
+    submitted.current = false
+    idempotency.current = null
     clearPhoto()
-    setText('')
+    setMode(null)
+    setTextState('')
     setSource(null)
     setAiClassification(null)
     setShown(null)
     setNotTrashReason(null)
     setInsufficient(null)
     setPercents(EMPTY_PERCENTS())
-    setLiters('50')
-    setUrgency('medium')
+    setLitersState('50')
+    setUrgencyState('medium')
+    setHazard({ checked: false, explicit: false })
     setReviewed(false)
-    setLat('')
-    setLng('')
+    setAccountTypeState('household')
+    setLatState('')
+    setLngState('')
     setGeoMessage(null)
     setError(null)
     setSuccess(null)
+    setModel(null)
   }
 
   return {
@@ -280,22 +329,40 @@ export function useReportFlow() {
     percents,
     liters,
     urgency,
+    hazardChecked: hazard.checked,
+    setHazardChecked: (checked: boolean) => {
+      setHazard({ checked, explicit: true })
+      markEdited()
+    },
+    classifierFlags: source === 'ai' ? (aiClassification?.flags ?? []) : [],
     reviewed,
     setReviewed,
+    accountType,
+    setAccountType: (value: AccountType) => {
+      setAccountTypeState(value)
+      markEdited()
+    },
     lat,
     lng,
-    setLat,
-    setLng,
+    setLat: (value: string) => {
+      setLatState(value)
+      markEdited()
+    },
+    setLng: (value: string) => {
+      setLngState(value)
+      markEdited()
+    },
     geoMessage,
     useMyLocation,
     busy,
     error,
     mode,
+    model,
     success,
     percentTotal,
     locationOk,
     draft,
-    hazardous: draft ? isHazardousClassification(draft) : false,
+    hazardous: draft ? isSeparateHazard(draft) : percents.hazardous > 0,
     confidence: shown?.confidence ?? null,
     canClassify: text.trim().length >= 1 && text.trim().length <= 1000 && !busy,
     canSubmit: Boolean(draft) && reviewed && locationOk && !busy && percentTotal === 100,
@@ -303,19 +370,21 @@ export function useReportFlow() {
     enterManually,
     submit,
     reset,
+    source,
     setPercent: (type: TrashType, value: string) => {
       const parsed = Number(value)
       if (!Number.isInteger(parsed) || parsed < 0 || parsed > 100) return
       setPercents((current) => ({ ...current, [type]: parsed }))
+      if (type === 'hazardous') setHazard((current) => nextHazardWarning(current, parsed))
       markEdited()
     },
     setLiters: (value: string) => {
       if (value !== '' && !/^\d+$/.test(value)) return
-      setLiters(value)
+      setLitersState(value)
       markEdited()
     },
     setUrgency: (value: Urgency) => {
-      setUrgency(value)
+      setUrgencyState(value)
       markEdited()
     },
     hasDraft: source !== null,

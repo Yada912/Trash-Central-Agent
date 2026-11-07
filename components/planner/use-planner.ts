@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { explanationMetaFrom, type ExplanationMeta } from '@/components/planner/explanation-label'
+import { withExpectedVersion } from '@/components/planner/decision-request'
 import { ApiError, messageForApiError, requestJson } from '@/lib/client/api'
 import type { Plan } from '@/lib/schemas'
 
@@ -19,6 +21,7 @@ export function usePlanner() {
   const params = useSearchParams()
   const planId = params.get('plan')
   const lock = useRef(false)
+  const knownModelPlanId = useRef<string | null>(null)
   const [loadingPlan, setLoadingPlan] = useState(Boolean(planId))
   const [trucks, setTrucks] = useState<TruckDraft[]>(DEFAULT_TRUCKS)
   const [crews, setCrews] = useState('4')
@@ -29,6 +32,8 @@ export function usePlanner() {
   const [violations, setViolations] = useState<string[]>([])
   const [plan, setPlan] = useState<Plan | null>(null)
   const [mode, setMode] = useState<'live' | 'demo' | null>(null)
+  const [explanationMeta, setExplanationMeta] = useState<ExplanationMeta | null>(null)
+  const [explainFailure, setExplainFailure] = useState<string | null>(null)
   const [busy, setBusy] = useState<'run' | 'edit' | 'approve' | 'reject' | 'explain' | null>(null)
   const [note, setNote] = useState('')
   const [moveStopId, setMoveStopId] = useState('')
@@ -50,6 +55,12 @@ export function usePlanner() {
         if (cancelled) return
         setPlan(response.data)
         setMode(response.meta.mode)
+        const incoming = explanationMetaFrom(response.meta)
+        setExplanationMeta((current) => {
+          if (knownModelPlanId.current === response.data.id && current?.modelFieldPresent && !incoming.modelFieldPresent) return current
+          if (incoming.modelFieldPresent) knownModelPlanId.current = response.data.id
+          return incoming
+        })
         setTrucks(
           response.data.input.trucks.map((truck, index) => ({
             key: `loaded-${index + 1}`,
@@ -87,12 +98,20 @@ export function usePlanner() {
       const response = await requestJson<Plan>(path, { method: 'POST', body })
       setPlan(response.data)
       setMode(response.meta.mode)
+      if (action === 'run' || action === 'explain') {
+        const incoming = explanationMetaFrom(response.meta)
+        if (incoming.modelFieldPresent) knownModelPlanId.current = response.data.id
+        setExplanationMeta(incoming)
+        setExplainFailure(null)
+      }
       remember(response.data)
       if (action === 'edit' || action === 'approve' || action === 'reject') setNote('')
     } catch (error) {
       if (error instanceof ApiError && error.fields?.violations) setViolations(error.fields.violations)
       const prefix = error instanceof ApiError && error.status === 409 ? '409 ' : ''
-      setRequestError(`${prefix}${messageForApiError(error)}`)
+      const message = `${prefix}${messageForApiError(error)}`
+      setRequestError(message)
+      if (action === 'explain') setExplainFailure(message)
     } finally {
       lock.current = false
       setBusy(null)
@@ -147,6 +166,8 @@ export function usePlanner() {
     plan,
     loadingPlan,
     mode,
+    explanationMeta,
+    explainFailure,
     busy,
     note,
     setNote,
@@ -157,23 +178,18 @@ export function usePlanner() {
     runPlan,
     approve: () => {
       if (!plan) return
-      void run('approve', `/api/plans/${plan.id}/decision`, { action: 'approve', expectedVersion: plan.version })
+      void run('approve', `/api/plans/${plan.id}/decision`, withExpectedVersion(plan.version, { action: 'approve' }))
     },
     reject: () => {
       if (!plan || note.trim().length === 0) return
-      void run('reject', `/api/plans/${plan.id}/decision`, {
-        action: 'reject',
-        note: note.trim(),
-        expectedVersion: plan.version,
-      })
+      void run('reject', `/api/plans/${plan.id}/decision`, withExpectedVersion(plan.version, { action: 'reject', note: note.trim() }))
     },
     edit: () => {
       if (!plan || !moveStopId || !moveTruckId) return
-      void run('edit', `/api/plans/${plan.id}/decision`, {
+      void run('edit', `/api/plans/${plan.id}/decision`, withExpectedVersion(plan.version, {
         action: 'edit',
-        expectedVersion: plan.version,
         edits: { moveStop: { stopId: moveStopId, toTruckId: moveTruckId } },
-      })
+      }))
     },
     reexplain: () => {
       if (!plan) return

@@ -16,7 +16,7 @@ export default function HomePage() {
       </p>
       <ul className="mt-8 grid gap-4 md:grid-cols-3">
         {LINKS.map((link) => (
-          <li key={link.href} className="rounded-lg border border-ink/10 bg-card p-4">
+          <li key={link.href} className="rounded-lg border border-ink/10 bg-card p-4 shadow-none">
             <h2 className="text-xl font-semibold">
               <Link href={link.href}>{link.title}</Link>
             </h2>

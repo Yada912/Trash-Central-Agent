@@ -18,21 +18,39 @@ function geminiConfigured(): boolean {
   return Boolean(process.env.GEMINI_API_KEY?.trim())
 }
 
-/** Labelled demo owned by the API. classifyReport does not invent this. */
+const MATERIAL_PATTERNS: Array<{ type: TrashType; pattern: RegExp }> = [
+  { type: 'hazardous', pattern: /\b(baterai|battery|aki|oli|medis|obat|kimia|hazardous|b3|pesticide|pestisida)\b/ },
+  { type: 'plastic', pattern: /\b(plastik|plastic|botol|bottle)\b/ },
+  { type: 'organic', pattern: /\b(organik|organic|daun|makanan|food|peel|sayur)\b/ },
+  { type: 'paper', pattern: /\b(kertas|paper|kardus|cardboard)\b/ },
+  { type: 'metal', pattern: /\b(logam|metal|kaleng|besi)\b/ },
+]
+
+function namedMaterials(text: string): TrashType[] {
+  return MATERIAL_PATTERNS.filter((entry) => entry.pattern.test(text)).map((entry) => entry.type)
+}
+
+function demoInsufficient(reason: string, missing: Array<'type' | 'volume'>): ClassifyOutcome {
+  return { kind: 'insufficient', reason, missing }
+}
+
+/**
+ * Labelled demo owned by the API. classifyReport does not invent this.
+ * A long or unfamiliar sentence is not evidence of residual waste.
+ * One named material can keep the keyword mock. Vague notes, unknown
+ * wrappers, and contradictory materials abstain.
+ */
 function demoClassify(input: { text: string; image?: { base64: string; mimeType: string } }): ClassifyOutcome {
   const text = input.text.trim().toLowerCase()
   if (text.length < 10 && !input.image) {
-    return {
-      kind: 'insufficient',
-      reason: 'Demo output: this note is too short to estimate the waste type or volume without guessing.',
-      missing: ['type', 'volume'],
-    }
+    return demoInsufficient(
+      'Demo output: this note is too short to estimate the waste type or volume without guessing.',
+      ['type', 'volume'],
+    )
   }
-  const wasteWord =
-    /\b(sampah|limbah|trash|waste|plastik|plastic|organik|organic|kertas|paper|kardus|logam|metal|kaleng|baterai|battery|oli|medis|hazardous)\b/
   if (
     /\b(bukan sampah|bukan limbah|not trash|not waste)\b/.test(text) ||
-    (!wasteWord.test(text) && /\b(kucing|anjing|sepeda|cat|dog|bicycle)\b/.test(text))
+    (!/\b(sampah|limbah|trash|waste)\b/.test(text) && /\b(kucing|anjing|sepeda|cat|dog|bicycle)\b/.test(text))
   ) {
     return {
       kind: 'not_trash',
@@ -40,14 +58,22 @@ function demoClassify(input: { text: string; image?: { base64: string; mimeType:
       confidence: 0.7,
     }
   }
-  let type: TrashType = 'residual'
-  if (/\b(baterai|battery|aki|oli|medis|obat|kimia|hazardous|b3)\b/.test(text)) type = 'hazardous'
-  else if (/\b(plastik|plastic|botol)\b/.test(text)) type = 'plastic'
-  else if (/\b(organik|organic|daun|makanan|food)\b/.test(text)) type = 'organic'
-  else if (/\b(kertas|paper|kardus|cardboard)\b/.test(text)) type = 'paper'
-  else if (/\b(logam|metal|kaleng|besi)\b/.test(text)) type = 'metal'
-  const parsedLiters = /(\d+)\s*(liter|litre|l)\b/.exec(text)
-  const liters = parsedLiters ? Math.max(1, Number(parsedLiters[1])) : type === 'residual' ? 50 : 80
+  const materials = namedMaterials(text)
+  const statedLiters = /(\d+)\s*(liter|litre|l)\b/.exec(text)
+  const contradicts = materials.length >= 2 && /\b(no|not|without|only|tanpa|bukan|tidak|hanya)\b/.test(text)
+  const unknownWrapper =
+    /\b(wrapper|wrappers|kemasan|bungkus)\b/.test(text) &&
+    /\b(unknown|unsure|not sure|tidak jelas|tidak tahu|ambiguous)\b/.test(text)
+  if (unknownWrapper || contradicts || materials.length !== 1) {
+    const missing: Array<'type' | 'volume'> = ['type']
+    if (!statedLiters) missing.push('volume')
+    const reason = contradicts
+      ? 'Demo output: the note contradicts itself, so no trash type or volume is estimated.'
+      : 'Demo output: this note does not support a trash type or volume without guessing.'
+    return demoInsufficient(reason, missing)
+  }
+  const type = materials[0]
+  const liters = statedLiters ? Math.max(1, Number(statedLiters[1])) : 80
   const flags: ClassificationFlag[] = []
   if (!input.image) flags.push('no_image')
   if (type === 'hazardous') flags.push('hazardous_present')
@@ -59,7 +85,7 @@ function demoClassify(input: { text: string; image?: { base64: string; mimeType:
         types: [{ type, share: 1 }],
         volume: { liters, label: volumeLabelFor(liters) },
         urgency: /\b(darurat|gawat|bahaya|urgent)\b/.test(text) ? 'high' : /\b(sedikit|kecil|small)\b/.test(text) ? 'low' : 'medium',
-        confidence: type === 'residual' ? 0.42 : 0.66,
+        confidence: 0.66,
         rationale: 'Demo output: keyword placeholder because GEMINI_API_KEY is unset.',
         flags,
       },
