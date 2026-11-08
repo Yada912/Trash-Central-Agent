@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { authenticateAccount, createAccount, listAccounts } from '@/lib/accounts/store'
+import { authenticateAccount } from '@/lib/accounts/authenticate'
+import { createAccount, listAccounts } from '@/lib/accounts/store'
 
 describe('guest state, demo judge credentials, and registration flow', () => {
   it('allows Dewan Juri to authenticate using the sample citizen credentials (I Made Adi Wijaya)', () => {

@@ -57,13 +57,13 @@ Fitur tambahan yang sudah berfungsi: jadwal angkut per kecamatan/aliran/jenis ak
 | Asisten Kresna `POST /api/agent/chat` | `gemini-3.5-flash` | Pesan warga + profil + jadwal → balasan dan pembaruan profil terstruktur (kondisi, liter ekstra acara, aliran dominan) |
 | Penjelasan rute `POST /api/plans`, `POST /api/plans/:id/explain` | `gemini-3.5-flash-lite` | Hasil solver → ringkasan dan risiko. Model hanya memilih kode, sedangkan kalimat dan angka dirender server dari fakta solver |
 
-Model diatur lewat `GEMINI_CLASSIFY_MODEL` / `GEMINI_EXPLAIN_MODEL`. Jika variabel kosong, kode memakai `gemini-2.5-flash` / `gemini-2.5-flash-lite` ([`lib/ai/keys.ts`](./lib/ai/keys.ts)). Hingga 4 kunci API dirotasi otomatis saat terkena 429/503.
+Model diatur lewat `GEMINI_CLASSIFY_MODEL` / `GEMINI_EXPLAIN_MODEL`. Jika variabel kosong, kode memakai `gemini-2.5-flash` / `gemini-2.5-flash-lite` ([`lib/ai/keys.ts`](./lib/ai/keys.ts)). Lingkungan produksi mengisi `gemini-3.5-flash` dan `gemini-3.5-flash-lite`. Hingga 4 kunci API dirotasi otomatis saat terkena 429/503. Penjelasan rute mencoba model explain, lalu model klasifikasi, lalu `gemini-2.5-flash-lite`, `gemini-2.5-flash`, `gemini-3.5-flash`, dan `gemini-3.5-flash-lite`, lalu templat deterministik jika semuanya gagal. Klasifikasi tidak mengganti kegagalan model dengan mock.
 
 **Pengaman:**
 - `needsReview` dihitung server secara deterministik ([`lib/review.ts`](./lib/review.ts)): confidence < 0,5, ada B3, teks terlalu pendek, kontradiksi, atau foto berkualitas rendah.
 - Laporan dengan porsi B3 > 0 tidak pernah masuk rute truk biasa (`hazardous_separate`).
 - Penghapusan label B3 oleh warga diaudit (`hazard_cleared_by_resident`).
-- Tanpa kunci API → mode `demo` berlabel. Dengan kunci → kegagalan model dilaporkan jujur, tidak diganti data tiruan.
+- Tanpa kunci API → mode `demo` berlabel. Dengan kunci, kegagalan klasifikasi dilaporkan sebagai galat. Kegagalan penjelasan rute beralih ke model berikutnya, lalu ke templat berlabel `template-fallback`. Kresna yang gagal memanggil model menandai balasan `source: template`.
 - Guard *prompt injection*, penyamaran data pribadi, dan pembatasan laju ([`lib/security/guard.ts`](./lib/security/guard.ts)).
 
 **Optimasi rute bukan AI.** [`lib/planner/vrp.ts`](./lib/planner/vrp.ts) memakai *cheapest insertion* berbasis urgensi + 2-opt, jarak Haversine garis lurus, 25 km/jam, dan 8 menit per pemberhentian.
@@ -102,7 +102,7 @@ Pengujian: `pnpm test` (Vitest) · `pnpm typecheck` · `pnpm lint` · `pnpm e2e`
 
 ## Deployment URL
 
-- Produksi: **[ISI URL VERCEL]**
+- Produksi: **https://central-trash-agent-bali.vercel.app**
 - Versi yang dinilai Tahap 1: tag `v1.0-submission`
 
 ## Demo Account (jika diperlukan - jangan simpan password sensitif di public repo)

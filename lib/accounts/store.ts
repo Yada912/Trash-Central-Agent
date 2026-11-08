@@ -69,6 +69,7 @@ export type AgentChatMessage = {
   text: string
   timestamp: string
   modelUpdateSummary?: string
+  source?: 'gemini' | 'template'
 }
 
 export type AgentMemoryItem = {
@@ -159,12 +160,18 @@ export type ResidentOptimizationSummary = {
 
 export const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
 
+/** Env override for the built-in demo rows. Unset keeps the passwords judges already have. */
+function demoPassword(envName: string, fallback: string): string {
+  const value = process.env[envName]?.trim()
+  return value || fallback
+}
+
 const DEFAULT_ACCOUNTS: UserAccount[] = [
   {
     id: 'usr_warga_01',
     name: 'I Made Adi Wijaya',
     email: 'made.adi@warga.denpasar.id',
-    password: 'warga123',
+    password: demoPassword('DEMO_WARGA_PASSWORD', 'warga123'),
     role: 'warga',
     kecamatan: 'Denpasar Barat',
     desa: 'Pemecutan',
@@ -289,7 +296,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_warga_02',
     name: 'Ni Luh Putu Sari (Warung Sari Sanur)',
     email: 'putu.sari@umkm.denpasar.id',
-    password: 'warga123',
+    password: demoPassword('DEMO_WARGA_PASSWORD', 'warga123'),
     role: 'warga',
     kecamatan: 'Denpasar Selatan',
     desa: 'Sanur',
@@ -355,7 +362,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_petugas_01',
     name: 'I Wayan Gde Surya Wirawan',
     email: 'surya.wirawan@dlhk.denpasar.id',
-    password: 'petugas123',
+    password: demoPassword('DEMO_PETUGAS_PASSWORD', 'petugas123'),
     role: 'petugas',
     badgeId: 'DLHK-DPS-042',
     kecamatan: 'Denpasar Barat',
@@ -729,15 +736,6 @@ function sanitizeAccount(account: UserAccount): UserAccount {
   return structuredClone(safeAccount)
 }
 
-function constantTimeMatch(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-  let diff = 0
-  for (let i = 0; i < a.length; i += 1) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
-  }
-  return diff === 0
-}
-
 export function loadExternalAccounts(externalAccounts: UserAccount[]): void {
   const state = getAccountState()
   const map = new Map<string, UserAccount>()
@@ -768,6 +766,25 @@ export function getRawAccount(id: string): UserAccount | null {
   return found ? structuredClone(found) : null
 }
 
+export function getRawAccountByEmail(email: string): UserAccount | null {
+  const normalized = email.trim().toLowerCase()
+  if (!normalized) return null
+  const found = getAccountState().accounts.find((acc) => acc.email.toLowerCase() === normalized)
+  return found ? structuredClone(found) : null
+}
+
+export function getAccountById(id: string): UserAccount | null {
+  const found = getAccountState().accounts.find((acc) => acc.id === id)
+  return found ? sanitizeAccount(found) : null
+}
+
+export function setAccountPassword(id: string, password: string): void {
+  const state = getAccountState()
+  const index = state.accounts.findIndex((acc) => acc.id === id)
+  if (index === -1) return
+  state.accounts[index] = { ...state.accounts[index], password }
+}
+
 export function listAccounts(): UserAccount[] {
   return getAccountState().accounts.map(sanitizeAccount)
 }
@@ -786,19 +803,6 @@ export function setActiveAccountId(accountId: string): UserAccount | null {
   const state = getAccountState()
   const found = state.accounts.find((acc) => acc.id === accountId)
   if (!found) return null
-  state.activeAccountId = found.id
-  return sanitizeAccount(found)
-}
-
-export function authenticateAccount(email: string, password?: string): UserAccount | null {
-  if (!email || !password || typeof password !== 'string') return null
-  const state = getAccountState()
-  const normalizedEmail = email.trim().toLowerCase()
-  const found = state.accounts.find((acc) => acc.email.toLowerCase() === normalizedEmail)
-  if (!found || !found.password) return null
-  if (!constantTimeMatch(found.password, password)) {
-    return null
-  }
   state.activeAccountId = found.id
   return sanitizeAccount(found)
 }
@@ -906,7 +910,7 @@ export function createAccount(input: {
     id,
     name: input.name.trim(),
     email: input.email.trim(),
-    password: input.password || 'warga123',
+    ...(input.password?.trim() ? { password: input.password.trim() } : {}),
     role: input.role,
     ...(input.role === 'petugas' ? { badgeId: `DLHK-DPS-${Math.floor(100 + Math.random() * 899)}` } : {}),
     kecamatan: input.kecamatan,

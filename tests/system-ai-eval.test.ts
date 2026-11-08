@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
+import { authenticateAccount } from '@/lib/accounts/authenticate'
 import {
-  authenticateAccount,
   computeResidentOptimization,
   listAccounts,
   listTimetableSlots,

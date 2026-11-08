@@ -1,5 +1,6 @@
 import { generateObject } from 'ai'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { explainModelChain } from '@/lib/ai/keys'
 import { EXPLAIN_MODEL_ID, EXPLAIN_PROMPT, EXPLAIN_REPAIR_PROMPT, explainPlan } from '@/lib/planner/explain'
 import type { PlanResult, SolvePlanInput } from '@/lib/schemas'
 
@@ -149,15 +150,20 @@ describe('explainPlan', () => {
         routeNotes: [{ truckId: 'ghost-truck', note: 'on_plan' }],
       },
     } as never)
-    await expect(explainPlan(plan, input)).rejects.toMatchObject({ code: 'UPSTREAM', reason: 'invalid_output' })
-    expect(generate).toHaveBeenCalledTimes(1 + 2)
+    const fallback = await explainPlan(plan, input)
+    expect(fallback.provenance).toEqual({ source: 'template', model: 'template-fallback' })
+    expect(fallback.summary.startsWith('Template fallback:')).toBe(true)
+    expect(fallback.summary).not.toContain('ghost-truck')
+    expect(generate).toHaveBeenCalledTimes(1 + explainModelChain().length * 2)
   })
 
-  it('rejects an inapplicable risk and a provider error without switching to demo', async () => {
+  it('uses the template when every model rejects the selection or the provider fails', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
     delete process.env.GEMINI_API_KEY_2
     delete process.env.GEMINI_API_KEY_3
     delete process.env.GEMINI_API_KEY_4
+    delete process.env.GEMINI_CLASSIFY_MODEL
+    delete process.env.GEMINI_EXPLAIN_MODEL
     generate.mockResolvedValue({
       object: {
         interpretation: 'infeasible_routes',
@@ -165,13 +171,16 @@ describe('explainPlan', () => {
         routeNotes: [],
       },
     } as never)
-    await expect(explainPlan(plan, input)).rejects.toMatchObject({ reason: 'invalid_output' })
-    expect(generate).toHaveBeenCalledTimes(2)
+    const invalid = await explainPlan(plan, input)
+    expect(invalid.provenance).toEqual({ source: 'template', model: 'template-fallback' })
+    expect(generate).toHaveBeenCalledTimes(explainModelChain().length * 2)
 
     generate.mockReset()
     generate.mockRejectedValue(Object.assign(new Error('down'), { statusCode: 503 }))
-    await expect(explainPlan(plan, input)).rejects.toMatchObject({ code: 'UPSTREAM' })
-    expect(generate).toHaveBeenCalledTimes(1)
+    const down = await explainPlan(plan, input)
+    expect(down.provenance.source).toBe('template')
+    expect(down.summary.startsWith('Template fallback:')).toBe(true)
+    expect(generate).toHaveBeenCalledTimes(explainModelChain().length)
   })
 
   it('fails over across multiple API keys when the primary key hits a 429 rate limit', async () => {

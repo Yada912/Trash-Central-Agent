@@ -165,7 +165,7 @@ function buildGoogleMapsDirectionsUrl(stops: Array<{ lat: number; lng: number }>
 }
 
 export function PetugasPortal() {
-  const { activeAccount, accounts, isSignedIn, timetable, updateTimetable } = useAccount()
+  const { activeAccount, isSignedIn, timetable, updateTimetable } = useAccount()
   const { reports, loading: loadingReports, reload } = useDashboard()
 
   const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan>('Denpasar Barat')
@@ -237,7 +237,6 @@ export function PetugasPortal() {
     r.classification.types.some((t) => t.type === 'hazardous' && t.share > 0),
   )
   const totalReportedLiters = reports.reduce((acc, r) => acc + r.classification.volume.liters, 0)
-  const wargaAccounts = accounts.filter((a) => a.role === 'warga')
   const kecamatanSlots = timetable.filter((s) => s.kecamatan === selectedKecamatan)
 
   async function handleQuickLeewayUpdate(slotId: string, leewayMinutes: number, surgeTolerancePct: number) {
@@ -623,9 +622,7 @@ export function PetugasPortal() {
         <InteractiveCalendar
           kecamatan={selectedKecamatan}
           timetable={timetable}
-          weeklyRegularLiters={wargaAccounts
-            .filter((w) => w.kecamatan === selectedKecamatan)
-            .reduce((sum, w) => sum + (w.wasteProfile?.weeklyRegularLiters ?? 80), 80)}
+          weeklyRegularLiters={80}
           selectedBalineseEventIds={[
             'bali_penampahan_galungan',
             'bali_galungan',

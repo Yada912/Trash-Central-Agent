@@ -72,7 +72,7 @@ function reviewReasons(raw, flags) {
 function mapReport(raw) {
   const liters = Math.max(1, Math.round(raw.volumeLiters))
   const flags = ['no_image']
-  if (raw.types.some((entry) => entry.type === 'hazardous' && entry.share >= 0.2)) flags.unshift('hazardous_present')
+  if (raw.types.some((entry) => entry.type === 'hazardous' && entry.share > 0)) flags.unshift('hazardous_present')
   const reasons = reviewReasons(raw, flags)
   return {
     id: raw.id,
@@ -86,7 +86,9 @@ function mapReport(raw) {
     description_en: raw.descriptionEn ?? null,
     photo_url: null,
     classification: {
-      types: raw.types,
+      types: [...raw.types].sort(
+        (left, right) => Number(right.share) - Number(left.share) || String(left.type).localeCompare(String(right.type)),
+      ),
       volume: { liters, label: labelFor(liters) },
       urgency: raw.urgency,
       confidence: raw.confidence,

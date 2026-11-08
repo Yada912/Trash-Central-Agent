@@ -17,9 +17,12 @@ Panduan ini menjelaskan langkah demi langkah untuk mendemonstrasikan seluruh kap
    GEMINI_API_KEY_2=kunci_cadangan_2
    GEMINI_API_KEY_3=kunci_cadangan_3
    GEMINI_API_KEY_4=kunci_cadangan_4
-   GEMINI_CLASSIFY_MODEL=gemini-2.5-flash
-   GEMINI_EXPLAIN_MODEL=gemini-2.5-flash-lite
+   GEMINI_CLASSIFY_MODEL=gemini-3.5-flash
+   GEMINI_EXPLAIN_MODEL=gemini-3.5-flash-lite
+   SESSION_SECRET=rahasia-sesi-minimal-16
    ```
+   Produksi: https://central-trash-agent-bali.vercel.app
+   > **Model:** nilai di atas sama dengan `.env.example`. Jika kedua variabel model dikosongkan, kode memakai `gemini-2.5-flash` dan `gemini-2.5-flash-lite`. Penjelasan rute mencoba model explain, model klasifikasi, lalu id 2.5/3.5 yang belum dicoba, dan akhirnya templat deterministik.
    > **Catatan Mode Demo:** Apabila seluruh `GEMINI_API_KEY` dikosongkan, aplikasi secara otomatis berjalan dalam **Mode Demo** menggunakan pengklasifikasi kata kunci deterministik dan penjelas templat, dengan lencana status `demo` yang jujur di bagian atas layar.
 3. **Menjalankan server pengembangan:**
    ```bash
@@ -63,9 +66,10 @@ Panduan ini menjelaskan langkah demi langkah untuk mendemonstrasikan seluruh kap
 2. Atur parameter armada (mis. 2 truk, 2 kru, sif `06:00`–`18:00`) lalu klik **Jalankan rencana**.
 3. Tunjukkan **Fakta rute** (jumlah pemberhentian biasa, beban liter per kapasitas, jarak km, durasi menit, dan status kelayakan) serta **Peta rute** dari depo simulasi **TPA Suwung**.
 4. Tunjukkan bagian **Belum terjadwal** (*Unassigned*) di mana seluruh laporan B3 ditahan dengan alasan penanganan khusus DLH.
-5. **Uji Pemindahan Pemberhentian & Pemblokiran Persetujuan:**
+5. Masuk sebagai petugas di `/masuk/petugas` sebelum mengubah atau menyetujui rencana. Keputusan (pindah pemberhentian, setujui, tolak) menolak sesi yang bukan petugas.
+6. **Uji Pemindahan Pemberhentian & Pemblokiran Persetujuan:**
    - Pada bagian *Ubah penugasan*, pindahkan satu pemberhentian ke truk lain lalu klik **Simpan perubahan**.
    - Status rencana berubah menjadi `edited_pending` (versi bertambah) dan penjelasan ditandai **kedaluwarsa** (*stale*). Tombol **Setujui** otomatis dikunci hingga petugas menekan **Jelaskan ulang** dan seluruh rute berstatus layak (*feasible*).
-6. Klik **Jelaskan ulang** untuk memperbarui penjelasan rute, lalu klik **Setujui** (atau isi catatan penolakan dan klik **Tolak**).
-7. Muat ulang halaman (`F5`) untuk membuktikan bahwa status rencana dan **Log audit** berstempel waktu WITA (`+08:00`) tersimpan secara persisten.
+7. Klik **Jelaskan ulang** untuk memperbarui penjelasan rute, lalu klik **Setujui** (atau isi catatan penolakan dan klik **Tolak**).
+8. Muat ulang halaman (`F5`) untuk membuktikan bahwa status rencana dan **Log audit** berstempel waktu WITA (`+08:00`) tersimpan secara persisten.
 

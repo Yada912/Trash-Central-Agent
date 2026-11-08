@@ -52,8 +52,10 @@ Sebelum menekan tombol **Deploy**, buka bagian **Environment Variables** di hala
 | `GEMINI_API_KEY_2` | *(Kunci API 2 Anda)* | Kunci cadangan otomatis ke-2 (failover `429`/`503`) |
 | `GEMINI_API_KEY_3` | *(Kunci API 3 Anda)* | Kunci cadangan otomatis ke-3 |
 | `GEMINI_API_KEY_4` | *(Kunci API 4 Anda)* | Kunci cadangan otomatis ke-4 |
-| `GEMINI_CLASSIFY_MODEL` | `gemini-3.5-flash` | Model multimodal untuk klasifikasi citra/teks laporan warga **serta asisten percakapan personal Kresna**. Fallback otomatis ke `gemini-2.5-flash` jika dikosongkan. |
-| `GEMINI_EXPLAIN_MODEL` | `gemini-3.5-flash-lite` | Model berlatensi rendah untuk narasi penjelasan rute VRP armada. Fallback otomatis ke `gemini-2.5-flash-lite` jika dikosongkan. |
+| `GEMINI_CLASSIFY_MODEL` | `gemini-3.5-flash` | Model multimodal untuk klasifikasi citra/teks laporan warga **serta asisten percakapan personal Kresna**. Jika dikosongkan, kode memakai `gemini-2.5-flash`. |
+| `GEMINI_EXPLAIN_MODEL` | `gemini-3.5-flash-lite` | Model pertama untuk penjelasan rute. Jika gagal, kode mencoba model klasifikasi, lalu `gemini-2.5-flash-lite` dan `gemini-2.5-flash`, lalu templat. Jika variabel ini dikosongkan, model pertama adalah `gemini-2.5-flash-lite`. |
+| `SESSION_SECRET` | (wajib, minimal 16 karakter) | Rahasia tanda tangan cookie sesi httpOnly. Jika kosong, masuk gagal tertutup (503) dan rute petugas menolak. |
+| `DEMO_WARGA_PASSWORD` / `DEMO_PETUGAS_PASSWORD` | kosong | Opsional. Jika kosong, kata sandi demo yang sudah dibagikan ke juri tetap berlaku. |
 
 > [!NOTE]
 > Asisten timbulan warga **Kresna** menggunakan `GEMINI_CLASSIFY_MODEL` (bukan model penjelas rute) untuk penalaran kontekstual dan integrasi kalender Bali.

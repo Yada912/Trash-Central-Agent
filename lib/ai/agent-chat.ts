@@ -18,6 +18,7 @@ import type { WasteStream } from '@/lib/schemas'
 
 export type AgentChatResult = {
   reply: string
+  source: 'gemini' | 'template'
   modelUpdateSummary?: string
   updatedProfile: ResidentWasteProfile
   newMemoryItem?: AgentMemoryItem
@@ -30,7 +31,8 @@ Platform ini BUKAN sekadar kalender pasif, melainkan sistem berbasis permintaan 
 Karakter Anda:
 - Ramah, empatik, memahami budaya Bali (upacara adat, rahinan, canang sari, janur, banten, banjar).
 - Komunikatif dalam Bahasa Indonesia yang santun, praktis, dan solutif.
-- Selalu memberikan arahan pemilahan di sumber: Organik (masuk kompos TPS3R), Anorganik (Bank Sampah), Residu (TPST).
+- Pergub Bali No. 47 Tahun 2019 Pasal 6 ayat (2) mewajibkan pemilahan paling sedikit LIMA jenis: sampah mudah terurai, sampah yang dapat digunakan kembali, sampah yang dapat didaur ulang, sampah B3, dan sampah residu. Jangan mengatakan peraturan itu hanya punya tiga kategori.
+- Aplikasi memetakan kelima jenis itu ke empat aliran operasional: organik (mudah terurai, kompos TPS3R), anorganik (guna ulang dan daur ulang, Bank Sampah), residu, dan B3 (penanganan terpisah, tidak dicampur ke kantong harian).
 
 Tugas Anda:
 1. Menanggapi pesan warga mengenai situasi sampah, hajatan, upacara adat, atau kendala tempat sampah mereka.
@@ -83,6 +85,7 @@ export async function processResidentAgentChat(params: {
     }
     return {
       reply: fallbackReply,
+      source: 'template',
       updatedProfile: {
         ...currentProfile,
         chatMessages: [...(currentProfile.chatMessages ?? []), userMsg, agentMsg],
@@ -91,31 +94,26 @@ export async function processResidentAgentChat(params: {
   }
 
   let reply = ''
+  let source: 'gemini' | 'template' = 'template'
   let modelUpdateSummary: string | undefined
   let conditionUpdate: CurrentTrashCondition | undefined
   let newEventData: SpecialEventSurge | undefined
   let memoryFact: string | undefined
 
   const keys = geminiApiKeys()
-  const canUseLiveGemini = keys.length > 0
+  if (keys.length > 0) {
+    const slotsInfo = kecamatanSlots
+      .map(
+        (s) =>
+          `- ${s.stream.toUpperCase()}: ${formatSlotDaysId(s.days)} (${s.windowStart}–${s.windowEnd} WITA), Kapasitas normal ${s.maxLitersPerPickup} L/angkut (+${s.surgeTolerancePct}% leeway)`,
+      )
+      .join('\n')
 
-  if (canUseLiveGemini) {
-    try {
-      const google = createGoogleGenerativeAI({ apiKey: keys[0] })
-      const model = google(classifyModelId())
+    const memoryContext = (currentProfile.agentMemory ?? []).map((m) => `- ${m.fact}`).join('\n')
 
-      const slotsInfo = kecamatanSlots
-        .map(
-          (s) =>
-            `- ${s.stream.toUpperCase()}: ${formatSlotDaysId(s.days)} (${s.windowStart}–${s.windowEnd} WITA), Kapasitas normal ${s.maxLitersPerPickup} L/angkut (+${s.surgeTolerancePct}% leeway)`,
-        )
-        .join('\n')
-
-      const memoryContext = (currentProfile.agentMemory ?? []).map((m) => `- ${m.fact}`).join('\n')
-
-      const prompt = `Konteks Profil Warga:
+    const prompt = `Konteks Profil Warga:
 Nama: ${account.name}
-Alamat: ${account.address}, Banjar: ${account.banjarName ?? 'Banjar Pekambingan'}, Desa: ${account.desa}, Kecamatan: ${account.kecamatan}
+Wilayah: Banjar ${account.banjarName ?? 'Banjar setempat'}, Desa ${account.desa}, Kecamatan ${account.kecamatan}
 Node Pengolahan: ${account.tps3rNode ?? 'TPS3R Swakelola Desa'}
 Kondisi Sampah Saat Ini: ${currentProfile.currentCondition} (${currentProfile.conditionNote})
 Timbulan Rutin: ${currentProfile.weeklyRegularLiters} Liter/minggu (${currentProfile.householdMembers} anggota keluarga)
@@ -137,52 +135,57 @@ Pesan Terbaru dari Warga: "${cleanMessage}"
 
 Berikan tanggapan dan ekstraksi pembaruan model sampah secara terstruktur.`
 
-      const schema = z.object({
-        reply: z.string().describe('Tanggapan ramah dan solutif dalam Bahasa Indonesia'),
-        detectedCondition: z
-          .enum(['terkendali', 'menumpuk', 'meluber', 'pasca_upacara', 'tidak_berubah'])
-          .describe('Perubahan kondisi tempat sampah jika disebutkan warga'),
-        newEvent: z
-          .object({
-            hasEvent: z.boolean(),
-            name: z.string().optional(),
-            extraLiters: z.number().optional(),
-            dominantStream: z.enum(['organik', 'anorganik', 'residu', 'B3']).optional(),
-            notes: z.string().optional(),
-          })
-          .optional()
-          .describe('Acara keluarga / upacara adat yang membutuhkan ekstra kuota penjemputan'),
-        memoryFact: z.string().optional().describe('Fakta baru tentang warga untuk disimpan di memori jangka panjang'),
-        modelUpdateSummary: z.string().optional().describe('Ringkasan 1 kalimat perubahan model sampah'),
-      })
+    const schema = z.object({
+      reply: z.string().describe('Tanggapan ramah dan solutif dalam Bahasa Indonesia'),
+      detectedCondition: z
+        .enum(['terkendali', 'menumpuk', 'meluber', 'pasca_upacara', 'tidak_berubah'])
+        .describe('Perubahan kondisi tempat sampah jika disebutkan warga'),
+      newEvent: z
+        .object({
+          hasEvent: z.boolean(),
+          name: z.string().optional(),
+          extraLiters: z.number().optional(),
+          dominantStream: z.enum(['organik', 'anorganik', 'residu', 'B3']).optional(),
+          notes: z.string().optional(),
+        })
+        .optional()
+        .describe('Acara keluarga / upacara adat yang membutuhkan ekstra kuota penjemputan'),
+      memoryFact: z.string().optional().describe('Fakta baru tentang warga untuk disimpan di memori jangka panjang'),
+      modelUpdateSummary: z.string().optional().describe('Ringkasan 1 kalimat perubahan model sampah'),
+    })
 
-      const result = await generateObject({
-        model,
-        system: AGENT_SYSTEM_PROMPT,
-        prompt,
-        schema,
-        temperature: 0.2,
-      })
-
-      reply = result.object.reply
-      modelUpdateSummary = result.object.modelUpdateSummary
-      if (result.object.detectedCondition && result.object.detectedCondition !== 'tidak_berubah') {
-        conditionUpdate = result.object.detectedCondition
-      }
-      if (result.object.newEvent?.hasEvent && result.object.newEvent.name) {
-        newEventData = {
-          id: `evt_${Date.now().toString(36)}`,
-          name: result.object.newEvent.name,
-          frequency: 'Sesuai percakapan warga',
-          extraLiters: Math.max(15, result.object.newEvent.extraLiters || 45),
-          dominantStream: result.object.newEvent.dominantStream || 'organik',
-          activeThisWeek: true,
-          notes: result.object.newEvent.notes || 'Dicatat otomatis oleh Agen Kresna melalui percakapan.',
+    for (const apiKey of keys) {
+      try {
+        const result = await generateObject({
+          model: createGoogleGenerativeAI({ apiKey })(classifyModelId()),
+          system: AGENT_SYSTEM_PROMPT,
+          prompt,
+          schema,
+          temperature: 0.2,
+          maxRetries: 0,
+        })
+        reply = result.object.reply
+        source = 'gemini'
+        modelUpdateSummary = result.object.modelUpdateSummary
+        if (result.object.detectedCondition && result.object.detectedCondition !== 'tidak_berubah') {
+          conditionUpdate = result.object.detectedCondition
         }
+        if (result.object.newEvent?.hasEvent && result.object.newEvent.name) {
+          newEventData = {
+            id: `evt_${Date.now().toString(36)}`,
+            name: result.object.newEvent.name,
+            frequency: 'Sesuai percakapan warga',
+            extraLiters: Math.max(15, result.object.newEvent.extraLiters || 45),
+            dominantStream: result.object.newEvent.dominantStream || 'organik',
+            activeThisWeek: true,
+            notes: result.object.newEvent.notes || 'Dicatat otomatis oleh Agen Kresna melalui percakapan.',
+          }
+        }
+        memoryFact = result.object.memoryFact
+        break
+      } catch {
+        // Try the next key, then the labelled template below.
       }
-      memoryFact = result.object.memoryFact
-    } catch {
-      // Graceful fallback to deterministic assistant logic below
     }
   }
 
@@ -263,6 +266,7 @@ Berikan tanggapan dan ekstraksi pembaruan model sampah secara terstruktur.`
     text: reply,
     timestamp: new Date().toISOString(),
     modelUpdateSummary,
+    source,
   }
 
   let newMemoryItem: AgentMemoryItem | undefined
@@ -289,6 +293,7 @@ Berikan tanggapan dan ekstraksi pembaruan model sampah secara terstruktur.`
 
   return {
     reply,
+    source,
     modelUpdateSummary,
     updatedProfile,
     newMemoryItem,

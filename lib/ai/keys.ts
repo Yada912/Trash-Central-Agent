@@ -44,3 +44,28 @@ export function explainModelId(): string {
   return process.env.GEMINI_EXPLAIN_MODEL?.trim() || EXPLAIN_DEFAULT_MODEL_ID
 }
 
+/**
+ * Models tried, in order, when a plan explanation needs a live model.
+ * The configured explain model is first, then the classify model, then the
+ * known 2.5 and 3.5 ids. Duplicates are removed.
+ */
+export function explainModelChain(): string[] {
+  const candidates = [
+    explainModelId(),
+    process.env.GEMINI_CLASSIFY_MODEL?.trim() ?? '',
+    EXPLAIN_DEFAULT_MODEL_ID,
+    CLASSIFY_DEFAULT_MODEL_ID,
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+  ]
+  const seen = new Set<string>()
+  const chain: string[] = []
+  for (const candidate of candidates) {
+    const id = candidate.trim()
+    if (!id || seen.has(id)) continue
+    seen.add(id)
+    chain.push(id)
+  }
+  return chain
+}
+

@@ -86,6 +86,7 @@ export function WargaAgentChat() {
       const payload = (await res.json()) as {
         data: {
           reply: string
+          source?: 'gemini' | 'template'
           modelUpdateSummary?: string
           updatedAccount?: { wasteProfile?: { chatMessages?: AgentChatMessage[] } }
         }
@@ -96,6 +97,7 @@ export function WargaAgentChat() {
         id: agentMessageId,
         sender: 'agent',
         text: payload.data.reply,
+        source: payload.data.source,
         timestamp: new Date().toISOString(),
         modelUpdateSummary: payload.data.modelUpdateSummary,
       }
@@ -297,6 +299,9 @@ export function WargaAgentChat() {
               <div className="flex items-center gap-1 text-[11px] font-black text-ink">
                 <MaterialIcon name={isAgent ? 'smart_toy' : 'person'} size="sm" />
                 <span>{isAgent ? 'Kresna (Asisten DLHK)' : 'Anda (Warga)'}</span>
+                {isAgent && msg.source === 'template' ? (
+                  <span className="font-semibold text-ink/70">· balasan template</span>
+                ) : null}
               </div>
               <div
                 className={`rounded-2xl border-2 border-ink p-3 text-sm font-semibold leading-relaxed ${
