@@ -67,7 +67,6 @@ export function AccountView() {
     busy,
     login,
     logout,
-    switchAccount,
     updateProfile,
     updateTimetable,
     isSignedIn,
@@ -226,8 +225,8 @@ export function AccountView() {
   }
 
   async function handleReturnToWarga() {
-    await switchAccount('usr_warga_01')
-    router.push('/warga')
+    await logout()
+    router.push('/masuk')
   }
 
   function handleLogout() {
@@ -275,7 +274,7 @@ export function AccountView() {
             ) : (
               <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
                 <MaterialIcon name="person" />
-                Kembali ke Mode Warga
+                Keluar dan masuk sebagai warga
               </Button>
             )}
             <button
@@ -874,7 +873,7 @@ export function AccountView() {
           </div>
 
           <p className="text-sm text-ink/85">
-            Sesuai protokol sistem, seluruh personil masuk melalui portal Warga terlebih dahulu. Jika Anda adalah petugas armada kebersihan, pengawas TPS3R desa, atau perencana operasional DLHK, masukkan kredensial kedinasan Anda di bawah ini untuk mengaktifkan <strong>Mode Petugas</strong> dan membuka dasbor koordinasi armada serta rute VRP.
+            Prototipe ini tidak terhubung ke sistem kedinasan DLHK. Masuk dengan akun petugas demo yang dibagikan melalui formulir panitia untuk membuka panel armada dan keputusan rute.
           </p>
 
           {petugasLoginError ? (
@@ -937,7 +936,7 @@ export function AccountView() {
             </div>
             <Button variant="secondary" onClick={() => void handleReturnToWarga()}>
               <MaterialIcon name="logout" size="sm" />
-              Keluar ke Mode Warga
+              Keluar dan masuk sebagai warga
             </Button>
           </div>
         </section>

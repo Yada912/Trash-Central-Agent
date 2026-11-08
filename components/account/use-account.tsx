@@ -11,7 +11,7 @@ import type {
 import type { AccountType, Kecamatan } from '@/lib/schemas'
 
 type AccountApiData = {
-  activeAccount: UserAccount
+  activeAccount: UserAccount | null
   accounts: UserAccount[]
   timetable: PetugasTimetableSlot[]
   optimization: ResidentOptimizationSummary | null
@@ -27,8 +27,7 @@ type AccountContextValue = {
   busy: boolean
   error: string | null
   login: (email: string, password?: string) => Promise<UserAccount | null>
-  logout: () => void
-  switchAccount: (accountId: string) => Promise<UserAccount | null>
+  logout: () => Promise<void>
   updateProfile: (patch: {
     name?: string
     kecamatan?: Kecamatan
@@ -86,22 +85,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const savedId = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null
-      const signedFlag = typeof window !== 'undefined' ? window.localStorage.getItem(SIGNED_IN_KEY) : null
-
-      if (signedFlag === 'true' && savedId) {
-        setIsSignedIn(true)
-        const res = await fetch(`/api/accounts?accountId=${encodeURIComponent(savedId)}`)
-        if (res.ok) {
-          const payload = (await res.json()) as { data: AccountApiData }
-          setData(payload.data)
-        }
-      } else {
-        setIsSignedIn(false)
-        const res = await fetch('/api/accounts')
-        if (res.ok) {
-          const payload = (await res.json()) as { data: AccountApiData }
-          setData(payload.data)
+      const res = await fetch('/api/accounts', { cache: 'no-store' })
+      if (res.ok) {
+        const payload = (await res.json()) as { data: AccountApiData }
+        setData(payload.data)
+        const signedIn = Boolean(payload.data.activeAccount)
+        setIsSignedIn(signedIn)
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(SIGNED_IN_KEY, signedIn ? 'true' : 'false')
+          if (payload.data.activeAccount?.id) {
+            window.localStorage.setItem(STORAGE_KEY, payload.data.activeAccount.id)
+          } else {
+            window.localStorage.removeItem(STORAGE_KEY)
+          }
         }
       }
     } catch {
@@ -154,26 +150,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     [mutate],
   )
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await mutate({ action: 'logout' })
     setIsSignedIn(false)
+    setData((current) =>
+      current
+        ? { ...current, activeAccount: null, accounts: [], optimization: null }
+        : current,
+    )
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(SIGNED_IN_KEY, 'false')
       window.localStorage.removeItem(STORAGE_KEY)
     }
-  }, [])
-
-  const switchAccount = useCallback(
-    async (accountId: string) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(STORAGE_KEY, accountId)
-        window.localStorage.setItem(SIGNED_IN_KEY, 'true')
-      }
-      setIsSignedIn(true)
-      const result = await mutate({ action: 'switch', accountId })
-      return result?.activeAccount ?? null
-    },
-    [mutate],
-  )
+  }, [mutate])
 
   const updateProfile = useCallback(
     async (patch: Parameters<AccountContextValue['updateProfile']>[0]) => {
@@ -229,7 +218,6 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         error,
         login,
         logout,
-        switchAccount,
         updateProfile,
         createNewAccount,
         updateTimetable,
@@ -254,8 +242,7 @@ export function useAccount(): AccountContextValue {
       busy: false,
       error: null,
       login: async () => null,
-      logout: () => {},
-      switchAccount: async () => null,
+      logout: async () => {},
       updateProfile: async () => {},
       createNewAccount: async () => null,
       updateTimetable: async () => {},

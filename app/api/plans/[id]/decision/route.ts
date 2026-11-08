@@ -1,6 +1,10 @@
 import { parseSchema, readJson } from '@/lib/api/body'
 import { jsonErr, jsonOk, requestIdFrom } from '@/lib/api/respond'
+import { readSessionFromRequest, sameOriginRequest } from '@/lib/auth/session'
+import { getRawAccount } from '@/lib/accounts/store'
+import { hydrateAccountState } from '@/lib/accounts/hydrate'
 import { applyDecision } from '@/lib/plans/apply-decision'
+import { checkRateLimit, clientIpFromRequest } from '@/lib/security/guard'
 import { buildSolveInput, PlanInputError } from '@/lib/plans/build-input'
 import { decisionRequestSchema, planSchema } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
@@ -13,6 +17,18 @@ export const maxDuration = 25
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const requestId = requestIdFrom(request)
   try {
+    if (!sameOriginRequest(request)) return jsonErr(requestId, 403, 'FORBIDDEN', 'Cross-site request rejected.')
+    const rate = checkRateLimit(`api_decision:${clientIpFromRequest(request)}`, 20, 60_000)
+    if (!rate.allowed) {
+      return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many plan decisions. Retry in ${rate.retryAfterSec} seconds.`)
+    }
+    const session = readSessionFromRequest(request)
+    if (!session) return jsonErr(requestId, 401, 'UNAUTHORIZED', 'Officer sign-in is required.')
+    await hydrateAccountState()
+    const actor = getRawAccount(session.accountId)
+    if (!actor || actor.role !== 'petugas') {
+      return jsonErr(requestId, 403, 'FORBIDDEN', 'Only an officer session can decide a plan.')
+    }
     const { id } = await context.params
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response
@@ -22,7 +38,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const plan = await store.getPlan(id)
     if (!plan) return jsonErr(requestId, 404, 'NOT_FOUND', 'Plan not found.')
     const solveInput = await buildSolveInput(store, plan.input)
-    const outcome = applyDecision(plan, parsed.data, { now: nowWita(), solveInput })
+    const outcome = applyDecision(plan, { ...parsed.data, actor: actor.name }, { now: nowWita(), solveInput })
     if (!outcome.ok) {
       return jsonErr(requestId, outcome.httpStatus, outcome.code, outcome.message, outcome.fields)
     }

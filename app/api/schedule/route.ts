@@ -1,5 +1,6 @@
 import { jsonErr, jsonOk, requestIdFrom } from '@/lib/api/respond'
 import { SCHEDULE_DISCLAIMER, SCHEDULE_GENERATED_FROM, buildSchedule, demoCheckedAvailability } from '@/lib/schedule'
+import { WeeklyInputError } from '@/lib/planner/weekly'
 import { accountTypeSchema, kecamatanSchema, wasteStreamSchema } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
 
@@ -56,6 +57,9 @@ export async function GET(request: Request) {
       disclaimer: SCHEDULE_DISCLAIMER,
     })
   } catch (error) {
+    if (error instanceof WeeklyInputError) {
+      return jsonErr(requestId, 400, 'VALIDATION', error.message)
+    }
     console.error(error)
     return jsonErr(requestId, 500, 'INTERNAL', 'Something went wrong.')
   }

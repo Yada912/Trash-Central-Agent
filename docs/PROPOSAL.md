@@ -45,7 +45,7 @@ Central Trash Agent Bali menerapkan alur kerja ujung-ke-ujung dengan pemisahan t
 
 1. **Pelaporan Warga dengan Konfirmasi Manusia (`/report`):**
    - Warga memasukkan deskripsi teks (1–1.000 karakter) dan/atau foto opsional (dikompresi di sisi klien ke maksimum 1280 px JPEG, $\le 3\text{ MB}$).
-   - Endpoint `POST /api/reports/classify` memanggil model multimodal **Gemini 3.5 Flash** (fallback `gemini-2.5-flash`) untuk menghasilkan usulan komposisi jenis sampah (`organic`, `plastic`, `paper`, `metal`, `residual`, `hazardous`), estimasi volume (liter dan label `small`/`medium`/`large`), tingkat urgensi (`low`/`medium`/`high`), skor keyakinan (`confidence` $0\text{--}1$), alasan singkat (`rationale`), serta bendera kualitas/risiko (`flags`).
+   - Endpoint `POST /api/reports/classify` memanggil model multimodal **Gemini 3.5 Flash** bila `GEMINI_CLASSIFY_MODEL` diisi demikian. Jika variabel kosong, kode memakai `gemini-2.5-flash`. Keluaran: komposisi jenis sampah (`organic`, `plastic`, `paper`, `metal`, `residual`, `hazardous`), estimasi volume (liter dan label `small`/`medium`/`large`), tingkat urgensi (`low`/`medium`/`high`), skor keyakinan (`confidence` $0\text{--}1$), alasan singkat (`rationale`), serta bendera kualitas/risiko (`flags`). Kata jumlah rumah tangga (kantong, karung, dan sejenisnya) dipetakan ke liter di server bila model menahan volume.
    - Warga wajib meninjau hasil tersebut, dapat mengubah proporsi jenis sampah atau volume secara langsung, menentukan koordinat di dalam kotak batas daratan Kota Denpasar (`lat -8.75..-8.57`, `lng 115.16..115.28`), serta mencentang persetujuan eksplisit sebelum mengirim ke `POST /api/reports`.
 2. **Dasbor Pemantauan Spasial Wilayah (`/dashboard`):**
    - Menampilkan metrik teragregasi, klaster peta Leaflet interaktif untuk laporan biasa, penanda terpisah untuk laporan B3, serta daftar fasilitas referensi TPS3R Kota Denpasar.
@@ -55,7 +55,7 @@ Central Trash Agent Bali menerapkan alur kerja ujung-ke-ujung dengan pemisahan t
 4. **Perencana Rute Deterministik & Integrasi Google Maps (`/planner`):**
    - Petugas mengatur armada truk beserta kapasitas liter, jumlah kru, dan jam mulai/akhir sif, lalu menjalankan `POST /api/plans`.
    - Solver VRP deterministik (`lib/planner/vrp.ts`) memisahkan laporan B3 ke daftar `unassigned` (`hazardous_separate`), lalu menyusun rute truk untuk laporan biasa dari depo simulasi **TPA Suwung** menggunakan algoritma *cheapest-insertion* dan *2-opt*.
-   - Model **Gemini 3.5 Flash-Lite** (`gemini-3.5-flash-lite`, fallback `gemini-2.5-flash-lite`) menyusun ringkasan penjelasan naratif dan risiko operasional tanpa mengubah angka rute solver.
+   - Model **Gemini 3.5 Flash-Lite** (`gemini-3.5-flash-lite` bila `GEMINI_EXPLAIN_MODEL` diisi demikian; default kode jika kosong adalah `gemini-2.5-flash-lite`) menyusun kode penjelasan. Jika model itu gagal, rantai model lain dicoba, lalu templat deterministik. Angka rute tetap dari solver.
    - Petugas dapat memindahkan pemberhentian antar-truk (`edit`), membuka tautan rute preloaded Google Maps, menyetujui rencana (`approve`), atau menolak rencana (`reject` dengan catatan audit).
 
 ---
@@ -64,8 +64,8 @@ Central Trash Agent Bali menerapkan alur kerja ujung-ke-ujung dengan pemisahan t
 
 ### 4.1 Arsitektur Pembagian Tugas Model (*Task-Split Models*) & Failover Multi-Kunci
 Untuk mengoptimalkan akurasi multimodal sekaligus menjaga efisiensi kuota dan latensi, sistem membagi beban kerja ke model Gemini melalui [`lib/ai/keys.ts`](../lib/ai/keys.ts):
-- **Tugas Klasifikasi Laporan & Asisten Kresna (`GEMINI_CLASSIFY_MODEL`, default `gemini-3.5-flash`):** Menangani analisis citra tumpukan sampah, teks laporan warga, serta percakapan personal warga Kresna.
-- **Tugas Penjelasan Rencana Rute (`GEMINI_EXPLAIN_MODEL`, default `gemini-3.5-flash-lite`):** Menangani pembuatan ringkasan naratif per rute dan identifikasi risiko dari keluaran numerik solver VRP (`PlanExplanation`).
+- **Tugas Klasifikasi Laporan & Asisten Kresna (`GEMINI_CLASSIFY_MODEL`):** Produksi memakai `gemini-3.5-flash`. Default kode bila variabel kosong adalah `gemini-2.5-flash`. Tugas ini menangani analisis citra tumpukan sampah, teks laporan warga, serta percakapan personal warga Kresna.
+- **Tugas Penjelasan Rencana Rute (`GEMINI_EXPLAIN_MODEL`):** Produksi memakai `gemini-3.5-flash-lite`. Default kode bila variabel kosong adalah `gemini-2.5-flash-lite`. Kegagalan model berlanjut ke rantai model lalu templat, tanpa mengubah angka solver (`PlanExplanation`).
 - **Rotasi & Failover hingga 4 Kunci API:** Konfigurasi `GEMINI_API_KEY` hingga `GEMINI_API_KEY_4`. Jika kunci aktif mengalami pembatasan laju (`429`) atau gangguan layanan (`503`), sistem otomatis beralih ke kunci cadangan berikutnya.
 - **Kejujuran Mode (`live` vs `demo`):** Mode `demo` hanya aktif jika seluruh kunci API kosong. Jika kunci terpasang, kegagalan dilaporkan secara jujur tanpa menggantikan diam-diam menjadi data tiruan.
 

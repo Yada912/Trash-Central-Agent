@@ -130,7 +130,7 @@ export default function KebijakanPrivasiPage() {
               5. Keamanan &amp; Retensi Data
             </h2>
             <p>
-              Seluruh transmisi data dilindungi protokol enkripsi HTTPS (TLS 1.3). Kredensial kata sandi diverifikasi menggunakan pencocokan waktu-konstan guna mencegah serangan timing attack, dan batasan laju panggilan (rate-limiting) diterapkan pada seluruh gerbang API.
+              Transmisi data memakai HTTPS (TLS 1.2 atau yang lebih baru, mengikuti setelan server). Sesi masuk disimpan di cookie httpOnly yang ditandatangani server. Kata sandi baru disimpan sebagai hash; baris demo yang masih plaintext diverifikasi lalu ditingkatkan saat masuk berhasil. Pembatasan laju berlaku pada masuk, klasifikasi, percakapan Kresna, evaluasi live, serta permintaan yang mengubah data (laporan, rencana, penjelasan, keputusan, dan akun). Batas itu dihitung di memori tiap instans, bukan satu gerbang bersama untuk seluruh API.
             </p>
           </section>
 

@@ -3,6 +3,7 @@ import { isModuleFailure, jsonErr, jsonOk, mapModuleError, requestIdFrom } from 
 import { explainPlan } from '@/lib/planner/explain'
 import { buildSolveInput, PlanInputError } from '@/lib/plans/build-input'
 import { explainRequestSchema, planSchema } from '@/lib/schemas'
+import { checkRateLimit, clientIpFromRequest } from '@/lib/security/guard'
 import { getStore } from '@/lib/store'
 
 export const runtime = 'nodejs'
@@ -13,6 +14,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const requestId = requestIdFrom(request)
   const started = Date.now()
   try {
+    const rate = checkRateLimit(`api_explain:${clientIpFromRequest(request)}`, 8, 60_000)
+    if (!rate.allowed) {
+      return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many explanation requests. Retry in ${rate.retryAfterSec} seconds.`)
+    }
     const { id } = await context.params
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response

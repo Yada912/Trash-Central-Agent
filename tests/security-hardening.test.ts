@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import { classifyReport } from '@/lib/ai/classify'
+import { authenticateAccount } from '@/lib/accounts/authenticate'
+import { signSession } from '@/lib/auth/session'
 import {
-  authenticateAccount,
   getActiveAccount,
   listAccounts,
 } from '@/lib/accounts/store'
@@ -82,8 +83,8 @@ describe('AI Security, Prompt Injection Defense, and User Data Hardening', () =>
     const accounts = listAccounts()
     for (const acc of accounts) {
       expect(acc.password).toBeUndefined()
-      expect(JSON.stringify(acc)).not.toContain('warga123')
-      expect(JSON.stringify(acc)).not.toContain('petugas123')
+      expect(JSON.stringify(acc)).not.toContain(process.env.DEMO_WARGA_PASSWORD)
+      expect(JSON.stringify(acc)).not.toContain(process.env.DEMO_PETUGAS_PASSWORD)
     }
 
     const active = getActiveAccount('usr_warga_01')
@@ -92,22 +93,26 @@ describe('AI Security, Prompt Injection Defense, and User Data Hardening', () =>
     // Empty or omitted password must NOT bypass authentication
     expect(authenticateAccount('made.adi@warga.denpasar.id', '')).toBeNull()
     expect(authenticateAccount('made.adi@warga.denpasar.id', undefined)).toBeNull()
-    expect(authenticateAccount('made.adi@warga.denpasar.id', 'warga123')?.password).toBeUndefined()
+    expect(authenticateAccount('made.adi@warga.denpasar.id', process.env.DEMO_WARGA_PASSWORD)?.password).toBeUndefined()
 
     const apiRes = await getAccounts(new Request('http://localhost:3000/api/accounts'))
     const rawJson = await apiRes.text()
-    expect(rawJson).not.toContain('warga123')
-    expect(rawJson).not.toContain('petugas123')
+    expect(rawJson).not.toContain(process.env.DEMO_WARGA_PASSWORD ?? 'missing-warga-secret')
+    expect(rawJson).not.toContain(process.env.DEMO_PETUGAS_PASSWORD ?? 'missing-petugas-secret')
   })
 
   it('enforces RBAC so Warga accounts cannot modify Petugas fleet timetables (HTTP 403)', async () => {
-    // Attempt timetable modification as Warga (usr_warga_01)
+    const wargaCookie = signSession({ accountId: 'usr_warga_01', role: 'warga' })
+    const petugasCookie = signSession({ accountId: 'usr_petugas_01', role: 'petugas' })
+    expect(wargaCookie).toBeTruthy()
+    expect(petugasCookie).toBeTruthy()
+
     const forbiddenReq = new Request('http://localhost:3000/api/accounts', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', cookie: `cta_session=${wargaCookie}` },
       body: JSON.stringify({
         action: 'update_timetable',
-        accountId: 'usr_warga_01',
+        accountId: 'usr_petugas_01',
         timetablePatch: {
           slotId: 'slot_barat_organik',
           leewayMinutes: 90,
@@ -117,13 +122,26 @@ describe('AI Security, Prompt Injection Defense, and User Data Hardening', () =>
     const forbiddenRes = await postAccounts(forbiddenReq)
     expect(forbiddenRes.status).toBe(403)
 
-    // Attempt timetable modification as Petugas (usr_petugas_01)
-    const allowedReq = new Request('http://localhost:3000/api/accounts', {
+    const spoofedReq = new Request('http://localhost:3000/api/accounts', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         action: 'update_timetable',
         accountId: 'usr_petugas_01',
+        timetablePatch: {
+          slotId: 'slot_barat_organik',
+          leewayMinutes: 90,
+        },
+      }),
+    })
+    expect((await postAccounts(spoofedReq)).status).toBe(401)
+
+    const allowedReq = new Request('http://localhost:3000/api/accounts', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie: `cta_session=${petugasCookie}` },
+      body: JSON.stringify({
+        action: 'update_timetable',
+        accountId: 'usr_warga_01',
         timetablePatch: {
           slotId: 'slot_barat_organik',
           leewayMinutes: 50,

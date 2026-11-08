@@ -5,7 +5,7 @@ import { classificationWasEdited } from '@/lib/reports/compare'
 import { savedReportIsDemo } from '@/lib/reports/demo-mode'
 import { canonicalReportBodyHash, idempotencyKeyFrom } from '@/lib/reports/idempotency'
 import { stampClassification } from '@/lib/review'
-import { inspectPromptInput, redactPiiFromText } from '@/lib/security/guard'
+import { checkRateLimit, clientIpFromRequest, inspectPromptInput, redactPiiFromText } from '@/lib/security/guard'
 import { createReportSchema, kecamatanSchema, reportStatusSchema, type Kecamatan, type Report } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
 import { nowWita } from '@/lib/time'
@@ -51,6 +51,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const requestId = requestIdFrom(request)
   try {
+    const rate = checkRateLimit(`api_reports:${clientIpFromRequest(request)}`, 20, 60_000)
+    if (!rate.allowed) {
+      return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many report submissions. Retry in ${rate.retryAfterSec} seconds.`)
+    }
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response
     const parsed = parseSchema(createReportSchema, body.value, requestId)

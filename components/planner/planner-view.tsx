@@ -11,6 +11,7 @@ import { demoMockLabel } from '@/components/report/report-labels'
 import { movableStopIds, ordinaryStopIds, shownUnassigned } from '@/components/planner/route-display'
 import { routeStyle } from '@/components/planner/route-style'
 import { usePlanner } from '@/components/planner/use-planner'
+import { useAccount } from '@/components/account/use-account'
 import { ErrorNotice } from '@/components/report/ErrorNotice'
 import { isSeparateHazard } from '@/components/report/hazard-policy'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,8 @@ const STEPS = ['Kapasitas dan sif', 'Usulan rute', 'Keputusan dan audit'] as con
 
 export function PlannerView() {
   const planner = usePlanner()
+  const { isSignedIn, activeAccount } = useAccount()
+  const officerSignedIn = isSignedIn && activeAccount?.role === 'petugas'
   const plan = planner.plan
   const allFeasible = Boolean(plan && plan.result.routes.every((route) => route.feasible))
   const canDecide = plan && (plan.status === 'proposed' || plan.status === 'edited_pending') && !planner.busy
@@ -312,6 +315,15 @@ export function PlannerView() {
           3. Keputusan dan log audit
         </h2>
         {!plan ? <p className="text-sm font-semibold">Keputusan dapat dicatat setelah usulan rute dibuat.</p> : null}
+        {officerSignedIn ? null : (
+          <p className="text-sm font-semibold">
+            Menyetujui, menolak, atau memindahkan pemberhentian membutuhkan sesi petugas. Masuk di{' '}
+            <Link href="/masuk/petugas" className="underline">
+              halaman petugas
+            </Link>
+            .
+          </p>
+        )}
         {plan ? (
           <>
             {planner.violations.length > 0 ? (

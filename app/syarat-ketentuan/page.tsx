@@ -61,7 +61,7 @@ export default function SyaratKetentuanPage() {
               1. Simulasi Aturan Warga: Pemilahan Berbasis Sumber
             </h2>
             <p>
-              Mengadopsi prinsip <strong>Pergub Bali No. 47 Tahun 2019</strong>, sistem ini memodelkan pengelolaan sampah rumah tangga dan badan usaha yang terpilah menjadi 3 aliran utama:
+              Mengadopsi <strong>Pergub Bali No. 47 Tahun 2019 Pasal 6 ayat (2)</strong>, pemilahan dari sumber paling sedikit lima jenis: mudah terurai, dapat digunakan kembali, dapat didaur ulang, B3, dan residu. Aplikasi memetakannya ke empat aliran operasional. Tiga aliran rutin di bawah ini berjalan terjadwal; B3 ditangani terpisah:
             </p>
             <ul className="list-disc pl-5 grid gap-1.5 text-xs font-semibold text-ink/85">
               <li><strong>Sampah Organik:</strong> Sisa makanan, daun, sisa banten, janur, canang sari, dan potongan ranting taman. Ditujukan untuk pengolahan kompos di TPS3R desa/kelurahan setempat.</li>

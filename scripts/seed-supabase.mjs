@@ -72,7 +72,7 @@ function reviewReasons(raw, flags) {
 function mapReport(raw) {
   const liters = Math.max(1, Math.round(raw.volumeLiters))
   const flags = ['no_image']
-  if (raw.types.some((entry) => entry.type === 'hazardous' && entry.share >= 0.2)) flags.unshift('hazardous_present')
+  if (raw.types.some((entry) => entry.type === 'hazardous' && entry.share > 0)) flags.unshift('hazardous_present')
   const reasons = reviewReasons(raw, flags)
   return {
     id: raw.id,
@@ -86,7 +86,9 @@ function mapReport(raw) {
     description_en: raw.descriptionEn ?? null,
     photo_url: null,
     classification: {
-      types: raw.types,
+      types: [...raw.types].sort(
+        (left, right) => Number(right.share) - Number(left.share) || String(left.type).localeCompare(String(right.type)),
+      ),
       volume: { liters, label: labelFor(liters) },
       urgency: raw.urgency,
       confidence: raw.confidence,
@@ -115,11 +117,17 @@ const facilities = JSON.parse(readFileSync(join(root, 'data/facilities.json'), '
   verified: facility.verified,
 }))
 
+function demoPasswordForRole(role) {
+  const name = role === 'petugas' ? 'DEMO_PETUGAS_PASSWORD' : 'DEMO_WARGA_PASSWORD'
+  const value = process.env[name]?.trim()
+  return value || undefined
+}
+
 const accounts = JSON.parse(readFileSync(join(root, 'data/accounts.json'), 'utf8')).map((acc) => ({
   id: acc.id,
   name: acc.name,
   email: acc.email,
-  password: acc.password,
+  password: demoPasswordForRole(acc.role),
   role: acc.role,
   badge_id: acc.badgeId ?? null,
   kecamatan: acc.kecamatan,
@@ -161,9 +169,18 @@ if (reportResult.error) {
   process.exit(1)
 }
 
-const accountResult = await client.from('accounts').upsert(accounts)
+const accountRows = accounts.map(({ password: _password, ...row }) => row)
+const accountResult = await client.from('accounts').upsert(accountRows)
 if (accountResult.error) {
   console.warn(`Account seed note (migration 0006): ${accountResult.error.message}`)
+} else {
+  for (const account of accounts) {
+    if (!account.password) continue
+    const passwordResult = await client.from('accounts').update({ password: account.password }).eq('id', account.id)
+    if (passwordResult.error) {
+      console.warn(`Account password seed note (${account.id}): ${passwordResult.error.message}`)
+    }
+  }
 }
 
 const timetableResult = await client.from('timetable_slots').upsert(timetableSlots)

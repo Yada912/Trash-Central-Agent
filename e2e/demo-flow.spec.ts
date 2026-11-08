@@ -10,6 +10,27 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: path.join(shots, `${name}.png`), fullPage: true })
 }
 
+async function signInOfficer(page: Page) {
+  const response = await page.request.post('/api/accounts', {
+    data: {
+      action: 'login',
+      login: { email: 'surya.wirawan@dlhk.denpasar.id', password: process.env.DEMO_PETUGAS_PASSWORD },
+    },
+  })
+  expect(response.ok()).toBeTruthy()
+  const token = /cta_session=([^;]+)/.exec(response.headers()['set-cookie'] ?? '')?.[1]
+  expect(token).toBeTruthy()
+  await page.context().addCookies([
+    {
+      name: 'cta_session',
+      value: decodeURIComponent(token ?? ''),
+      url: 'http://127.0.0.1:3456',
+      httpOnly: true,
+      sameSite: 'Lax',
+    },
+  ])
+}
+
 async function keepTwoTrucks(page: Page) {
   const remove = page.getByRole('button', { name: 'Hapus' })
   while ((await remove.count()) > 2) {
@@ -33,6 +54,7 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await page.getByRole('button', { name: 'Klasifikasi' }).click()
   await expect(page.getByText('Demo output: keyword placeholder because GEMINI_API_KEY is unset.')).toBeVisible()
   await expect(page.getByText('Demo mock: keyword rules, not AI').first()).toBeVisible()
+  await page.getByRole('button', { name: 'Ketik Angka' }).click()
   await page.getByLabel('Lintang (Latitude)').fill('-8.650000')
   await page.getByLabel('Bujur (Longitude)').fill('115.220000')
   await page.getByRole('checkbox', { name: 'Saya telah meninjau hasil ini' }).check()
@@ -73,6 +95,7 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await expect(page.getByTestId('mode-badge')).toContainText('demo')
   await shot(page, '03-plan')
 
+  await signInOfficer(page)
   await page.locator('#move-stop').selectOption(reportId)
   await page.locator('#move-truck').selectOption('truck-small')
   await page.getByRole('button', { name: 'Simpan perubahan' }).click()

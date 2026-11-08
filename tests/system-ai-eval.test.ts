@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
+import { authenticateAccount } from '@/lib/accounts/authenticate'
 import {
-  authenticateAccount,
   computeResidentOptimization,
   listAccounts,
   listTimetableSlots,
@@ -19,16 +19,16 @@ import { GET as getEval } from '@/app/api/eval/route'
 
 describe('Authentication, Balinese Calendar, and System/AI Evaluation Suite', () => {
   it('authenticates Warga and Petugas accounts with strict role separation and rejects invalid credentials', () => {
-    const wargaLogin = authenticateAccount('made.adi@warga.denpasar.id', 'warga123')
+    const wargaLogin = authenticateAccount('made.adi@warga.denpasar.id', process.env.DEMO_WARGA_PASSWORD)
     expect(wargaLogin).not.toBeNull()
     expect(wargaLogin?.role).toBe('warga')
     expect(wargaLogin?.wasteProfile?.pickupHistory?.length).toBeGreaterThan(0)
 
-    const petugasLogin = authenticateAccount('surya.wirawan@dlhk.denpasar.id', 'petugas123')
+    const petugasLogin = authenticateAccount('surya.wirawan@dlhk.denpasar.id', process.env.DEMO_PETUGAS_PASSWORD)
     expect(petugasLogin).not.toBeNull()
     expect(petugasLogin?.role).toBe('petugas')
 
-    const wrongPass = authenticateAccount('made.adi@warga.denpasar.id', 'salah123')
+    const wrongPass = authenticateAccount('made.adi@warga.denpasar.id', 'incorrect')
     expect(wrongPass).toBeNull()
   })
 
