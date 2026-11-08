@@ -1,11 +1,13 @@
 import { parseSchema, readJson } from '@/lib/api/body'
-import { isModuleFailure, jsonErr, jsonOk, mapModuleError, requestIdFrom } from '@/lib/api/respond'
+import { jsonErr, jsonOk, requestIdFrom } from '@/lib/api/respond'
+import { requireOfficer } from '@/lib/auth/officer'
 import { explainPlan } from '@/lib/planner/explain'
 import { solvePlan } from '@/lib/planner/vrp'
 import { buildSolveInput, PlanInputError } from '@/lib/plans/build-input'
 import { planRequestSchema, planSchema, type Plan } from '@/lib/schemas'
 import { checkRateLimit, clientIpFromRequest } from '@/lib/security/guard'
 import { getStore } from '@/lib/store'
+import { nowWita } from '@/lib/time'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -19,13 +21,20 @@ export async function POST(request: Request) {
     if (!rate.allowed) {
       return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many plan requests. Retry in ${rate.retryAfterSec} seconds.`)
     }
+    const officer = await requireOfficer(request)
+    if (!officer.ok) return jsonErr(requestId, officer.status, officer.code, officer.message)
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response
     const parsed = parseSchema(planRequestSchema, body.value, requestId)
     if (!parsed.ok) return parsed.response
     const store = getStore()
     const reportIds = parsed.data.reportIds ?? (await store.listReports({ status: 'new' })).map((report) => report.id)
-    const input = { ...parsed.data, reportIds }
+    const input = {
+      trucks: parsed.data.trucks,
+      crews: parsed.data.crews,
+      shift: parsed.data.shift,
+      ...(parsed.data.reportIds ? { reportIds: parsed.data.reportIds } : { reportIds }),
+    }
     let solveInput
     try {
       solveInput = await buildSolveInput(store, input)
@@ -37,15 +46,22 @@ export async function POST(request: Request) {
       }
       throw error
     }
+    const storedInput = { ...input, reportIds: solveInput.stops.map((stop) => stop.id) }
     const result = solvePlan(solveInput)
-    const explanation = await explainPlan(result, solveInput)
+    let explanation
+    try {
+      explanation = parsed.data.skipExplanation ? await explainPlan(result, solveInput, { defer: true }) : await explainPlan(result, solveInput)
+    } catch (error) {
+      console.error(error)
+      explanation = await explainPlan(result, solveInput, { defer: true })
+    }
     const plan = planSchema.parse({
       id: `plan_${crypto.randomUUID()}`,
       status: 'proposed',
       version: 1,
-      input,
+      input: storedInput,
       result,
-      explanation: { ...explanation, stale: false },
+      explanation: { ...explanation, stale: false, generatedAt: nowWita() },
       decisions: [],
     } satisfies Plan)
     await store.savePlan(plan)
@@ -56,14 +72,7 @@ export async function POST(request: Request) {
       201,
     )
   } catch (error) {
-    if (error instanceof PlanInputError) {
-      return jsonErr(requestId, 500, 'INTERNAL', error.message)
-    }
-    if (!isModuleFailure(error)) {
-      console.error(error)
-      return jsonErr(requestId, 500, 'INTERNAL', 'Something went wrong.')
-    }
-    const mapped = mapModuleError(error)
-    return jsonErr(requestId, mapped.status, mapped.code, mapped.message)
+    console.error(error)
+    return jsonErr(requestId, 500, 'INTERNAL', 'Something went wrong.')
   }
 }

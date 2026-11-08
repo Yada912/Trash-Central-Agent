@@ -3,6 +3,7 @@ import { SCHEDULE_DISCLAIMER, SCHEDULE_GENERATED_FROM, buildSchedule, demoChecke
 import { WeeklyInputError } from '@/lib/planner/weekly'
 import { accountTypeSchema, kecamatanSchema, wasteStreamSchema } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
+import { nowWita } from '@/lib/time'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
         })
       }
       weekStart = suppliedWeek
-      asOf = url.searchParams.get('asOf') ?? `${suppliedWeek}T08:00+08:00`
+      asOf = url.searchParams.get('asOf') ?? nowWita()
       availability = demoCheckedAvailability(suppliedWeek)
     }
     const reports = await getStore().listReports()

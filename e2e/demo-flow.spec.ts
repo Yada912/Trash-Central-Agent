@@ -76,6 +76,7 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await shot(page, '02-dashboard')
 
   await page.getByRole('link', { name: 'Perencana' }).click()
+  await signInOfficer(page)
   await keepTwoTrucks(page)
   await page.locator('#truck-id-truck-1').fill('truck-small')
   await page.locator('#truck-cap-truck-1').fill('10')
@@ -95,7 +96,6 @@ test('resident report, planner decisions, and reload', async ({ page }) => {
   await expect(page.getByTestId('mode-badge')).toContainText('demo')
   await shot(page, '03-plan')
 
-  await signInOfficer(page)
   await page.locator('#move-stop').selectOption(reportId)
   await page.locator('#move-truck').selectOption('truck-small')
   await page.getByRole('button', { name: 'Simpan perubahan' }).click()

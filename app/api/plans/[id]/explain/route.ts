@@ -1,4 +1,5 @@
 import { parseSchema, readJson } from '@/lib/api/body'
+import { requireOfficer } from '@/lib/auth/officer'
 import { isModuleFailure, jsonErr, jsonOk, mapModuleError, requestIdFrom } from '@/lib/api/respond'
 import { explainPlan } from '@/lib/planner/explain'
 import { buildSolveInput, PlanInputError } from '@/lib/plans/build-input'
@@ -14,6 +15,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const requestId = requestIdFrom(request)
   const started = Date.now()
   try {
+    const officer = await requireOfficer(request)
+    if (!officer.ok) return jsonErr(requestId, officer.status, officer.code, officer.message)
     const rate = checkRateLimit(`api_explain:${clientIpFromRequest(request)}`, 8, 60_000)
     if (!rate.allowed) {
       return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many explanation requests. Retry in ${rate.retryAfterSec} seconds.`)

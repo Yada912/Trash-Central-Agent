@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { readSessionFromRequest, sameOriginRequest } from '@/lib/auth/session'
-import { computeResidentOptimization, getAccountById, getRawAccount, listTimetableSlots, updateAccountProfile } from '@/lib/accounts/store'
+import { computeResidentOptimization, getAccountById, getRawAccount, listTimetableSlots, removeAccount, updateAccountProfile } from '@/lib/accounts/store'
 import { hydrateAccountState } from '@/lib/accounts/hydrate'
 import { syncAccountToSupabase } from '@/lib/accounts/supabase-sync'
 import { processResidentAgentChat } from '@/lib/ai/agent-chat'
@@ -59,7 +59,13 @@ export async function POST(request: Request) {
       }) ?? active
 
     const raw = getRawAccount(active.id)
-    if (raw) await syncAccountToSupabase(raw)
+    if (raw) {
+      const synced = await syncAccountToSupabase(raw, 'update')
+      if (synced === 'missing') {
+        removeAccount(active.id)
+        return errorResponse(404, 'NOT_FOUND', 'Akun sesi tidak ditemukan.')
+      }
+    }
 
     const response = NextResponse.json({
       data: {

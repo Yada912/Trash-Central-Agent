@@ -154,7 +154,7 @@ describe('explainPlan', () => {
     expect(fallback.provenance).toEqual({ source: 'template', model: 'template-fallback' })
     expect(fallback.summary.startsWith('Template fallback:')).toBe(true)
     expect(fallback.summary).not.toContain('ghost-truck')
-    expect(generate).toHaveBeenCalledTimes(1 + explainModelChain().length * 2)
+    expect(generate).toHaveBeenCalledTimes(1 + 4)
   })
 
   it('uses the template when every model rejects the selection or the provider fails', async () => {
@@ -173,7 +173,7 @@ describe('explainPlan', () => {
     } as never)
     const invalid = await explainPlan(plan, input)
     expect(invalid.provenance).toEqual({ source: 'template', model: 'template-fallback' })
-    expect(generate).toHaveBeenCalledTimes(explainModelChain().length * 2)
+    expect(generate).toHaveBeenCalledTimes(4)
 
     generate.mockReset()
     generate.mockRejectedValue(Object.assign(new Error('down'), { statusCode: 503 }))
