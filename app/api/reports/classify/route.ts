@@ -1,6 +1,7 @@
 import { guardImage, parseSchema, readJson } from '@/lib/api/body'
 import { jsonErr, jsonOk, mapModuleError, requestIdFrom } from '@/lib/api/respond'
 import { classifyReport } from '@/lib/ai/classify'
+import { estimateHouseholdReport, outcomeFromHouseholdEstimate } from '@/lib/ai/quantity'
 import { classifyModelId, hasGeminiApiKey } from '@/lib/ai/keys'
 import { stampClassification } from '@/lib/review'
 import { checkRateLimit, clientIpFromRequest, inspectPromptInput } from '@/lib/security/guard'
@@ -65,6 +66,14 @@ function demoClassify(input: { text: string; image?: { base64: string; mimeType:
       reason: 'Demo output: the description does not look like waste.',
       confidence: 0.7,
     }
+  }
+  const household = estimateHouseholdReport(input.text)
+  if (household) {
+    return outcomeFromHouseholdEstimate(input.text, household, {
+      hasImage: Boolean(input.image),
+      source: 'mock',
+      demoLabel: true,
+    })
   }
   const materials = namedMaterials(text)
   const statedLiters = /(\d+)\s*(liter|litre|l)\b/.exec(text)

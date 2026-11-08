@@ -4,6 +4,7 @@ import {
   EXPLAIN_DEFAULT_MODEL_ID,
   MAX_GEMINI_API_KEYS,
   classifyModelId,
+  explainModelChain,
   explainModelId,
   geminiApiKeys,
   hasGeminiApiKey,
@@ -80,6 +81,18 @@ describe('geminiApiKeys and task model splitting', () => {
     process.env.GEMINI_EXPLAIN_MODEL = 'gemini-2.5-flash'
     expect(classifyModelId()).toBe('gemini-2.5-pro')
     expect(explainModelId()).toBe('gemini-2.5-flash')
+  })
+
+  it('tries the configured explain model, then the classify model, then known fallbacks', () => {
+    clearKeyEnv()
+    process.env.GEMINI_EXPLAIN_MODEL = 'gemini-3.5-flash-lite'
+    process.env.GEMINI_CLASSIFY_MODEL = 'gemini-3.5-flash'
+    expect(explainModelChain()).toEqual([
+      'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-2.5-flash',
+    ])
   })
 })
 

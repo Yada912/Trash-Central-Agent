@@ -149,8 +149,8 @@ flowchart TD
 Diimplementasikan di [`lib/ai/keys.ts`](../lib/ai/keys.ts), [`lib/ai/classify.ts`](../lib/ai/classify.ts), [`lib/ai/agent-chat.ts`](../lib/ai/agent-chat.ts), dan [`lib/planner/explain.ts`](../lib/planner/explain.ts):
 
 1. **Pemisahan Model Berdasarkan Beban Tugas:**
-   - **Klasifikasi Laporan Warga & Agen Kresna (`GEMINI_CLASSIFY_MODEL`, default `gemini-3.5-flash`):** Menangani penalaran multimodal (foto + teks Bahasa Indonesia/Bali) serta memproses dialog personalisasi warga Kresna. Fallback otomatis ke `gemini-2.5-flash` bila variabel kosong.
-   - **Penjelasan Rencana Rute (`GEMINI_EXPLAIN_MODEL`, default `gemini-3.5-flash-lite`):** Menangani perangkuman teks terstruktur dari hasil solver VRP dengan latensi rendah dan kuota harian terpisah. Fallback otomatis ke `gemini-2.5-flash-lite` bila variabel kosong.
+   - **Klasifikasi Laporan Warga & Agen Kresna (`GEMINI_CLASSIFY_MODEL`):** Produksi memakai `gemini-3.5-flash`. Jika variabel kosong, kode memakai `gemini-2.5-flash`. Kegagalan klasifikasi tidak diganti mock. Kresna mencoba kunci berikutnya, lalu balasan template bertanda `source: template`.
+   - **Penjelasan Rencana Rute (`GEMINI_EXPLAIN_MODEL`):** Produksi memakai `gemini-3.5-flash-lite`. Jika variabel kosong, kode memakai `gemini-2.5-flash-lite`. Saat kunci terpasang, rantai model (`explainModelChain`) berakhir pada templat deterministik `template-fallback` supaya rencana tetap tersimpan.
 2. **Rotasi Otomatis Hingga 4 Kunci API:**
    - Sistem membaca `GEMINI_API_KEY`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3`, dan `GEMINI_API_KEY_4`.
    - Saat salah satu kunci mengembalikan batas kuota (`429`) atau gangguan layanan sementara (`503`), fungsi rotasi secara transparan mencoba kunci berikutnya.

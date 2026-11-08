@@ -4,6 +4,7 @@ import { explainPlan } from '@/lib/planner/explain'
 import { solvePlan } from '@/lib/planner/vrp'
 import { buildSolveInput, PlanInputError } from '@/lib/plans/build-input'
 import { planRequestSchema, planSchema, type Plan } from '@/lib/schemas'
+import { checkRateLimit, clientIpFromRequest } from '@/lib/security/guard'
 import { getStore } from '@/lib/store'
 
 export const runtime = 'nodejs'
@@ -14,6 +15,10 @@ export async function POST(request: Request) {
   const requestId = requestIdFrom(request)
   const started = Date.now()
   try {
+    const rate = checkRateLimit(`api_plans:${clientIpFromRequest(request)}`, 8, 60_000)
+    if (!rate.allowed) {
+      return jsonErr(requestId, 429, 'RATE_LIMIT', `Too many plan requests. Retry in ${rate.retryAfterSec} seconds.`)
+    }
     const body = await readJson(request, requestId)
     if (!body.ok) return body.response
     const parsed = parseSchema(planRequestSchema, body.value, requestId)

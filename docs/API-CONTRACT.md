@@ -13,7 +13,7 @@ Sumber kebenaran skema validasi berada di [`lib/schemas.ts`](../lib/schemas.ts) 
     "meta": {
       "mode": "live | demo",
       "requestId": "req_...",
-      "model": "gemini-2.5-flash | gemini-2.5-flash-lite | demo-mock | demo-template",
+      "model": "gemini-3.5-flash | gemini-3.5-flash-lite | gemini-2.5-flash | gemini-2.5-flash-lite | demo-mock | demo-template | template-fallback",
       "latencyMs": 42
     }
   }
@@ -53,8 +53,8 @@ Konfigurasi kunci dan model dikelola di [`lib/ai/keys.ts`](../lib/ai/keys.ts):
 
 | Tugas | Endpoint | Model Bawaan | Variabel Lingkungan Pengubah |
 |---|---|---|---|
-| Klasifikasi Laporan (Multimodal/Teks) | `POST /api/reports/classify` | `gemini-2.5-flash` | `GEMINI_CLASSIFY_MODEL` |
-| Penjelasan Rencana Rute VRP | `POST /api/plans`, `POST /api/plans/:id/explain` | `gemini-2.5-flash-lite` | `GEMINI_EXPLAIN_MODEL` |
+| Klasifikasi Laporan (Multimodal/Teks) | `POST /api/reports/classify` | `gemini-3.5-flash` di produksi; default kode `gemini-2.5-flash` jika variabel kosong | `GEMINI_CLASSIFY_MODEL` |
+| Penjelasan Rencana Rute VRP | `POST /api/plans`, `POST /api/plans/:id/explain` | `gemini-3.5-flash-lite` di produksi, lalu rantai model di `explainModelChain()`, lalu `template-fallback`. Default kode jika variabel kosong: `gemini-2.5-flash-lite` | `GEMINI_EXPLAIN_MODEL` |
 
 - **Rotasi & Failover Kunci API:** Mendukung hingga 4 kunci API (`GEMINI_API_KEY`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3`, `GEMINI_API_KEY_4`, atau daftar dipisahkan koma di `GEMINI_API_KEYS`). Apabila kunci pertama mengembalikan `429 RATE_LIMIT` atau kesalahan sementara (`503`), pemanggil otomatis beralih (*failover*) ke kunci berikutnya sebelum mengembalikan kegagalan.
 

@@ -85,6 +85,8 @@ export const ERROR_CODES = [
   'NOT_FOUND',
   'CONFLICT',
   'PAYLOAD_TOO_LARGE',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
   'INTERNAL',
   'empty_report',
 ] as const

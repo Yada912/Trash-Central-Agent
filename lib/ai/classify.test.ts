@@ -358,6 +358,37 @@ describe('classifyReport live model', () => {
     expect(photoClaim.test(outcome.classification.rationale)).toBe(false)
   })
 
+  it('accepts household counts and flags hazardous waste when the model withholds a volume', async () => {
+    process.env.GEMINI_API_KEY = 'test-key'
+    generate.mockResolvedValue({
+      object: {
+        kind: 'insufficient_evidence',
+        rationale: 'The words do not support a volume.',
+        missing: ['volume'],
+      },
+    } as never)
+
+    const bags = await classifyReport({ text: 'dua kantong sisa canang dan daun, satu botol plastik' })
+    expect(bags.kind).toBe('trash')
+    if (bags.kind !== 'trash') return
+    expect(bags.classification.volume.liters).toBe(31)
+    expect(bags.classification.types.map((entry) => entry.type).sort()).toEqual(['organic', 'plastic'])
+
+    const guide = await classifyReport({
+      text: 'Ada tumpukan sampah plastik dan sisa makanan di pinggir jalan dekat pasar',
+    })
+    expect(guide.kind).toBe('trash')
+    if (guide.kind !== 'trash') return
+    expect(guide.classification.volume.liters).toBe(40)
+    expect(guide.classification.needsReview).toBe(true)
+
+    const hazard = await classifyReport({ text: 'Ada baterai bocor dan kaleng cat di dekat jalur pejalan kaki' })
+    expect(hazard.kind).toBe('trash')
+    if (hazard.kind !== 'trash') return
+    expect(hazard.classification.flags).toContain('hazardous_present')
+    expect(hazard.classification.urgency).toBe('high')
+  })
+
   it('returns insufficient evidence without inventing a volume or calling the subject non-trash', async () => {
     process.env.GEMINI_API_KEY = 'test-key'
     generate.mockResolvedValue({

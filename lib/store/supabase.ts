@@ -1,6 +1,7 @@
 import 'server-only'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { facilitySchema, planSchema, reportSchema, type Plan, type Report } from '@/lib/schemas'
+import { normalizeStoredClassification } from '@/lib/store/normalize-classification'
 import type { Store } from '@/lib/store/types'
 
 type ReportRow = {
@@ -50,8 +51,8 @@ function toReport(row: ReportRow): Report {
     ...(row.desa ? { desa: row.desa } : {}),
     description: row.description,
     ...(row.photo_url ? { photoUrl: row.photo_url } : {}),
-    classification: row.classification,
-    ...(row.ai_classification ? { aiClassification: row.ai_classification } : {}),
+    classification: normalizeStoredClassification(row.classification),
+    ...(row.ai_classification ? { aiClassification: normalizeStoredClassification(row.ai_classification) } : {}),
     edited: row.edited,
     ...(row.account_type ? { accountType: row.account_type } : {}),
     status: row.status,
@@ -59,6 +60,15 @@ function toReport(row: ReportRow): Report {
     ...(row.description_en ? { descriptionEn: row.description_en } : {}),
     ...(row.estimated_weight_kg != null ? { estimatedWeightKg: row.estimated_weight_kg } : {}),
   })
+}
+
+function readReportRow(row: ReportRow): Report | null {
+  try {
+    return toReport(row)
+  } catch (error) {
+    console.error(`Skipping unreadable report ${row.id}`, error)
+    return null
+  }
 }
 
 function toReportRow(report: Report): ReportRow {
@@ -110,7 +120,10 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
       if (query?.status) request = request.eq('status', query.status)
       const { data, error } = await request
       if (error) throw new Error(error.message)
-      const reports = ((data ?? []) as ReportRow[]).map((row) => toReport(row))
+      const reports = ((data ?? []) as ReportRow[]).flatMap((row) => {
+        const report = readReportRow(row)
+        return report ? [report] : []
+      })
       if (!query?.since) return reports
       const sinceMs = Date.parse(query.since)
       return reports.filter((report) => Date.parse(report.createdAt) >= sinceMs)
@@ -118,7 +131,7 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
     async getReport(id) {
       const { data, error } = await client.from('reports').select('*').eq('id', id).maybeSingle()
       if (error) throw new Error(error.message)
-      return data ? toReport(data as ReportRow) : null
+      return data ? readReportRow(data as ReportRow) : null
     },
     async createReport(report, idempotency) {
       if (idempotency) {

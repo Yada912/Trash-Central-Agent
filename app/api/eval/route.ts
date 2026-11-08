@@ -19,6 +19,7 @@ import {
   inspectPromptInput,
   redactPiiFromText,
 } from '@/lib/security/guard'
+import { nowWita } from '@/lib/time'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,6 +36,18 @@ export type EvalCheckResult = {
 }
 
 export async function GET(request: Request) {
+  try {
+    return await evaluate(request)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { ok: false, error: { code: 'INTERNAL', message: 'Something went wrong.' } },
+      { status: 500, headers: { 'cache-control': 'no-store' } },
+    )
+  }
+}
+
+async function evaluate(request: Request) {
   const url = new URL(request.url)
   const runLiveAi = url.searchParams.get('live') === '1'
   if (runLiveAi) {
@@ -118,7 +131,7 @@ export async function GET(request: Request) {
   const grid = buildMonthCalendarGrid({
     year: 2026,
     month: 11,
-    todayDate: '2026-11-07',
+    todayDate: nowWita().slice(0, 10),
     kecamatan: sampleWarga.kecamatan,
     timetable,
     weeklyRegularLiters: sampleWarga.wasteProfile?.weeklyRegularLiters ?? 105,

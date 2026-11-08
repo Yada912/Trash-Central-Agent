@@ -8,13 +8,14 @@
 // A digit filter is not the guard.
 //
 // GEMINI_API_KEY unset: labelled demo built from those same facts.
-// GEMINI_API_KEY set: a failed or fabricated model response throws after one
-// repair. It is never replaced with the demo.
+// GEMINI_API_KEY set: try explainModelChain(). A failed or fabricated response
+// moves to the next model. If every model fails, return a labelled template
+// built from the same plan facts so planning still succeeds.
 
 import { generateObject, NoObjectGeneratedError } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
-import { EXPLAIN_DEFAULT_MODEL_ID, explainModelId, geminiApiKeys, hasGeminiApiKey } from '@/lib/ai/keys'
+import { EXPLAIN_DEFAULT_MODEL_ID, explainModelChain, explainModelId, geminiApiKeys, hasGeminiApiKey } from '@/lib/ai/keys'
 import { shiftWindowMinutes } from '@/lib/planner/vrp'
 import { sanitizeUntrustedForPrompt } from '@/lib/security/guard'
 import type { Explanation, PlanResult, SolvePlanInput, Urgency } from '@/lib/schemas'
@@ -341,7 +342,14 @@ function selectionAllowed(
   return true
 }
 
-function render(plan: PlanResult, input: SolvePlanInput, interpretation: Interpretation, risks: readonly RiskCode[], notes: ReadonlyMap<string, RouteNote>): Explanation {
+function render(
+  plan: PlanResult,
+  input: SolvePlanInput,
+  interpretation: Interpretation,
+  risks: readonly RiskCode[],
+  notes: ReadonlyMap<string, RouteNote>,
+  modelId = explainModelId(),
+): Explanation {
   const shift = readShift(input)
   const unassigned =
     plan.unassigned.length === 0
@@ -374,7 +382,16 @@ function render(plan: PlanResult, input: SolvePlanInput, interpretation: Interpr
     perRoute,
     risks: RISK_CODES.filter((code) => riskSet.has(code)).map((code) => riskText(code, input)),
     stale: false,
-    provenance: { source: 'gemini', model: explainModelId() },
+    provenance: { source: 'gemini', model: modelId },
+  }
+}
+
+function templateFallback(plan: PlanResult, input: SolvePlanInput): Explanation {
+  const rendered = render(plan, input, 'no_special_priority', [...applicableRisks(plan)], new Map())
+  return {
+    ...rendered,
+    summary: `Template fallback: the explanation models were unavailable. ${rendered.summary}`,
+    provenance: { source: 'template', model: 'template-fallback' },
   }
 }
 
@@ -397,10 +414,15 @@ function demoExplain(plan: PlanResult, input: SolvePlanInput): Explanation {
   }
 }
 
-async function callModel(plan: PlanResult, input: SolvePlanInput, signal: AbortSignal, repair: boolean): Promise<unknown> {
+async function callModel(
+  plan: PlanResult,
+  input: SolvePlanInput,
+  signal: AbortSignal,
+  repair: boolean,
+  modelId: string,
+): Promise<unknown> {
   const keys = geminiApiKeys()
   if (keys.length === 0) throw new ExplainError('UPSTREAM', 'The model request failed.')
-  const modelId = explainModelId()
   const shift = readShift(input)
   const safeTruckId = (id: string) => sanitizeUntrustedForPrompt(id).replace(/[\r\n\t]/g, ' ').slice(0, 64)
   const menu = {
@@ -466,40 +488,41 @@ export async function explainPlan(plan: PlanResult, input: SolvePlanInput): Prom
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), EXPLAIN_TIMEOUT_MS)
   try {
-    let repair = false
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      if (controller.signal.aborted) {
-        throw new ExplainError('TIMEOUT', 'The model did not respond within 15 seconds.')
-      }
-      let raw: unknown
-      try {
-        raw = await callModel(plan, input, controller.signal, repair)
-      } catch (error) {
-        if (error instanceof ExplainError) throw error
-        if (error instanceof OutputRejected && attempt === 0) {
-          repair = true
-          continue
+    for (const modelId of explainModelChain()) {
+      if (controller.signal.aborted) break
+      let repair = false
+      let failed = false
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        if (controller.signal.aborted) {
+          failed = true
+          break
         }
-        throw new ExplainError('UPSTREAM', 'The explanation cited facts that are not in the plan.', {
-          reason: 'invalid_output',
-        })
-      }
-      const parsed = explainModelSchema.safeParse(raw)
-      if (!parsed.success || !selectionAllowed(parsed.data, plan, input)) {
-        if (attempt === 0) {
-          repair = true
-          continue
+        let raw: unknown
+        try {
+          raw = await callModel(plan, input, controller.signal, repair, modelId)
+        } catch (error) {
+          if (error instanceof OutputRejected && attempt === 0) {
+            repair = true
+            continue
+          }
+          failed = true
+          break
         }
-        throw new ExplainError('UPSTREAM', 'The explanation cited facts that are not in the plan.', {
-          reason: 'invalid_output',
-        })
+        const parsed = explainModelSchema.safeParse(raw)
+        if (!parsed.success || !selectionAllowed(parsed.data, plan, input)) {
+          if (attempt === 0) {
+            repair = true
+            continue
+          }
+          failed = true
+          break
+        }
+        const notes = new Map(parsed.data.routeNotes.map((entry) => [entry.truckId, entry.note]))
+        return render(plan, input, parsed.data.interpretation, parsed.data.riskCodes, notes, modelId)
       }
-      const notes = new Map(parsed.data.routeNotes.map((entry) => [entry.truckId, entry.note]))
-      return render(plan, input, parsed.data.interpretation, parsed.data.riskCodes, notes)
+      if (!failed && repair) continue
     }
-    throw new ExplainError('UPSTREAM', 'The explanation cited facts that are not in the plan.', {
-      reason: 'invalid_output',
-    })
+    return templateFallback(plan, input)
   } finally {
     clearTimeout(timer)
   }

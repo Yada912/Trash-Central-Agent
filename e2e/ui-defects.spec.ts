@@ -13,6 +13,7 @@ test('hazard share edit clears the stale flag and review filters move the totals
   await expect(page.getByText('Bendera terkonfirmasi: no_image')).toBeVisible()
   await expect(page.getByText('Hazard cleared by resident, needs check')).toBeVisible()
 
+  await page.getByRole('button', { name: 'Ketik Angka' }).click()
   await page.getByLabel('Lintang (Latitude)').fill('-8.670000')
   await page.getByLabel('Bujur (Longitude)').fill('115.210000')
   await page.getByRole('checkbox', { name: 'Saya telah meninjau hasil ini' }).check()
@@ -40,7 +41,11 @@ test('hazard share edit clears the stale flag and review filters move the totals
   expect(body.aiClassification.flags).toContain('hazardous_present')
   expect(body.aiClassification.types[0]).toMatchObject({ type: 'hazardous', share: 1 })
   expect(saved.data.classification.flags).not.toContain('hazardous_present')
-  expect(saved.data.classification.reviewReasons).toEqual(['hazard_cleared_by_resident'])
+  expect(saved.data.classification.reviewReasons).toEqual([
+    'low_confidence',
+    'hazard_cleared_by_resident',
+    'insufficient_text',
+  ])
   expect(saved.data.classification.needsReview).toBe(true)
   expect(saved.data.aiClassification?.flags).toContain('hazardous_present')
   expect(saved.data.aiClassification?.types[0]).toMatchObject({ type: 'hazardous', share: 1 })

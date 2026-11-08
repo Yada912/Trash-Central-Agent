@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import { processResidentAgentChat } from '@/lib/ai/agent-chat'
+import { signSession } from '@/lib/auth/session'
 import { getActiveAccount, listTimetableSlots } from '@/lib/accounts/store'
 import { POST as handleChatApi } from '@/app/api/agent/chat/route'
 
@@ -59,12 +60,13 @@ describe('Conversational Waste Agent (Kresna) & Demand-Based Model', () => {
   })
 
   it('handles chat API endpoint POST and returns updated account & optimization', async () => {
+    const token = signSession({ accountId: 'usr_warga_01', role: 'warga' })
     const request = new Request('http://localhost/api/agent/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', cookie: `cta_session=${token}` },
       body: JSON.stringify({
         message: 'Keluarga kumpul akhir pekan ini, ada banyak kardus dan botol plastik',
-        accountId: 'usr_warga_01',
+        accountId: 'usr_petugas_01',
       }),
     })
 
