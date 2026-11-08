@@ -88,25 +88,33 @@ function errorResponse(status: number, code: string, message: string): NextRespo
   return response
 }
 
-function applySessionCookie(response: NextResponse, token: string): void {
+/** Secure only on HTTPS. `next start` in CI is production mode on http://127.0.0.1. */
+function cookieSecure(request: Request): boolean {
+  if (process.env.NODE_ENV !== 'production') return false
+  const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  if (forwarded) return forwarded === 'https'
+  return new URL(request.url).protocol === 'https:'
+}
+
+function applySessionCookie(response: NextResponse, token: string, request: Request): void {
   response.cookies.set({
     name: SESSION_COOKIE,
     value: token,
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: cookieSecure(request),
     path: '/',
     maxAge: SESSION_MAX_AGE_SEC,
   })
 }
 
-function clearSessionCookie(response: NextResponse): void {
+function clearSessionCookie(response: NextResponse, request: Request): void {
   response.cookies.set({
     name: SESSION_COOKIE,
     value: '',
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: cookieSecure(request),
     path: '/',
     maxAge: 0,
   })
@@ -148,7 +156,7 @@ export async function POST(request: Request) {
 
     if (body.action === 'logout') {
       const response = accountResponse(null)
-      clearSessionCookie(response)
+      clearSessionCookie(response, request)
       return response
     }
 
@@ -172,7 +180,7 @@ export async function POST(request: Request) {
       const raw = getRawAccount(authed.id)
       if (raw) await syncAccountToSupabase(raw)
       const response = accountResponse(authed)
-      applySessionCookie(response, token)
+      applySessionCookie(response, token, request)
       return response
     }
 
@@ -215,7 +223,7 @@ export async function POST(request: Request) {
       const raw = getRawAccount(created.id)
       if (raw) await syncAccountToSupabase(raw)
       const response = accountResponse(created)
-      applySessionCookie(response, token)
+      applySessionCookie(response, token, request)
       return response
     }
 
