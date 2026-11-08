@@ -4,7 +4,8 @@ import { classifyReport } from '@/lib/ai/classify'
 import { estimateHouseholdReport, outcomeFromHouseholdEstimate } from '@/lib/ai/quantity'
 import { classifyModelId, hasGeminiApiKey } from '@/lib/ai/keys'
 import { stampClassification } from '@/lib/review'
-import { checkRateLimit, clientIpFromRequest, inspectPromptInput } from '@/lib/security/guard'
+import { clientIpFromRequest, inspectPromptInput } from '@/lib/security/guard'
+import { durableRateLimit } from '@/lib/security/shared-limit'
 import {
   classifyRequestSchema,
   volumeLabelFor,
@@ -128,7 +129,7 @@ export async function POST(request: Request) {
   const started = Date.now()
   try {
     const ip = clientIpFromRequest(request)
-    const rate = checkRateLimit(`api_classify:${ip}`, 30, 60_000)
+    const rate = await durableRateLimit(`api_classify:${ip}`, 30, 60_000)
     if (!rate.allowed) {
       return jsonErr(requestId, 429, 'RATE_LIMIT', `Terlalu banyak permintaan klasifikasi. Coba lagi dalam ${rate.retryAfterSec} detik.`)
     }

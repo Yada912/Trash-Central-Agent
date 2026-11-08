@@ -338,6 +338,7 @@ export function useReportFlow() {
       setMode(response.meta.mode)
       setSuccess(response.data)
       submitted.current = true
+      window.dispatchEvent(new Event('cta-data-changed'))
     } catch (caught) {
       setError(messageForApiError(caught))
     } finally {

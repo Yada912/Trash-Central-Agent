@@ -17,6 +17,7 @@
 import { generateObject, NoObjectGeneratedError } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
+import { createProviderBudget, ProviderBudgetExceeded, type ProviderBudget } from '@/lib/ai/budget'
 import { CLASSIFY_DEFAULT_MODEL_ID, classifyModelId, geminiApiKeys, hasGeminiApiKey } from '@/lib/ai/keys'
 import { estimateHouseholdReport, outcomeFromHouseholdEstimate, textMentionsHazard } from '@/lib/ai/quantity'
 import { decodedBase64Bytes } from '@/lib/api/image'
@@ -419,7 +420,7 @@ function interpret(raw: unknown, input: ValidatedInput): ClassifyOutcome {
   return { kind: 'trash', classification: checked.data }
 }
 
-async function callModel(input: ValidatedInput, signal: AbortSignal, repairNote?: string): Promise<unknown> {
+async function callModel(input: ValidatedInput, signal: AbortSignal, repairNote: string | undefined, budget: ProviderBudget): Promise<unknown> {
   const keys = geminiApiKeys()
   if (keys.length === 0) throw new ClassifyError('UPSTREAM', 'The model request failed.')
   const modelId = classifyModelId()
@@ -441,6 +442,7 @@ async function callModel(input: ValidatedInput, signal: AbortSignal, repairNote?
   for (let index = 0; index < keys.length; index += 1) {
     const apiKey = keys[index]
     try {
+      budget.take()
       const { object } = await withAbort(
         generateObject({
           model: createGoogleGenerativeAI({ apiKey })(modelId),
@@ -518,6 +520,7 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutc
   }
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), CLASSIFY_TIMEOUT_MS)
+  const budget = createProviderBudget()
   try {
     let repairNote: string | undefined
     for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -525,7 +528,7 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutc
         throw new ClassifyError('TIMEOUT', 'The model did not respond within 15 seconds.')
       }
       try {
-        const raw = await callModel(validated, controller.signal, repairNote)
+        const raw = await callModel(validated, controller.signal, repairNote, budget)
         return recoverHousehold(validated, interpret(raw, validated))
       } catch (error) {
         if (error instanceof OutputRejected && attempt === 0 && !controller.signal.aborted) {
@@ -536,6 +539,9 @@ export async function classifyReport(input: ClassifyInput): Promise<ClassifyOutc
           throw new ClassifyError('UPSTREAM', 'The model output did not match the schema.', {
             reason: 'invalid_output',
           })
+        }
+        if (error instanceof ProviderBudgetExceeded) {
+          throw new ClassifyError('UPSTREAM', 'The model request failed.')
         }
         throw error
       }

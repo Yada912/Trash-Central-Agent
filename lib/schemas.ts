@@ -272,6 +272,18 @@ export const reportSchema = z.object({
   status: reportStatusSchema,
   provenance: z.string().min(1).optional(),
   descriptionEn: z.string().min(1).optional(),
+  accountId: z.string().min(1).max(80).optional(),
+  collectionAudit: z
+    .array(
+      z.object({
+        at: z.string().min(1).max(40),
+        actor: z.string().min(1).max(120),
+        fromStatus: reportStatusSchema,
+        toStatus: reportStatusSchema,
+      }),
+    )
+    .max(20)
+    .optional(),
   estimatedWeightKg: z.number().positive().optional(),
 })
 export type Report = z.infer<typeof reportSchema>
@@ -389,7 +401,8 @@ export const planRequestSchema = z
         end: clockSchema,
       })
       .strict(),
-    reportIds: z.array(z.string().min(1)).optional(),
+    reportIds: z.array(z.string().min(1)).max(200).optional(),
+    skipExplanation: z.boolean().optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -444,6 +457,7 @@ export const explanationSchema = z.object({
   risks: z.array(z.string()),
   stale: z.boolean(),
   provenance: explanationProvenanceSchema,
+  generatedAt: z.string().min(1).max(40).optional(),
 })
 export type Explanation = z.infer<typeof explanationSchema>
 

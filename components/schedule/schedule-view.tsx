@@ -18,6 +18,7 @@ import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
 import { formatSlotDaysId } from '@/lib/accounts/store'
 import { messageForApiError, requestJson } from '@/lib/client/api'
+import { currentWitaMonday } from '@/lib/time'
 import {
   ACCOUNT_TYPES,
   KECAMATAN,
@@ -53,7 +54,7 @@ export function ScheduleView() {
       if (accountType) params.set('accountType', accountType)
       if (checkedAvailability) {
         params.set('availability', 'checked')
-        params.set('weekStart', '2026-11-02')
+        params.set('weekStart', currentWitaMonday())
       }
       const query = params.toString()
       const response = await requestJson<ScheduleResponse>(
@@ -70,6 +71,15 @@ export function ScheduleView() {
 
   useEffect(() => {
     void loadSchedule()
+    const refresh = () => {
+      void loadSchedule()
+    }
+    window.addEventListener('focus', refresh)
+    window.addEventListener('cta-data-changed', refresh)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      window.removeEventListener('cta-data-changed', refresh)
+    }
   }, [loadSchedule])
 
   const entries = data?.entries ?? []

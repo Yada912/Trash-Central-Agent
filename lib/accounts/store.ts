@@ -736,16 +736,22 @@ function sanitizeAccount(account: UserAccount): UserAccount {
   return structuredClone(safeAccount)
 }
 
+/**
+ * Replaces the in-memory account list with the database snapshot.
+ * Ids that are absent from `externalAccounts` are dropped, including when the snapshot is empty.
+ */
 export function loadExternalAccounts(externalAccounts: UserAccount[]): void {
   const state = getAccountState()
-  const map = new Map<string, UserAccount>()
-  for (const acc of state.accounts) {
-    map.set(acc.id, acc)
+  state.accounts = externalAccounts.map((account) => structuredClone(account))
+  if (!state.accounts.some((account) => account.id === state.activeAccountId)) {
+    state.activeAccountId = state.accounts[0]?.id ?? ''
   }
-  for (const ext of externalAccounts) {
-    map.set(ext.id, ext)
-  }
-  state.accounts = Array.from(map.values())
+}
+
+export function removeAccount(id: string): void {
+  const state = getAccountState()
+  state.accounts = state.accounts.filter((account) => account.id !== id)
+  if (state.activeAccountId === id) state.activeAccountId = state.accounts[0]?.id ?? ''
 }
 
 export function loadExternalTimetable(externalTimetable: PetugasTimetableSlot[]): void {

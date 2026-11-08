@@ -13,13 +13,15 @@ export function isSupabaseConfigured(): boolean {
   return Boolean((process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL) && process.env.SUPABASE_SERVICE_ROLE_KEY)
 }
 
-export async function fetchAccountsFromSupabase(): Promise<UserAccount[] | null> {
+export type AccountFetch = { ok: true; rows: UserAccount[] } | { ok: false }
+
+export async function fetchAccountsFromSupabase(): Promise<AccountFetch> {
   const client = getClient()
-  if (!client) return null
+  if (!client) return { ok: false }
   try {
     const { data, error } = await client.from('accounts').select('*').order('created_at', { ascending: true })
-    if (error || !data || data.length === 0) return null
-    return data.map((row) => ({
+    if (error || !data) return { ok: false }
+    return { ok: true, rows: data.map((row) => ({
       id: row.id,
       name: row.name,
       email: row.email,
@@ -36,9 +38,9 @@ export async function fetchAccountsFromSupabase(): Promise<UserAccount[] | null>
       lng: row.lng ?? 115.2124,
       accountType: row.account_type ?? 'household',
       wasteProfile: row.waste_profile ?? undefined,
-    }))
+    })) }
   } catch {
-    return null
+    return { ok: false }
   }
 }
 
@@ -65,31 +67,57 @@ export async function fetchTimetableFromSupabase(): Promise<PetugasTimetableSlot
   }
 }
 
-export async function syncAccountToSupabase(account: UserAccount): Promise<void> {
+export type AccountSyncMode = 'insert' | 'update'
+export type AccountSyncResult = 'wrote' | 'missing' | 'skipped' | 'failed'
+
+function accountRow(account: UserAccount) {
+  return {
+    id: account.id,
+    name: account.name,
+    email: account.email,
+    password: account.password ?? null,
+    role: account.role,
+    badge_id: account.badgeId ?? null,
+    kecamatan: account.kecamatan,
+    desa: account.desa,
+    banjar_name: account.banjarName ?? null,
+    tps3r_node: account.tps3rNode ?? null,
+    birth_date: account.birthDate ?? null,
+    address: account.address,
+    lat: account.lat,
+    lng: account.lng,
+    account_type: account.accountType,
+    waste_profile: account.wasteProfile ?? null,
+    updated_at: new Date().toISOString(),
+  }
+}
+
+/**
+ * `insert` is only for a brand-new signup. `update` never inserts, so a row
+ * deleted in the database cannot be recreated from warm memory.
+ */
+export async function syncAccountToSupabase(account: UserAccount, mode: AccountSyncMode = 'update'): Promise<AccountSyncResult> {
   const client = getClient()
-  if (!client) return
+  if (!client) return 'skipped'
   try {
-    await client.from('accounts').upsert({
-      id: account.id,
-      name: account.name,
-      email: account.email,
-      password: account.password ?? null,
-      role: account.role,
-      badge_id: account.badgeId ?? null,
-      kecamatan: account.kecamatan,
-      desa: account.desa,
-      banjar_name: account.banjarName ?? null,
-      tps3r_node: account.tps3rNode ?? null,
-      birth_date: account.birthDate ?? null,
-      address: account.address,
-      lat: account.lat,
-      lng: account.lng,
-      account_type: account.accountType,
-      waste_profile: account.wasteProfile ?? null,
-      updated_at: new Date().toISOString(),
-    })
+    if (mode === 'insert') {
+      const { error } = await client.from('accounts').insert(accountRow(account))
+      if (error) {
+        console.warn('Supabase account insert failed:', error.message)
+        return 'failed'
+      }
+      return 'wrote'
+    }
+    const { data, error } = await client.from('accounts').update(accountRow(account)).eq('id', account.id).select('id')
+    if (error) {
+      console.warn('Supabase account update failed:', error.message)
+      return 'failed'
+    }
+    if (!data || data.length === 0) return 'missing'
+    return 'wrote'
   } catch (err) {
     console.warn('Supabase account sync failed:', err)
+    return 'failed'
   }
 }
 

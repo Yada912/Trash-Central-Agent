@@ -22,6 +22,8 @@ type ReportRow = {
   status: Report['status']
   provenance: string | null
   estimated_weight_kg: number | null
+  account_id?: string | null
+  collection_audit?: Report['collectionAudit'] | null
 }
 
 function assertServiceRole(key: string): void {
@@ -59,7 +61,21 @@ function toReport(row: ReportRow): Report {
     ...(row.provenance ? { provenance: row.provenance } : {}),
     ...(row.description_en ? { descriptionEn: row.description_en } : {}),
     ...(row.estimated_weight_kg != null ? { estimatedWeightKg: row.estimated_weight_kg } : {}),
+    ...(row.account_id ? { accountId: row.account_id } : {}),
+    ...(row.collection_audit && row.collection_audit.length > 0 ? { collectionAudit: row.collection_audit } : {}),
   })
+}
+
+function missingColumn(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false
+  return error.code === '42703' || /column .+ does not exist/i.test(error.message ?? '')
+}
+
+function withoutOwnerColumns(row: ReportRow): ReportRow {
+  const copy = { ...row }
+  delete copy.account_id
+  delete copy.collection_audit
+  return copy
 }
 
 function readReportRow(row: ReportRow): Report | null {
@@ -90,6 +106,8 @@ function toReportRow(report: Report): ReportRow {
     status: report.status,
     provenance: report.provenance ?? null,
     estimated_weight_kg: report.estimatedWeightKg ?? null,
+    ...(report.accountId ? { account_id: report.accountId } : {}),
+    ...(report.collectionAudit ? { collection_audit: report.collectionAudit } : {}),
   }
 }
 
@@ -155,7 +173,11 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
           ? { client_request_id: idempotency.key, idempotency_body_hash: idempotency.bodyHash }
           : {}),
       }
-      const { error } = await client.from('reports').insert(row)
+      let { error } = await client.from('reports').insert(row)
+      if (missingColumn(error)) {
+        const retry = await client.from('reports').insert(withoutOwnerColumns(row))
+        error = retry.error
+      }
       if (error && idempotency && error.code === '23505') {
         const again = await client
           .from('reports')
@@ -178,7 +200,12 @@ export function createSupabaseStore(url: string, serviceRoleKey: string): Store 
       const existing = await this.getReport(id)
       if (!existing) return null
       const next = reportSchema.parse({ ...existing, ...patch })
-      const { error } = await client.from('reports').update(toReportRow(next)).eq('id', id)
+      const row = toReportRow(next)
+      let { error } = await client.from('reports').update(row).eq('id', id)
+      if (missingColumn(error)) {
+        const retry = await client.from('reports').update(withoutOwnerColumns(row)).eq('id', id)
+        error = retry.error
+      }
       if (error) throw new Error(error.message)
       return next
     },

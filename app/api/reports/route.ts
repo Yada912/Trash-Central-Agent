@@ -5,6 +5,7 @@ import { classificationWasEdited } from '@/lib/reports/compare'
 import { savedReportIsDemo } from '@/lib/reports/demo-mode'
 import { canonicalReportBodyHash, idempotencyKeyFrom } from '@/lib/reports/idempotency'
 import { stampClassification } from '@/lib/review'
+import { readSessionFromRequest } from '@/lib/auth/session'
 import { checkRateLimit, clientIpFromRequest, inspectPromptInput, redactPiiFromText } from '@/lib/security/guard'
 import { createReportSchema, kecamatanSchema, reportStatusSchema, type Kecamatan, type Report } from '@/lib/schemas'
 import { getStore } from '@/lib/store'
@@ -36,11 +37,14 @@ export async function GET(request: Request) {
     if (since && Number.isNaN(Date.parse(since))) {
       return jsonErr(requestId, 400, 'VALIDATION', 'since must be an ISO timestamp.', { since: ['Use an ISO timestamp.'] })
     }
-    const reports = await getStore().listReports({
+    const mine = url.searchParams.get('mine') === '1'
+    const session = mine ? readSessionFromRequest(request) : null
+    if (mine && !session) return jsonErr(requestId, 401, 'UNAUTHORIZED', 'Sign in to see your reports.')
+    const reports = (await getStore().listReports({
       ...(kecamatan ? { kecamatan } : {}),
       ...(status ? { status } : {}),
       ...(since ? { since } : {}),
-    })
+    })).filter((report) => !mine || report.accountId === session?.accountId)
     return jsonOk(requestId, reports)
   } catch (error) {
     console.error(error)
@@ -70,6 +74,7 @@ export async function POST(request: Request) {
       return jsonErr(requestId, 400, 'VALIDATION', securityCheck.reason ?? 'Disallowed input in description.')
     }
     const text = redactPiiFromText(rawText)
+    const ownerId = readSessionFromRequest(request)?.accountId
     const store = getStore()
     const idempotencyKey = idempotencyKeyFrom(request.headers.get('idempotency-key'), parsed.data.clientRequestId)
     const hasImage = Boolean(parsed.data.image)
@@ -108,6 +113,7 @@ export async function POST(request: Request) {
       edited: classificationWasEdited(parsed.data.classification, parsed.data.aiClassification),
       accountType: parsed.data.accountType ?? 'household',
       status: 'new',
+      ...(ownerId ? { accountId: ownerId } : {}),
     }
     const saved = await store.createReport(report, idempotencyKey ? { key: idempotencyKey, bodyHash } : undefined)
     if (saved.status === 'conflict') {

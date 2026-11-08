@@ -253,6 +253,10 @@ export function PlannerView() {
                 <p className="text-sm font-bold">
                   Total: {plan.result.totals.stops} pemberhentian, {plan.result.totals.liters} L, {plan.result.totals.distanceKm} km.
                 </p>
+                <p className="text-sm" data-testid="plan-snapshot">
+                  Snapshot
+                  {plan.explanation.generatedAt ? ` ${plan.explanation.generatedAt}` : ''} · {plan.input.reportIds?.length ?? 0} laporan · sif {plan.input.shift.start}–{plan.input.shift.end} · {plan.input.trucks.length} truk. Ini adalah daftar pada saat rencana dibuat, bukan laporan baru setelah itu.
+                </p>
               </section>
               <div className="vector-card p-5 grid gap-2">
                 <h3 className="text-lg font-extrabold">Peta rute</h3>

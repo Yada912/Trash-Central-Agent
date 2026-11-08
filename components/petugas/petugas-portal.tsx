@@ -818,6 +818,32 @@ export function PetugasPortal() {
               </div>
               <p className="text-xs font-bold">{report.kecamatan} · {report.desa}</p>
               <p className="text-xs text-ink/80 truncate">{report.description}</p>
+              {report.status !== 'collected' ? (
+                <button
+                  type="button"
+                  className="mt-2 text-xs font-black underline"
+                  onClick={() => {
+                    void fetch(`/api/reports/${report.id}/status`, {
+                      method: 'POST',
+                      headers: { 'content-type': 'application/json' },
+                      body: JSON.stringify({ status: 'collected' }),
+                    }).then(async (response) => {
+                      if (!response.ok) return
+                      window.dispatchEvent(new Event('cta-data-changed'))
+                      await reload()
+                    })
+                  }}
+                >
+                  Tandai terangkut
+                </button>
+              ) : (
+                <p className="text-xs font-bold">
+                  Terangkut
+                  {report.collectionAudit?.at(-1)
+                    ? ` · ${report.collectionAudit.at(-1)?.actor} · ${report.collectionAudit.at(-1)?.at}`
+                    : ''}
+                </p>
+              )}
             </div>
           ))}
         </div>

@@ -15,6 +15,7 @@
 import { generateObject, NoObjectGeneratedError } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { z } from 'zod'
+import { createProviderBudget, ProviderBudgetExceeded, type ProviderBudget } from '@/lib/ai/budget'
 import { EXPLAIN_DEFAULT_MODEL_ID, explainModelChain, explainModelId, geminiApiKeys, hasGeminiApiKey } from '@/lib/ai/keys'
 import { shiftWindowMinutes } from '@/lib/planner/vrp'
 import { sanitizeUntrustedForPrompt } from '@/lib/security/guard'
@@ -420,6 +421,7 @@ async function callModel(
   signal: AbortSignal,
   repair: boolean,
   modelId: string,
+  budget: ProviderBudget,
 ): Promise<unknown> {
   const keys = geminiApiKeys()
   if (keys.length === 0) throw new ExplainError('UPSTREAM', 'The model request failed.')
@@ -444,6 +446,7 @@ async function callModel(
   for (let index = 0; index < keys.length; index += 1) {
     const apiKey = keys[index]
     try {
+      budget.take()
       const { object } = await withAbort(
         generateObject({
           model: createGoogleGenerativeAI({ apiKey })(modelId),
@@ -483,10 +486,25 @@ class OutputRejected extends Error {
   }
 }
 
-export async function explainPlan(plan: PlanResult, input: SolvePlanInput): Promise<Explanation> {
+function deferredExplanation(plan: PlanResult, input: SolvePlanInput): Explanation {
+  const rendered = render(plan, input, 'no_special_priority', [...applicableRisks(plan)], new Map())
+  return {
+    ...rendered,
+    summary: `Template deferred: the model explanation was skipped. ${rendered.summary}`,
+    provenance: { source: 'template', model: 'template-deferred' },
+  }
+}
+
+export async function explainPlan(
+  plan: PlanResult,
+  input: SolvePlanInput,
+  options?: { defer?: boolean },
+): Promise<Explanation> {
+  if (options?.defer) return deferredExplanation(plan, input)
   if (!hasGeminiApiKey()) return demoExplain(plan, input)
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), EXPLAIN_TIMEOUT_MS)
+  const budget = createProviderBudget()
   try {
     for (const modelId of explainModelChain()) {
       if (controller.signal.aborted) break
@@ -499,8 +517,9 @@ export async function explainPlan(plan: PlanResult, input: SolvePlanInput): Prom
         }
         let raw: unknown
         try {
-          raw = await callModel(plan, input, controller.signal, repair, modelId)
+          raw = await callModel(plan, input, controller.signal, repair, modelId, budget)
         } catch (error) {
+          if (error instanceof ProviderBudgetExceeded) return templateFallback(plan, input)
           if (error instanceof OutputRejected && attempt === 0) {
             repair = true
             continue

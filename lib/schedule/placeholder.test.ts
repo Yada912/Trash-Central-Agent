@@ -137,7 +137,8 @@ describe('scheduleDemand', () => {
 
   it('conserves litres across the seeded reports', () => {
     const reports = (reportsJson as SeedReport[]).map((item) => mapSeedReport(item))
-    const total = Math.round(reports.reduce((sum, item) => sum + item.classification.volume.liters, 0) * 100)
+    const pending = reports.filter((item) => item.status !== 'collected')
+    const total = Math.round(pending.reduce((sum, item) => sum + item.classification.volume.liters, 0) * 100)
     expect(cents(scheduleDemand(reports))).toBe(total)
     expect(cents(buildSchedule(reports).map((entry) => entry.basis))).toBe(total)
   })
