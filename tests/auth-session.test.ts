@@ -40,8 +40,8 @@ describe('signed session and account privacy', () => {
     const body = await response.text()
     expect(body).not.toContain('made.adi@warga.denpasar.id')
     expect(body).not.toContain('surya.wirawan@dlhk.denpasar.id')
-    expect(body).not.toContain('warga123')
-    expect(body).not.toContain('petugas123')
+    expect(body).not.toContain(process.env.DEMO_WARGA_PASSWORD ?? 'missing-warga-secret')
+    expect(body).not.toContain(process.env.DEMO_PETUGAS_PASSWORD ?? 'missing-petugas-secret')
     expect(body).not.toContain('Jl. Hasanuddin')
     expect(body).not.toContain('"password"')
   })
@@ -53,7 +53,7 @@ describe('signed session and account privacy', () => {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           action: 'login',
-          login: { email: 'made.adi@warga.denpasar.id', password: 'warga123' },
+          login: { email: 'made.adi@warga.denpasar.id', password: process.env.DEMO_WARGA_PASSWORD },
         }),
       }),
     )
@@ -76,7 +76,7 @@ describe('signed session and account privacy', () => {
 
     const stored = getRawAccount('usr_warga_01')
     expect(stored?.password && isPasswordHash(stored.password)).toBe(true)
-    expect(authenticateAccount('made.adi@warga.denpasar.id', 'warga123')?.id).toBe('usr_warga_01')
+    expect(authenticateAccount('made.adi@warga.denpasar.id', process.env.DEMO_WARGA_PASSWORD)?.id).toBe('usr_warga_01')
   })
 
   it('forces public signup to warga and refuses passwordless switching', async () => {
@@ -89,7 +89,7 @@ describe('signed session and account privacy', () => {
           newAccount: {
             name: 'Ni Wayan Uji',
             email: `uji.${Date.now()}@example.invalid`,
-            password: 'rahasia-uji',
+            password: `signup-${Date.now().toString(36)}`,
             role: 'petugas',
             kecamatan: 'Denpasar Selatan',
             desa: 'Sanur',

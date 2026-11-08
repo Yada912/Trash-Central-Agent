@@ -83,8 +83,8 @@ describe('AI Security, Prompt Injection Defense, and User Data Hardening', () =>
     const accounts = listAccounts()
     for (const acc of accounts) {
       expect(acc.password).toBeUndefined()
-      expect(JSON.stringify(acc)).not.toContain('warga123')
-      expect(JSON.stringify(acc)).not.toContain('petugas123')
+      expect(JSON.stringify(acc)).not.toContain(process.env.DEMO_WARGA_PASSWORD)
+      expect(JSON.stringify(acc)).not.toContain(process.env.DEMO_PETUGAS_PASSWORD)
     }
 
     const active = getActiveAccount('usr_warga_01')
@@ -93,12 +93,12 @@ describe('AI Security, Prompt Injection Defense, and User Data Hardening', () =>
     // Empty or omitted password must NOT bypass authentication
     expect(authenticateAccount('made.adi@warga.denpasar.id', '')).toBeNull()
     expect(authenticateAccount('made.adi@warga.denpasar.id', undefined)).toBeNull()
-    expect(authenticateAccount('made.adi@warga.denpasar.id', 'warga123')?.password).toBeUndefined()
+    expect(authenticateAccount('made.adi@warga.denpasar.id', process.env.DEMO_WARGA_PASSWORD)?.password).toBeUndefined()
 
     const apiRes = await getAccounts(new Request('http://localhost:3000/api/accounts'))
     const rawJson = await apiRes.text()
-    expect(rawJson).not.toContain('warga123')
-    expect(rawJson).not.toContain('petugas123')
+    expect(rawJson).not.toContain(process.env.DEMO_WARGA_PASSWORD ?? 'missing-warga-secret')
+    expect(rawJson).not.toContain(process.env.DEMO_PETUGAS_PASSWORD ?? 'missing-petugas-secret')
   })
 
   it('enforces RBAC so Warga accounts cannot modify Petugas fleet timetables (HTTP 403)', async () => {

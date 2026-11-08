@@ -55,7 +55,7 @@ Sebelum menekan tombol **Deploy**, buka bagian **Environment Variables** di hala
 | `GEMINI_CLASSIFY_MODEL` | `gemini-3.5-flash` | Model multimodal untuk klasifikasi citra/teks laporan warga **serta asisten percakapan personal Kresna**. Jika dikosongkan, kode memakai `gemini-2.5-flash`. |
 | `GEMINI_EXPLAIN_MODEL` | `gemini-3.5-flash-lite` | Model pertama untuk penjelasan rute. Jika gagal, kode mencoba model klasifikasi, lalu `gemini-2.5-flash-lite` dan `gemini-2.5-flash`, lalu templat. Jika variabel ini dikosongkan, model pertama adalah `gemini-2.5-flash-lite`. |
 | `SESSION_SECRET` | (wajib, minimal 16 karakter) | Rahasia tanda tangan cookie sesi httpOnly. Jika kosong, masuk gagal tertutup (503) dan rute petugas menolak. |
-| `DEMO_WARGA_PASSWORD` / `DEMO_PETUGAS_PASSWORD` | kosong | Opsional. Jika kosong, kata sandi demo yang sudah dibagikan ke juri tetap berlaku. |
+| `DEMO_WARGA_PASSWORD` / `DEMO_PETUGAS_PASSWORD` | (rahasia, tidak di repositori) | Kata sandi akun demo untuk salinan memori dan seeding. Credentials are provided to judges via the committee form. Jika kosong dan tabel `accounts` tidak punya kata sandi untuk akun itu, login gagal. Baris plaintext yang sudah ada diverifikasi lalu diubah menjadi hash scrypt saat masuk berhasil. |
 
 > [!NOTE]
 > Asisten timbulan warga **Kresna** menggunakan `GEMINI_CLASSIFY_MODEL` (bukan model penjelas rute) untuk penalaran kontekstual dan integrasi kalender Bali.

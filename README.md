@@ -105,9 +105,9 @@ Pengujian: `pnpm test` (Vitest) · `pnpm typecheck` · `pnpm lint` · `pnpm e2e`
 - Produksi: **https://central-trash-agent-bali.vercel.app**
 - Versi yang dinilai Tahap 1: tag `v1.0-submission`
 
-## Demo Account (jika diperlukan - jangan simpan password sensitif di public repo)
+## Demo Account
 
-Portal petugas memerlukan login. Akun demo untuk juri **dikirim melalui formulir panitia**, tidak dicantumkan di README ini. Akun demo hanya berisi data fiktif.
+Portal petugas memerlukan login. Credentials are provided to judges via the committee form. Repositori ini tidak menyimpan kata sandi demo. Login demo memakai `DEMO_WARGA_PASSWORD` dan `DEMO_PETUGAS_PASSWORD`, atau baris akun yang sudah ada di Supabase.
 
 ## Known Limitations
 

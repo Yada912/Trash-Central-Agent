@@ -6,6 +6,8 @@ export default defineConfig({
     environment: 'node',
     env: {
       SESSION_SECRET: 'vitest-session-secret-32',
+      DEMO_WARGA_PASSWORD: 'ci-warga-only',
+      DEMO_PETUGAS_PASSWORD: 'ci-petugas-only',
     },
     include: ['tests/**/*.test.ts', 'lib/ai/**/*.test.ts', 'lib/planner/**/*.test.ts', 'lib/schedule/**/*.test.ts'],
   },

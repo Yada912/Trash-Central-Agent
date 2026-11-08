@@ -4,7 +4,7 @@ import { createAccount, listAccounts } from '@/lib/accounts/store'
 
 describe('guest state, demo judge credentials, and registration flow', () => {
   it('allows Dewan Juri to authenticate using the sample citizen credentials (I Made Adi Wijaya)', () => {
-    const warga = authenticateAccount('made.adi@warga.denpasar.id', 'warga123')
+    const warga = authenticateAccount('made.adi@warga.denpasar.id', process.env.DEMO_WARGA_PASSWORD)
     expect(warga).not.toBeNull()
     expect(warga?.id).toBe('usr_warga_01')
     expect(warga?.name).toBe('I Made Adi Wijaya')
@@ -15,7 +15,7 @@ describe('guest state, demo judge credentials, and registration flow', () => {
   })
 
   it('allows Dewan Juri to authenticate using the sample DLHK officer credentials (Surya Wirawan)', () => {
-    const petugas = authenticateAccount('surya.wirawan@dlhk.denpasar.id', 'petugas123')
+    const petugas = authenticateAccount('surya.wirawan@dlhk.denpasar.id', process.env.DEMO_PETUGAS_PASSWORD)
     expect(petugas).not.toBeNull()
     expect(petugas?.id).toBe('usr_petugas_01')
     expect(petugas?.name).toBe('I Wayan Gde Surya Wirawan')
@@ -24,16 +24,27 @@ describe('guest state, demo judge credentials, and registration flow', () => {
   })
 
   it('rejects incorrect passwords or unregistered emails cleanly without crashing', () => {
-    expect(authenticateAccount('made.adi@warga.denpasar.id', 'wrongpassword')).toBeNull()
-    expect(authenticateAccount('hacker@unknown.org', 'warga123')).toBeNull()
+    expect(authenticateAccount('made.adi@warga.denpasar.id', 'incorrect')).toBeNull()
+    expect(authenticateAccount('hacker@unknown.org', process.env.DEMO_WARGA_PASSWORD)).toBeNull()
     expect(authenticateAccount('', '')).toBeNull()
+    const unsigned = createAccount({
+      name: 'Tanpa Sandi',
+      email: 'tanpa.sandi@example.invalid',
+      role: 'warga',
+      kecamatan: 'Denpasar Barat',
+      desa: 'Pemecutan',
+      address: 'Tanpa kata sandi',
+      accountType: 'household',
+    })
+    expect(authenticateAccount(unsigned.email, process.env.DEMO_WARGA_PASSWORD)).toBeNull()
   })
 
   it('allows new citizens to register their own account without overwriting the demo account', () => {
+    const signupPassword = `signup-${Date.now().toString(36)}`
     const newCitizen = createAccount({
       name: 'Ni Wayan Sari Dewi',
       email: 'sari.dewi@denpasar.id',
-      password: 'passwordRahasia123',
+      password: signupPassword,
       role: 'warga',
       kecamatan: 'Denpasar Selatan',
       desa: 'Sanur Kauh',
@@ -47,7 +58,7 @@ describe('guest state, demo judge credentials, and registration flow', () => {
     expect(newCitizen.name).toBe('Ni Wayan Sari Dewi')
 
     // Verify the new user can authenticate with their registered password
-    const authResult = authenticateAccount('sari.dewi@denpasar.id', 'passwordRahasia123')
+    const authResult = authenticateAccount('sari.dewi@denpasar.id', signupPassword)
     expect(authResult).not.toBeNull()
     expect(authResult?.id).toBe(newCitizen.id)
 

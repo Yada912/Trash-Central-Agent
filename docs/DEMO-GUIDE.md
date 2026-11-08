@@ -19,8 +19,11 @@ Panduan ini menjelaskan langkah demi langkah untuk mendemonstrasikan seluruh kap
    GEMINI_API_KEY_4=kunci_cadangan_4
    GEMINI_CLASSIFY_MODEL=gemini-3.5-flash
    GEMINI_EXPLAIN_MODEL=gemini-3.5-flash-lite
-   SESSION_SECRET=rahasia-sesi-minimal-16
+   SESSION_SECRET=
+   DEMO_WARGA_PASSWORD=
+   DEMO_PETUGAS_PASSWORD=
    ```
+   Credentials are provided to judges via the committee form. Jangan menulis kata sandi di repositori.
    Produksi: https://central-trash-agent-bali.vercel.app
    > **Model:** nilai di atas sama dengan `.env.example`. Jika kedua variabel model dikosongkan, kode memakai `gemini-2.5-flash` dan `gemini-2.5-flash-lite`. Penjelasan rute mencoba model explain, model klasifikasi, lalu id 2.5/3.5 yang belum dicoba, dan akhirnya templat deterministik.
    > **Catatan Mode Demo:** Apabila seluruh `GEMINI_API_KEY` dikosongkan, aplikasi secara otomatis berjalan dalam **Mode Demo** menggunakan pengklasifikasi kata kunci deterministik dan penjelas templat, dengan lencana status `demo` yang jujur di bagian atas layar.

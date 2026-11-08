@@ -14,7 +14,7 @@ async function signInOfficer(page: Page) {
   const response = await page.request.post('/api/accounts', {
     data: {
       action: 'login',
-      login: { email: 'surya.wirawan@dlhk.denpasar.id', password: 'petugas123' },
+      login: { email: 'surya.wirawan@dlhk.denpasar.id', password: process.env.DEMO_PETUGAS_PASSWORD },
     },
   })
   expect(response.ok()).toBeTruthy()

@@ -7,6 +7,10 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      DEMO_WARGA_PASSWORD: ci-warga-only
+      DEMO_PETUGAS_PASSWORD: ci-petugas-only
+      SESSION_SECRET: ci-session-secret-32
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

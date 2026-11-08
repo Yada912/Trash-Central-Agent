@@ -160,10 +160,10 @@ export type ResidentOptimizationSummary = {
 
 export const DEFAULT_SELECTED_BALI_EVENTS = BALINESE_CALENDAR_EVENTS_2026.filter((e) => e.defaultSelected).map((e) => e.id)
 
-/** Env override for the built-in demo rows. Unset keeps the passwords judges already have. */
-function demoPassword(envName: string, fallback: string): string {
+/** Demo login secret from the environment. Unset means this process has no password for that account. */
+function demoPassword(envName: string): string | undefined {
   const value = process.env[envName]?.trim()
-  return value || fallback
+  return value || undefined
 }
 
 const DEFAULT_ACCOUNTS: UserAccount[] = [
@@ -171,7 +171,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_warga_01',
     name: 'I Made Adi Wijaya',
     email: 'made.adi@warga.denpasar.id',
-    password: demoPassword('DEMO_WARGA_PASSWORD', 'warga123'),
+    password: demoPassword('DEMO_WARGA_PASSWORD'),
     role: 'warga',
     kecamatan: 'Denpasar Barat',
     desa: 'Pemecutan',
@@ -296,7 +296,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_warga_02',
     name: 'Ni Luh Putu Sari (Warung Sari Sanur)',
     email: 'putu.sari@umkm.denpasar.id',
-    password: demoPassword('DEMO_WARGA_PASSWORD', 'warga123'),
+    password: demoPassword('DEMO_WARGA_PASSWORD'),
     role: 'warga',
     kecamatan: 'Denpasar Selatan',
     desa: 'Sanur',
@@ -362,7 +362,7 @@ const DEFAULT_ACCOUNTS: UserAccount[] = [
     id: 'usr_petugas_01',
     name: 'I Wayan Gde Surya Wirawan',
     email: 'surya.wirawan@dlhk.denpasar.id',
-    password: demoPassword('DEMO_PETUGAS_PASSWORD', 'petugas123'),
+    password: demoPassword('DEMO_PETUGAS_PASSWORD'),
     role: 'petugas',
     badgeId: 'DLHK-DPS-042',
     kecamatan: 'Denpasar Barat',

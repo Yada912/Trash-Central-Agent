@@ -117,11 +117,17 @@ const facilities = JSON.parse(readFileSync(join(root, 'data/facilities.json'), '
   verified: facility.verified,
 }))
 
+function demoPasswordForRole(role) {
+  const name = role === 'petugas' ? 'DEMO_PETUGAS_PASSWORD' : 'DEMO_WARGA_PASSWORD'
+  const value = process.env[name]?.trim()
+  return value || undefined
+}
+
 const accounts = JSON.parse(readFileSync(join(root, 'data/accounts.json'), 'utf8')).map((acc) => ({
   id: acc.id,
   name: acc.name,
   email: acc.email,
-  password: acc.password,
+  password: demoPasswordForRole(acc.role),
   role: acc.role,
   badge_id: acc.badgeId ?? null,
   kecamatan: acc.kecamatan,
@@ -163,9 +169,18 @@ if (reportResult.error) {
   process.exit(1)
 }
 
-const accountResult = await client.from('accounts').upsert(accounts)
+const accountRows = accounts.map(({ password: _password, ...row }) => row)
+const accountResult = await client.from('accounts').upsert(accountRows)
 if (accountResult.error) {
   console.warn(`Account seed note (migration 0006): ${accountResult.error.message}`)
+} else {
+  for (const account of accounts) {
+    if (!account.password) continue
+    const passwordResult = await client.from('accounts').update({ password: account.password }).eq('id', account.id)
+    if (passwordResult.error) {
+      console.warn(`Account password seed note (${account.id}): ${passwordResult.error.message}`)
+    }
+  }
 }
 
 const timetableResult = await client.from('timetable_slots').upsert(timetableSlots)
