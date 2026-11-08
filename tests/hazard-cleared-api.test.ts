@@ -5,6 +5,7 @@ vi.mock('server-only', () => ({}))
 import { GET as getDashboard } from '@/app/api/dashboard/route'
 import { POST as createPlan } from '@/app/api/plans/route'
 import { POST as createReport } from '@/app/api/reports/route'
+import { signSession } from '@/lib/auth/session'
 import { isHazardousClassification, type Classification, type Dashboard, type Plan, type Report } from '@/lib/schemas'
 import { resetMemoryStoreForTests } from '@/lib/store/memory'
 
@@ -77,10 +78,11 @@ describe('POST /api/reports hazard cleared by the resident', () => {
     expect(dashboardBody.data.zones.some((zone) => zone.reportIds.includes(saved.id))).toBe(true)
     expect(dashboardBody.data.totals.byType.plastic).toBeGreaterThan(beforeBody.data.totals.byType.plastic)
 
+    const officer = signSession({ accountId: 'usr_petugas_01', role: 'petugas' })
     const planResponse = await createPlan(
       new Request('http://localhost/api/plans', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', cookie: `cta_session=${officer}` },
         body: JSON.stringify({
           trucks: [{ id: 'truck-1', capacityLiters: 1000 }],
           crews: 1,

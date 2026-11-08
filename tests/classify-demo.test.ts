@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+vi.mock('server-only', () => ({}))
+
 import { POST } from '@/app/api/reports/classify/route'
 
 vi.mock('@/lib/ai/classify', () => ({

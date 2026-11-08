@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import reportsJson from '@/data/reports.json'
-import { buildSchedule, scheduleDemand } from '@/lib/schedule'
+import { buildSchedule, demoCheckedAvailability, scheduleDemand } from '@/lib/schedule'
 import { streamOf, type Report } from '@/lib/schemas'
 import { mapSeedReport, type SeedReport } from '@/lib/store/map-seed'
 
@@ -137,7 +137,8 @@ describe('scheduleDemand', () => {
 
   it('conserves litres across the seeded reports', () => {
     const reports = (reportsJson as SeedReport[]).map((item) => mapSeedReport(item))
-    const total = Math.round(reports.reduce((sum, item) => sum + item.classification.volume.liters, 0) * 100)
+    const pending = reports.filter((item) => item.status !== 'collected')
+    const total = Math.round(pending.reduce((sum, item) => sum + item.classification.volume.liters, 0) * 100)
     expect(cents(scheduleDemand(reports))).toBe(total)
     expect(cents(buildSchedule(reports).map((entry) => entry.basis))).toBe(total)
   })
@@ -290,5 +291,34 @@ describe('buildSchedule placeholder', () => {
     expect(during[0]?.nextPickup).toBe('2026-11-02')
     expect(during[0]?.basis.liters).toBe(90)
     expect(after[0]?.nextPickup).toBe('2026-11-04')
+  })
+
+  it('uses the current WITA time for next pickup and keeps Monday as the week anchor', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-11-04T02:00:00.000Z'))
+    try {
+      const ordinary = report({
+        id: 'organik-now',
+        kecamatan: 'Denpasar Barat',
+        classification: {
+          types: [{ type: 'organic', share: 1 }],
+          volume: { liters: 90, label: 'medium' },
+          urgency: 'low',
+          confidence: 0.8,
+          rationale: 'Food scraps.',
+          flags: [],
+          needsReview: false,
+          reviewReasons: [],
+          source: 'manual',
+        },
+      })
+      const entries = buildSchedule([ordinary], {
+        availability: demoCheckedAvailability('2026-11-02'),
+        weekStart: '2026-11-02',
+      })
+      expect(entries.find((entry) => entry.stream === 'organik')?.nextPickup).toBe('2026-11-06')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

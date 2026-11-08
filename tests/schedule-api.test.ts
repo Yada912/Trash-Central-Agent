@@ -50,6 +50,21 @@ describe('GET /api/schedule', () => {
     expect(error.error.fields?.stream?.[0]).toMatch(/Unknown stream/)
   })
 
+  it('does not treat Monday 08:00 as now when the checked week is already underway', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-11-08T14:40:00.000Z'))
+    try {
+      const response = await getSchedule(
+        new Request('http://localhost/api/schedule?availability=checked&weekStart=2026-11-02'),
+      )
+      expect(response.status).toBe(200)
+      const body = (await response.json()) as { data: ScheduleResponse }
+      expect(body.data.entries.some((entry) => entry.nextPickup === '2026-11-02')).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('stores an optional accountType and defaults the rest to household', async () => {
     resetMemoryStoreForTests()
     const company = await createReport(

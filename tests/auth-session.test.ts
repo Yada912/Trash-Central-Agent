@@ -46,6 +46,24 @@ describe('signed session and account privacy', () => {
     expect(body).not.toContain('"password"')
   })
 
+  it('keeps a strict per-email login cap without locking the rest of a shared IP', async () => {
+    const headers = { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.10' }
+    const attempt = (email: string) =>
+      postAccounts(
+        new Request('http://localhost/api/accounts', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ action: 'login', login: { email, password: 'not-the-password' } }),
+        }),
+      )
+
+    for (let i = 0; i < 12; i += 1) {
+      expect((await attempt('made.adi@warga.denpasar.id')).status).toBe(401)
+    }
+    expect((await attempt('Made.Adi@warga.denpasar.id')).status).toBe(429)
+    expect((await attempt('surya.wirawan@dlhk.denpasar.id')).status).toBe(401)
+  })
+
   it('returns only the signed-in account and keeps the existing demo passwords', async () => {
     const login = await postAccounts(
       new Request('http://localhost/api/accounts', {

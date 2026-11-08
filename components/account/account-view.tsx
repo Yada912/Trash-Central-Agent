@@ -19,6 +19,7 @@ import {
   type SpecialEventSurge,
 } from '@/lib/accounts/store'
 import { computeUserOtonanFromBirthDate } from '@/lib/calendar/balinese-calendar'
+import { DEMO_CAPACITY_LABEL } from '@/lib/copy'
 import { KECAMATAN, type Kecamatan, type WasteStream } from '@/lib/schemas'
 
 const CONDITION_OPTIONS: Array<{
@@ -847,6 +848,7 @@ export function AccountView() {
                     defaultValue={slot.maxLitersPerPickup}
                     onBlur={(e) => void updateTimetable({ slotId: slot.id, maxLitersPerPickup: Number(e.target.value) || 60 })}
                   />
+                  <p className="text-xs font-semibold text-ink/80">{DEMO_CAPACITY_LABEL}</p>
                 </div>
                 <p className="text-xs text-ink/75">{slot.notes}</p>
               </div>

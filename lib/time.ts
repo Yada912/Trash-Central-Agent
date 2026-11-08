@@ -24,6 +24,17 @@ export function nowWita(date = new Date()): string {
   return `${parts.year}-${parts.month}-${parts.day}T${hour}:${parts.minute}:${parts.second}+08:00`
 }
 
+/** Monday YYYY-MM-DD of the civil week that contains `date` in WITA. */
+export function currentWitaMonday(date = new Date()): string {
+  const [year, month, day] = nowWita(date).slice(0, 10).split('-').map(Number)
+  const utc = new Date(Date.UTC(year, month - 1, day))
+  const weekday = utc.getUTCDay()
+  utc.setUTCDate(utc.getUTCDate() - (weekday === 0 ? 6 : weekday - 1))
+  const monthText = String(utc.getUTCMonth() + 1).padStart(2, '0')
+  const dayText = String(utc.getUTCDate()).padStart(2, '0')
+  return `${utc.getUTCFullYear()}-${monthText}-${dayText}`
+}
+
 export function formatWita(iso: string): string {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return `${iso} WITA`

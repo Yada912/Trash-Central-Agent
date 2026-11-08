@@ -9,6 +9,7 @@ import {
   getAccountById,
   getRawAccount,
   listAccounts,
+  removeAccount,
   listTimetableSlots,
   updateAccountProfile,
   updateTimetableSlot,
@@ -17,7 +18,17 @@ import {
 } from '@/lib/accounts/store'
 import { syncAccountToSupabase, syncTimetableToSupabase } from '@/lib/accounts/supabase-sync'
 import { checkRateLimit, clientIpFromRequest, redactPiiFromText } from '@/lib/security/guard'
+import { durableRateLimit } from '@/lib/security/shared-limit'
 import { KECAMATAN, type AccountType, type Kecamatan } from '@/lib/schemas'
+
+const LOGIN_WINDOW_MS = 5 * 60_000
+const LOGIN_EMAIL_LIMIT = 12
+const LOGIN_IP_LIMIT = 200
+
+function loginEmailKey(email: unknown): string {
+  if (typeof email !== 'string') return ''
+  return email.trim().toLowerCase().slice(0, 200)
+}
 
 type AccountBody = {
   action?: 'login' | 'logout' | 'switch' | 'update_profile' | 'create_account' | 'update_timetable'
@@ -166,9 +177,14 @@ export async function POST(request: Request) {
 
     if (body.action === 'login') {
       if (!sessionSecret()) return errorResponse(503, 'INTERNAL', 'Sesi server belum dikonfigurasi.')
-      const rate = checkRateLimit(`auth_login:${ip}`, 12, 5 * 60_000)
-      if (!rate.allowed) {
-        return errorResponse(429, 'RATE_LIMITED', `Terlalu banyak percobaan masuk. Coba lagi dalam ${rate.retryAfterSec} detik.`)
+      const emailKey = loginEmailKey(body.login?.email)
+      const ipRate = await durableRateLimit(`auth_login:ip:${ip}`, LOGIN_IP_LIMIT, LOGIN_WINDOW_MS)
+      const emailRate = emailKey
+        ? await durableRateLimit(`auth_login:email:${emailKey}`, LOGIN_EMAIL_LIMIT, LOGIN_WINDOW_MS)
+        : null
+      if (!ipRate.allowed || emailRate?.allowed === false) {
+        const retryAfterSec = Math.max(ipRate.retryAfterSec, emailRate?.retryAfterSec ?? 0)
+        return errorResponse(429, 'RATE_LIMITED', `Terlalu banyak percobaan masuk. Coba lagi dalam ${retryAfterSec} detik.`)
       }
       if (!body.login?.email) return errorResponse(400, 'VALIDATION', 'Email dan kata sandi wajib diisi.')
       const authed = authenticateAccount(body.login.email, body.login.password)
@@ -178,7 +194,13 @@ export async function POST(request: Request) {
         return errorResponse(503, 'INTERNAL', 'Sesi server belum dikonfigurasi.')
       }
       const raw = getRawAccount(authed.id)
-      if (raw) await syncAccountToSupabase(raw)
+      if (raw) {
+        const synced = await syncAccountToSupabase(raw, 'update')
+        if (synced === 'missing') {
+          removeAccount(authed.id)
+          return errorResponse(401, 'VALIDATION', 'Email atau kata sandi tidak cocok.')
+        }
+      }
       const response = accountResponse(authed)
       applySessionCookie(response, token, request)
       return response
@@ -221,7 +243,7 @@ export async function POST(request: Request) {
       const token = signSession({ accountId: created.id, role: 'warga' })
       if (!token) return errorResponse(503, 'INTERNAL', 'Sesi server belum dikonfigurasi.')
       const raw = getRawAccount(created.id)
-      if (raw) await syncAccountToSupabase(raw)
+      if (raw) await syncAccountToSupabase(raw, 'insert')
       const response = accountResponse(created)
       applySessionCookie(response, token, request)
       return response
@@ -244,7 +266,13 @@ export async function POST(request: Request) {
       const updated = updateAccountProfile(actor.id, patch)
       if (!updated) return errorResponse(404, 'NOT_FOUND', 'Akun tidak ditemukan.')
       const raw = getRawAccount(actor.id)
-      if (raw) await syncAccountToSupabase(raw)
+      if (raw) {
+        const synced = await syncAccountToSupabase(raw, 'update')
+        if (synced === 'missing') {
+          removeAccount(actor.id)
+          return errorResponse(404, 'NOT_FOUND', 'Akun tidak ditemukan.')
+        }
+      }
       return accountResponse(updated)
     }
 

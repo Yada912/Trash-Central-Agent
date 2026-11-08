@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { requestJson, type ApiMeta } from '@/lib/client/api'
 import type { Dashboard, Report } from '@/lib/schemas'
 
@@ -11,7 +11,7 @@ export function useDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -27,7 +27,7 @@ export function useDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -47,10 +47,17 @@ export function useDashboard() {
         if (!cancelled) setLoading(false)
       }
     })()
+    const refresh = () => {
+      void load()
+    }
+    window.addEventListener('focus', refresh)
+    window.addEventListener('cta-data-changed', refresh)
     return () => {
       cancelled = true
+      window.removeEventListener('focus', refresh)
+      window.removeEventListener('cta-data-changed', refresh)
     }
-  }, [])
+  }, [load])
 
   return { reports, dashboard, meta, error, loading, reload: load }
 }

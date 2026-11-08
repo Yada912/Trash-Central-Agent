@@ -17,6 +17,7 @@
 // A company entry is one group window for that kecamatan and stream.
 
 import { solveWeekly, type WeeklyAvailability, type WeeklyPlanInput, type WeeklyScheduleResult } from '@/lib/planner/weekly'
+import { currentWitaMonday, nowWita } from '@/lib/time'
 import {
   ACCOUNT_TYPES,
   KECAMATAN,
@@ -101,6 +102,7 @@ function portions(report: Report): Array<{ stream: WasteStream; cents: number }>
 export function scheduleDemand(reports: readonly Report[]): ScheduleDemand[] {
   const cells = new Map<string, Cell>()
   for (const report of reports) {
+    if (report.status === 'collected') continue
     for (const portion of portions(report)) {
       if (portion.cents <= 0) continue
       const key = cellKey(report.kecamatan, portion.stream, report.accountType)
@@ -231,10 +233,10 @@ export function buildSchedule(reports: readonly Report[], opts: ScheduleBuildOpt
     .filter((cell) => !opts.kecamatan || cell.kecamatan === opts.kecamatan)
     .filter((cell) => !opts.stream || cell.stream === opts.stream)
     .filter((cell) => !opts.accountType || cell.accountType === opts.accountType)
-  const weekStart = opts.weekStart ?? '2026-11-02'
+  const weekStart = opts.weekStart ?? currentWitaMonday()
   const input: WeeklyPlanInput = {
     weekStart,
-    asOf: opts.asOf ?? `${weekStart}T08:00+08:00`,
+    asOf: opts.asOf ?? nowWita(),
     demand: cells.map((cell) => ({
       kecamatan: cell.kecamatan,
       stream: cell.stream,
