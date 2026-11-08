@@ -9,6 +9,7 @@ import {
   type CalendarDayCell,
   type ExternalCalendarEventInput,
 } from '@/lib/calendar/balinese-calendar'
+import { DEMO_CAPACITY_LABEL } from '@/lib/copy'
 import type { Kecamatan, WasteStream } from '@/lib/schemas'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
@@ -311,7 +312,7 @@ export function InteractiveCalendar({
                       Estimasi Volume Anda: <strong>{pickup.estimatedUserLiters} L</strong>
                     </span>
                     <span>
-                      Batas Kuota Jemput: <strong>{pickup.maxLitersPerPickup} L</strong> (+{pickup.surgeTolerancePct}% hari raya)
+                      Batas Kuota Jemput: <strong>{pickup.maxLitersPerPickup} L</strong> (+{pickup.surgeTolerancePct}% hari raya) · {DEMO_CAPACITY_LABEL}
                     </span>
                   </div>
 

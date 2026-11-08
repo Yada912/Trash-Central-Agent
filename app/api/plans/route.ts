@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       }
       throw error
     }
+    const storedInput = { ...input, reportIds: solveInput.stops.map((stop) => stop.id) }
     const result = solvePlan(solveInput)
     let explanation
     try {
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
       id: `plan_${crypto.randomUUID()}`,
       status: 'proposed',
       version: 1,
-      input,
+      input: storedInput,
       result,
       explanation: { ...explanation, stale: false, generatedAt: nowWita() },
       decisions: [],

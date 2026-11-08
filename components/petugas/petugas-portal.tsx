@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
+import { DEMO_CAPACITY_LABEL } from '@/lib/copy'
 import { KECAMATAN, type Kecamatan } from '@/lib/schemas'
 import type { EvalCheckResult } from '@/app/api/eval/route'
 
@@ -612,7 +613,7 @@ export function PetugasPortal() {
               </div>
               <p className="text-[11px] font-bold text-primary">
                 Kuota Dasar: {slot.maxLitersPerPickup} L/jemput · Kuota Hari Raya:{' '}
-                {Math.round(slot.maxLitersPerPickup * (1 + slot.surgeTolerancePct / 100))} L
+                {Math.round(slot.maxLitersPerPickup * (1 + slot.surgeTolerancePct / 100))} L · {DEMO_CAPACITY_LABEL}
               </p>
             </div>
           ))}
@@ -716,7 +717,7 @@ export function PetugasPortal() {
                       {activeRoute.isToday ? 'Rute Berjalan Hari Ini' : 'Rute Terencana Mendatang'}
                     </span>
                     <h3 className="mt-1 font-black text-lg text-ink">{activeRoute.title}</h3>
-                    <p className="text-xs font-black text-ink">{activeRoute.armadaName}</p>
+                    <p className="text-xs font-black text-ink">{activeRoute.armadaName} · {DEMO_CAPACITY_LABEL}</p>
                   </div>
                 </div>
 
@@ -725,7 +726,7 @@ export function PetugasPortal() {
                   <div className="flex items-center justify-between text-xs font-black">
                     <span>Estimasi Beban Muatan:</span>
                     <span className="text-primary font-black">
-                      {activeRoute.loadLiters} L / {activeRoute.maxCapacityLiters} L ({pctUsed}%)
+                      {activeRoute.loadLiters} L / {activeRoute.maxCapacityLiters} L ({pctUsed}%) · {DEMO_CAPACITY_LABEL}
                     </span>
                   </div>
                   <div className="h-3 w-full overflow-hidden rounded-full border-2 border-ink bg-ink/10">

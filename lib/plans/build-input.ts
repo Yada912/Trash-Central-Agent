@@ -29,6 +29,7 @@ export async function buildSolveInput(store: Store, request: PlanRequest): Promi
   for (const id of request.reportIds ?? []) {
     const report = await store.getReport(id)
     if (!report) throw new PlanInputError('REPORT', 'A report in this plan was not found.', id)
+    if (report.status === 'collected') continue
     stops.push({
       id: report.id,
       lat: report.lat,

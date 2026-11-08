@@ -17,7 +17,7 @@
 // A company entry is one group window for that kecamatan and stream.
 
 import { solveWeekly, type WeeklyAvailability, type WeeklyPlanInput, type WeeklyScheduleResult } from '@/lib/planner/weekly'
-import { currentWitaMonday } from '@/lib/time'
+import { currentWitaMonday, nowWita } from '@/lib/time'
 import {
   ACCOUNT_TYPES,
   KECAMATAN,
@@ -236,7 +236,7 @@ export function buildSchedule(reports: readonly Report[], opts: ScheduleBuildOpt
   const weekStart = opts.weekStart ?? currentWitaMonday()
   const input: WeeklyPlanInput = {
     weekStart,
-    asOf: opts.asOf ?? `${weekStart}T08:00+08:00`,
+    asOf: opts.asOf ?? nowWita(),
     demand: cells.map((cell) => ({
       kecamatan: cell.kecamatan,
       stream: cell.stream,

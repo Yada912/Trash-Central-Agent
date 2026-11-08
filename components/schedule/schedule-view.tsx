@@ -18,6 +18,7 @@ import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
 import { formatSlotDaysId } from '@/lib/accounts/store'
 import { messageForApiError, requestJson } from '@/lib/client/api'
+import { DEMO_CAPACITY_LABEL, SCHEDULE_DEMAND_LABEL } from '@/lib/copy'
 import { currentWitaMonday } from '@/lib/time'
 import {
   ACCOUNT_TYPES,
@@ -221,6 +222,7 @@ export function ScheduleView() {
             />
             <span>Validasi ketersediaan armada mingguan (solver_checked)</span>
           </label>
+          <p className="text-xs font-semibold text-ink/80">Armada solver: {DEMO_CAPACITY_LABEL}.</p>
           <Button variant="secondary" onClick={() => void loadSchedule()} disabled={busy}>
             <MaterialIcon name="refresh" size="sm" />
             {busy ? 'Memuat…' : 'Muat ulang jadwal'}
@@ -278,7 +280,7 @@ export function ScheduleView() {
                   </p>
                 ) : null}
                 <p className="text-xs text-ink/80 font-medium">
-                  Basis laporan terkonfirmasi: {item.totalReports} laporan · {item.totalLiters} L
+                  Basis permintaan ({SCHEDULE_DEMAND_LABEL}): {item.totalReports} laporan · {item.totalLiters} L
                 </p>
                 {item.stream === 'B3' ? (
                   <p className="text-xs font-bold text-alert">
@@ -326,7 +328,7 @@ export function ScheduleView() {
                         {entry.nextPickup ? ` (berikutnya: ${entry.nextPickup})` : ''}
                       </td>
                       <td className="py-2.5 pr-4 font-semibold">
-                        {entry.basis.liters} L ({entry.basis.reports} laporan)
+                        {entry.basis.liters} L ({entry.basis.reports} laporan, {SCHEDULE_DEMAND_LABEL})
                       </td>
                       <td className="py-2.5">
                         <Badge
@@ -380,7 +382,7 @@ export function ScheduleView() {
                 Jam: {slot.windowStart}–{slot.windowEnd} WITA (±{slot.leewayMinutes} mnt leeway)
               </p>
               <p className="font-semibold">
-                Muatan normal: {slot.maxLitersPerPickup} L · Toleransi lonjakan: +{slot.surgeTolerancePct}%
+                Muatan normal: {slot.maxLitersPerPickup} L · Toleransi lonjakan: +{slot.surgeTolerancePct}% · {DEMO_CAPACITY_LABEL}
               </p>
               <p className="text-ink font-semibold">{slot.notes}</p>
             </div>

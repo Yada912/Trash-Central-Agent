@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MaterialIcon } from '@/components/ui/material-icon'
 import { Select } from '@/components/ui/select'
-import { DEPOT_LABEL } from '@/lib/copy'
+import { DEMO_CAPACITY_LABEL, DEPOT_LABEL, ROUTE_REPORT_LABEL } from '@/lib/copy'
 import { formatWita } from '@/lib/time'
 
 const STEPS = ['Kapasitas dan sif', 'Usulan rute', 'Keputusan dan audit'] as const
@@ -126,6 +126,7 @@ export function PlannerView() {
             <MaterialIcon name="local_shipping" className="text-primary" />
             1. Parameter masukan
           </h2>
+          <p className="text-sm font-semibold">Masukan rute: {ROUTE_REPORT_LABEL}.</p>
           <div className="grid gap-3">
             {planner.trucks.map((truck, index) => (
               <div key={truck.key} className="vector-card-soft bg-bg p-3 grid gap-2 md:grid-cols-[auto_1fr_1fr_auto] md:items-end">
@@ -136,6 +137,7 @@ export function PlannerView() {
                 </div>
                 <div className="grid gap-1">
                   <Label htmlFor={`truck-cap-${truck.key}`}>Kapasitas (liter)</Label>
+                  <p className="text-xs font-semibold text-ink/80">{DEMO_CAPACITY_LABEL}</p>
                   <Input
                     id={`truck-cap-${truck.key}`}
                     inputMode="decimal"
@@ -236,7 +238,7 @@ export function PlannerView() {
                           Truk {index + 1} · {route.truckId} · kru {index + 1} · garis {style.pattern}
                         </p>
                         <p className="text-sm font-medium mt-1">
-                          {ordinaryStopIds(route.stopIds, separateIds).length} pemberhentian biasa · muatan {route.loadLiters} / {route.capacityLiters} L · {route.distanceKm} km · {route.durationMin} mnt ·{' '}
+                          {ordinaryStopIds(route.stopIds, separateIds).length} pemberhentian biasa · muatan {route.loadLiters} / {route.capacityLiters} L ({DEMO_CAPACITY_LABEL}) · {route.distanceKm} km · {route.durationMin} mnt ·{' '}
                           {route.feasible ? 'layak (feasible)' : 'tidak layak (not feasible)'}
                         </p>
                         {route.violations.length > 0 ? (
@@ -255,7 +257,7 @@ export function PlannerView() {
                 </p>
                 <p className="text-sm" data-testid="plan-snapshot">
                   Snapshot
-                  {plan.explanation.generatedAt ? ` ${plan.explanation.generatedAt}` : ''} · {plan.input.reportIds?.length ?? 0} laporan · sif {plan.input.shift.start}–{plan.input.shift.end} · {plan.input.trucks.length} truk. Ini adalah daftar pada saat rencana dibuat, bukan laporan baru setelah itu.
+                  {plan.explanation.generatedAt ? ` ${plan.explanation.generatedAt}` : ''} · {plan.input.reportIds?.length ?? 0} {ROUTE_REPORT_LABEL} · sif {plan.input.shift.start}–{plan.input.shift.end} · {plan.input.trucks.length} truk. Ini adalah daftar pada saat rencana dibuat, bukan laporan baru setelah itu.
                 </p>
               </section>
               <div className="vector-card p-5 grid gap-2">

@@ -21,6 +21,15 @@ import { checkRateLimit, clientIpFromRequest, redactPiiFromText } from '@/lib/se
 import { durableRateLimit } from '@/lib/security/shared-limit'
 import { KECAMATAN, type AccountType, type Kecamatan } from '@/lib/schemas'
 
+const LOGIN_WINDOW_MS = 5 * 60_000
+const LOGIN_EMAIL_LIMIT = 12
+const LOGIN_IP_LIMIT = 200
+
+function loginEmailKey(email: unknown): string {
+  if (typeof email !== 'string') return ''
+  return email.trim().toLowerCase().slice(0, 200)
+}
+
 type AccountBody = {
   action?: 'login' | 'logout' | 'switch' | 'update_profile' | 'create_account' | 'update_timetable'
   accountId?: string
@@ -168,9 +177,14 @@ export async function POST(request: Request) {
 
     if (body.action === 'login') {
       if (!sessionSecret()) return errorResponse(503, 'INTERNAL', 'Sesi server belum dikonfigurasi.')
-      const rate = await durableRateLimit(`auth_login:${ip}`, 12, 5 * 60_000)
-      if (!rate.allowed) {
-        return errorResponse(429, 'RATE_LIMITED', `Terlalu banyak percobaan masuk. Coba lagi dalam ${rate.retryAfterSec} detik.`)
+      const emailKey = loginEmailKey(body.login?.email)
+      const ipRate = await durableRateLimit(`auth_login:ip:${ip}`, LOGIN_IP_LIMIT, LOGIN_WINDOW_MS)
+      const emailRate = emailKey
+        ? await durableRateLimit(`auth_login:email:${emailKey}`, LOGIN_EMAIL_LIMIT, LOGIN_WINDOW_MS)
+        : null
+      if (!ipRate.allowed || emailRate?.allowed === false) {
+        const retryAfterSec = Math.max(ipRate.retryAfterSec, emailRate?.retryAfterSec ?? 0)
+        return errorResponse(429, 'RATE_LIMITED', `Terlalu banyak percobaan masuk. Coba lagi dalam ${retryAfterSec} detik.`)
       }
       if (!body.login?.email) return errorResponse(400, 'VALIDATION', 'Email dan kata sandi wajib diisi.')
       const authed = authenticateAccount(body.login.email, body.login.password)
