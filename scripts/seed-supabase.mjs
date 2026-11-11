@@ -169,7 +169,11 @@ if (reportResult.error) {
   process.exit(1)
 }
 
-const accountRows = accounts.map(({ password: _password, ...row }) => row)
+const accountRows = accounts.map((acc) => {
+  const copy = { ...acc }
+  delete copy.password
+  return copy
+})
 const accountResult = await client.from('accounts').upsert(accountRows)
 if (accountResult.error) {
   console.warn(`Account seed note (migration 0006): ${accountResult.error.message}`)

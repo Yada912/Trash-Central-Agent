@@ -51,6 +51,7 @@ const API_KEY_REGEX = /AIza[0-9A-Za-z\-_]{20,}/g
  * or stored in public report feeds.
  */
 export function redactPiiFromText(text: string): string {
+  if (!text || typeof text !== 'string') return ''
   return text
     .replace(API_KEY_REGEX, '[API-KEY-REDACTED]')
     .replace(EMAIL_PII_REGEX, '[EMAIL-REDACTED]')
