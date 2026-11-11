@@ -1,5 +1,6 @@
 import type { AccountType, Kecamatan, TrashType, WasteStream } from '@/lib/schemas'
 import { getDesaDetails } from '@/lib/data/denpasar-regions'
+import { addDaysIso, getTodayWita } from '@/lib/time'
 import {
   BALINESE_CALENDAR_EVENTS_2026,
   computeUserOtonanFromBirthDate,
@@ -540,6 +541,7 @@ export function formatSlotDaysId(days: string[]): string {
 export function computeResidentOptimization(
   account: UserAccount,
   timetable: PetugasTimetableSlot[],
+  referenceDate?: string,
 ): ResidentOptimizationSummary | null {
   const profile = account.wasteProfile
   if (!profile) return null
@@ -548,15 +550,17 @@ export function computeResidentOptimization(
   const activeEvents = profile.specialEvents.filter((event) => event.activeThisWeek)
   const customExtraLiters = activeEvents.reduce((sum, event) => sum + event.extraLiters, 0)
 
-  // Also include selected Balinese calendar events occurring in the upcoming 7-day horizon (2026-11-07 .. 2026-11-14)
+  // Also include selected Balinese calendar events occurring in the upcoming 7-day horizon
+  const todayIso = referenceDate ?? getTodayWita()
+  const horizonEndIso = addDaysIso(todayIso, 7)
   const selectedBaliSet = new Set(profile.selectedBalineseEventIds ?? DEFAULT_SELECTED_BALI_EVENTS)
   const upcomingBaliEvents = BALINESE_CALENDAR_EVENTS_2026.filter(
-    (ev) => selectedBaliSet.has(ev.id) && ev.date >= '2026-11-07' && ev.date <= '2026-11-14',
+    (ev) => selectedBaliSet.has(ev.id) && ev.date >= todayIso && ev.date <= horizonEndIso,
   )
   // Check personal Otonan Pawukon
-  const otonan = account.birthDate ? computeUserOtonanFromBirthDate(account.birthDate) : null
+  const otonan = account.birthDate ? computeUserOtonanFromBirthDate(account.birthDate, todayIso) : null
   let otonanExtraLiters = 0
-  if (otonan && otonan.calendarHighlightDate >= '2026-11-07' && otonan.calendarHighlightDate <= '2026-11-14') {
+  if (otonan && otonan.nextOtonanDate >= todayIso && otonan.nextOtonanDate <= horizonEndIso) {
     otonanExtraLiters = otonan.extraLitersHousehold
   }
 

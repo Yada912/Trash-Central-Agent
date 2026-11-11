@@ -50,3 +50,45 @@ export function formatWita(iso: string): string {
   }).format(date)
   return `${formatted} WITA`
 }
+
+export function getTodayWita(date = new Date()): string {
+  return nowWita(date).slice(0, 10)
+}
+
+export function addDaysIso(isoDate: string, days: number): string {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  const d = new Date(Date.UTC(year, month - 1, day + days))
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const dt = String(d.getUTCDate()).padStart(2, '0')
+  return `${d.getUTCFullYear()}-${m}-${dt}`
+}
+
+const MONTH_NAMES_ID = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
+] as const
+
+export function getMonthNameId(month1To12: number): string {
+  return MONTH_NAMES_ID[Math.max(0, Math.min(11, month1To12 - 1))]
+}
+
+const DAY_NAMES_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as const
+
+export function formatDayDateId(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  const d = new Date(Date.UTC(year, month - 1, day))
+  const dayName = DAY_NAMES_ID[d.getUTCDay()]
+  const monthName = getMonthNameId(month)
+  return `${dayName}, ${day} ${monthName} ${year}`
+}
+

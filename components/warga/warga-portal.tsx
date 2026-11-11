@@ -14,7 +14,8 @@ import {
   type BalineseCalendarEvent,
   type BalineseEventCategory,
 } from '@/lib/calendar/balinese-calendar'
-import { computeResidentOptimization } from '@/lib/accounts/store'
+import { CONTAINER_PRESETS, computeResidentOptimization } from '@/lib/accounts/store'
+import { addDaysIso, getTodayWita } from '@/lib/time'
 import { WargaAgentChat } from '@/components/warga/warga-agent-chat'
 
 export function WargaPortal() {
@@ -48,6 +49,56 @@ export function WargaPortal() {
     if (!activeAccount) return null
     return computeResidentOptimization(activeAccount, timetable)
   }, [activeAccount, timetable])
+
+  const todayIso = useMemo(() => getTodayWita(), [])
+  const pickupHistory = useMemo(
+    () => activeAccount?.wasteProfile?.pickupHistory ?? [],
+    [activeAccount?.wasteProfile?.pickupHistory],
+  )
+  const rawUpcoming = useMemo(
+    () => pickupHistory.filter((p) => p.status === 'scheduled' && p.date >= todayIso),
+    [pickupHistory, todayIso],
+  )
+  const pastPickups = useMemo(
+    () => pickupHistory.filter((p) => p.status === 'completed' || p.date < todayIso),
+    [pickupHistory, todayIso],
+  )
+
+  const upcomingPickups = useMemo(() => {
+    if (rawUpcoming.length > 0) return rawUpcoming
+    if (!activeAccount) return []
+
+    // Dynamic upcoming pickups generated from kecamatan timetable
+    const WEEKDAY_CODES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const generated: typeof rawUpcoming = []
+    const profile = activeAccount.wasteProfile
+    const presetLabel = profile?.containerPreset ? CONTAINER_PRESETS[profile.containerPreset]?.label : 'Kantong Kresek'
+    const regLiters = profile?.weeklyRegularLiters ?? 105
+
+    for (let offset = 0; offset < 14 && generated.length < 3; offset++) {
+      const targetDate = addDaysIso(todayIso, offset)
+      const d = new Date(`${targetDate}T00:00:00Z`)
+      const dow = WEEKDAY_CODES[d.getUTCDay()]
+      const matchingSlots = timetable.filter(
+        (s) => s.kecamatan === activeAccount.kecamatan && (s.days as readonly string[]).includes(dow),
+      )
+      for (const slot of matchingSlots) {
+        if (generated.length >= 3) break
+        const estLiters = Math.max(15, Math.round(slot.stream === 'organik' ? regLiters * 0.4 : regLiters * 0.25))
+        generated.push({
+          id: `pkp_dyn_${targetDate}_${slot.stream}`,
+          date: targetDate,
+          window: `${slot.windowStart}–${slot.windowEnd} WITA`,
+          stream: slot.stream,
+          liters: estLiters,
+          containersLabel: `${Math.max(1, Math.ceil(estLiters / 15))} ${presetLabel}`,
+          status: 'scheduled',
+          notes: `Penjemputan armada ${slot.stream} kecamatan ${activeAccount.kecamatan} (leeway ±${slot.leewayMinutes} mnt).`,
+        })
+      }
+    }
+    return generated
+  }, [rawUpcoming, todayIso, timetable, activeAccount])
 
   // Role separation guard: block direct access if not signed in as 'warga'
   if (!isSignedIn || !activeAccount || activeAccount.role !== 'warga') {
@@ -88,10 +139,6 @@ export function WargaPortal() {
       </main>
     )
   }
-
-  const pickupHistory = activeAccount.wasteProfile?.pickupHistory ?? []
-  const upcomingPickups = pickupHistory.filter((p) => p.status === 'scheduled')
-  const pastPickups = pickupHistory.filter((p) => p.status === 'completed')
 
   async function handleToggleBalineseEvent(eventId: string) {
     if (!activeAccount || !activeAccount.wasteProfile) return

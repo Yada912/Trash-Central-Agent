@@ -11,6 +11,7 @@ import {
 } from '@/lib/calendar/balinese-calendar'
 import { DEMO_CAPACITY_LABEL } from '@/lib/copy'
 import type { Kecamatan, WasteStream } from '@/lib/schemas'
+import { formatDayDateId, getMonthNameId, getTodayWita } from '@/lib/time'
 import { Button } from '@/components/ui/button'
 import { MaterialIcon } from '@/components/ui/material-icon'
 
@@ -38,22 +39,54 @@ export function InteractiveCalendar({
   birthDate?: string
   onToggleBalineseEvent?: (eventId: string) => void
 }) {
-  const [selectedDate, setSelectedDate] = useState<string>('2026-11-07')
+  const liveToday = useMemo(() => getTodayWita(), [])
+  const [initYear, initMonth] = useMemo(() => {
+    const parts = liveToday.split('-').map(Number)
+    return [parts[0] || 2026, parts[1] || 11]
+  }, [liveToday])
+
+  const [viewYear, setViewYear] = useState<number>(initYear)
+  const [viewMonth, setViewMonth] = useState<number>(initMonth)
+  const [selectedDate, setSelectedDate] = useState<string>(liveToday)
   const [downloadedNotice, setDownloadedNotice] = useState<string | null>(null)
+
+  function handlePrevMonth() {
+    if (viewMonth === 1) {
+      setViewYear((y) => y - 1)
+      setViewMonth(12)
+    } else {
+      setViewMonth((m) => m - 1)
+    }
+  }
+
+  function handleNextMonth() {
+    if (viewMonth === 12) {
+      setViewYear((y) => y + 1)
+      setViewMonth(1)
+    } else {
+      setViewMonth((m) => m + 1)
+    }
+  }
+
+  function handleToday() {
+    setViewYear(initYear)
+    setViewMonth(initMonth)
+    setSelectedDate(liveToday)
+  }
 
   const cells = useMemo(
     () =>
       buildMonthCalendarGrid({
-        year: 2026,
-        month: 11,
-        todayDate: '2026-11-07',
+        year: viewYear,
+        month: viewMonth,
+        todayDate: liveToday,
         kecamatan,
         timetable,
         weeklyRegularLiters,
         selectedBalineseEventIds,
         birthDate,
       }),
-    [kecamatan, timetable, weeklyRegularLiters, selectedBalineseEventIds, birthDate],
+    [viewYear, viewMonth, liveToday, kecamatan, timetable, weeklyRegularLiters, selectedBalineseEventIds, birthDate],
   )
 
   const activeCell: CalendarDayCell =
@@ -81,10 +114,43 @@ export function InteractiveCalendar({
       <div className="vector-card bg-card p-5 grid gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <span className="vector-pill bg-mint text-ink">
-              <MaterialIcon name="calendar_month" size="sm" />
-              November 2026 · WITA
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="vector-pill bg-mint text-ink font-extrabold" data-testid="calendar-month-indicator">
+                <MaterialIcon name="calendar_month" size="sm" />
+                {getMonthNameId(viewMonth)} {viewYear} · WITA
+              </span>
+              <div className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  title="Bulan sebelumnya"
+                  className="vector-btn inline-flex items-center justify-center rounded border-2 border-ink bg-bg px-2.5 py-1 text-xs font-black text-ink hover:bg-card shadow-[1.5px_1.5px_0_#1F2933]"
+                  data-testid="calendar-prev-month"
+                >
+                  <MaterialIcon name="chevron_left" size="sm" />
+                  Bulan Lalu
+                </button>
+                <button
+                  type="button"
+                  onClick={handleToday}
+                  title="Kembali ke hari ini (WITA)"
+                  className="vector-btn inline-flex items-center justify-center rounded border-2 border-ink bg-primary px-3 py-1 text-xs font-black text-white hover:opacity-90 shadow-[1.5px_1.5px_0_#1F2933]"
+                  data-testid="calendar-today-btn"
+                >
+                  Hari Ini
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  title="Bulan berikutnya"
+                  className="vector-btn inline-flex items-center justify-center rounded border-2 border-ink bg-bg px-2.5 py-1 text-xs font-black text-ink hover:bg-card shadow-[1.5px_1.5px_0_#1F2933]"
+                  data-testid="calendar-next-month"
+                >
+                  Bulan Depan
+                  <MaterialIcon name="chevron_right" size="sm" />
+                </button>
+              </div>
+            </div>
             <h3 className="mt-1.5 text-xl font-extrabold">
               Kalender Angkut & Hari Raya Bali ({kecamatan})
             </h3>
@@ -122,6 +188,11 @@ export function InteractiveCalendar({
                 onClick={() => {
                   setSelectedDate(cell.date)
                   setDownloadedNotice(null)
+                  if (!cell.isCurrentMonth) {
+                    const [cy, cm] = cell.date.split('-').map(Number)
+                    setViewYear(cy)
+                    setViewMonth(cm)
+                  }
                 }}
                 aria-pressed={isSelected}
                 className={[
@@ -191,8 +262,8 @@ export function InteractiveCalendar({
             <span className="text-xs font-extrabold uppercase tracking-wider text-primary">
               Detail Tanggal Terpilih
             </span>
-            <h4 className="text-xl font-extrabold">
-              {activeCell.weekdayNameId}, {activeCell.dayOfMonth} November 2026
+            <h4 className="text-xl font-extrabold" data-testid="selected-date-heading">
+              {formatDayDateId(activeCell.date)}
             </h4>
           </div>
           <span
